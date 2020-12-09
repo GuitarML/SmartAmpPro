@@ -8,6 +8,14 @@
   ==============================================================================
 */
 
+// Include the following:
+//      C:\Users\KBloemer\Desktop\Archive\AudioFile-master\AudioFile-master
+//      C:\Users\KBloemer\Desktop\Archive\json-develop\json-develop\include
+//      C:\Users\KBloemer\Desktop\Archive\FunctionalPlus-master\include
+//      C:\Users\KBloemer\Desktop\Archive\eigen-3.3.7\eigen-3.3.7
+//      C:\Users\KBloemer\Desktop\Archive\frugally-deep-master\include
+#include "fdeep/fdeep.hpp"
+
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
@@ -82,6 +90,9 @@ public:
     float ampTrebleKnobState = 0.0;
     float ampGainKnobState = 10.0;
     float ampMasterKnobState = -12.0;
+
+    int input_size = 100;
+    const fdeep::model model = fdeep::load_model("C:/Users/KBloemer/Desktop/Archive/tf_test/Release/ts9_fdeep_in1.json");
 
 private:
     Eq4Band eq4band; // Amp EQ

@@ -26,6 +26,7 @@ SmartAmpProAudioProcessor::SmartAmpProAudioProcessor()
     
 #endif
 {
+
 }
 
 SmartAmpProAudioProcessor::~SmartAmpProAudioProcessor()
@@ -146,6 +147,20 @@ void SmartAmpProAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
         eq4band.process(buffer, midiMessages, numSamples, numInputChannels);
 
         buffer.applyGain(ampDrive);
+
+		// Apply LSTM model
+        for (int i = 0; i < numSamples - input_size; i++)
+        {
+            //std::vector<float> range(&buffer[0][i], &buffer[0][i] + input_size); // does this need to be a std::vector<std::vector<double>>?
+
+            const fdeep::tensor input = fdeep::tensor(fdeep::tensor_shape(input_size, 1), 0.01);
+            const auto result = model.predict({ input });
+
+            //const std::vector<float> result_vec = result.front().to_vector();
+            //double result_double = result_vec[0];
+
+            //buffer[0][i] = result.front().to_vector()[0];
+        }
 
         //    Master Volume 
         buffer.applyGain(ampMaster);
