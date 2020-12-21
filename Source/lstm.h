@@ -36,7 +36,7 @@ class lstm
             nc::NdArray<float> dense_bias_nc, nc::NdArray<float> dense_kernel_nc, int input_size);
 
         // Network Parameters
-        int input_size = 120;
+        int input_size = 120; // TODO read from file
 
         int HS = 1;
         int conv1d_Kernel_Size = 0;

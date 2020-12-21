@@ -144,8 +144,6 @@ std::vector<std::vector <float>> SmartAmpProAudioProcessor::set_data(const float
 
     const float *chData = inputData[0];
 
-    std::vector<float> new_buffer(numSamples + input_size - 1, 0.0);// for numSamples = 128, input_size = 120, vector size 247
-    std::vector<std::vector<float>> data(numSamples, std::vector<float>(input_size, 0.0));  //vector<vector> 128, 120
 
     // Move input_size-1 of last buffer to the beginning of new_buffer
     for (int i = 0; i < input_size - 1; i++)
@@ -180,6 +178,11 @@ void SmartAmpProAudioProcessor::check_buffer(int numSamples, int input_size)  //
     if (old_buffer.size() != numSamples + input_size - 1) {
         std::vector<float> temp(numSamples + input_size - 1, 0.0);
         old_buffer = temp;
+
+        std::vector<float> temp2(numSamples + input_size - 1, 0.0);// for numSamples = 128, input_size = 120, vector size 247
+        new_buffer = temp2;
+        std::vector<std::vector<float>> temp3(numSamples, std::vector<float>(input_size, 0.0));  //vector<vector> 128, 120
+        data = temp3;
     }
 }
 

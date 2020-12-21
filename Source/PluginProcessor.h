@@ -92,7 +92,7 @@ public:
     float ampGainKnobState = 10.0;
     float ampMasterKnobState = -12.0;
 
-    int input_size = 120;
+    int input_size = 120; //TODO read from file
     //const fdeep::model model = fdeep::load_model("C:/Users/rache/Desktop/func_ts9_in100.json");
 
     ModelLoader loader;
