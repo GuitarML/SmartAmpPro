@@ -62,7 +62,7 @@
     <VS2019 targetFolder="Builds/VisualStudio2019">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" targetName="SmartAmpPro" headerPath="C:\Users\rache\Desktop\dev\eigen-3.3.7"/>
-        <CONFIGURATION isDebug="0" name="Release" targetName="SmartAmpPro" headerPath="C:\Users\KBloemer\Desktop\Archive\eigen-3.3.7\eigen-3.3.7&#10;C:\Users\KBloemer\Desktop\Archive\json-develop\json-develop\include&#10;C:\Users\KBloemer\Desktop\Archive\FunctionalPlus-master\include&#10;C:\Users\KBloemer\Desktop\Archive\frugally-deep-master\include"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="SmartAmpPro" headerPath="C:\Users\rache\Desktop\dev\eigen-3.3.7&#10;C:\Users\rache\Desktop\dev\frugally-deep-master\include&#10;C:\Users\rache\Desktop\dev\FunctionalPlus-master\include&#10;C:\Users\rache\Desktop\dev\json-develop\include&#10;"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_video"/>

@@ -149,12 +149,13 @@ void SmartAmpProAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
         buffer.applyGain(ampDrive);
 
 		// Apply LSTM model
-        for (int i = 0; i < numSamples - input_size; i++)
+        //for (int i = 0; i < numSamples - input_size; i++)
+        for (int i = 0; i < numSamples; i++)
         {
             //std::vector<float> range(&buffer[0][i], &buffer[0][i] + input_size); // does this need to be a std::vector<std::vector<double>>?
 
-            const fdeep::tensor input = fdeep::tensor(fdeep::tensor_shape(input_size, 1), 0.01);
-            const auto result = model.predict({ input });
+            //const fdeep::tensor input = fdeep::tensor(fdeep::tensor_shape(input_size, 1), 0.01);
+            //const auto result = model.predict({ input });
 
             //const std::vector<float> result_vec = result.front().to_vector();
             //double result_double = result_vec[0];

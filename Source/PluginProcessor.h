@@ -92,7 +92,7 @@ public:
     float ampMasterKnobState = -12.0;
 
     int input_size = 100;
-    const fdeep::model model = fdeep::load_model("C:/Users/KBloemer/Desktop/Archive/tf_test/Release/ts9_fdeep_in1.json");
+    //const fdeep::model model = fdeep::load_model("C:/Users/rache/Desktop/func_ts9_in100.json");
 
 private:
     Eq4Band eq4band; // Amp EQ
