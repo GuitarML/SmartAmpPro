@@ -15,6 +15,10 @@
 //      C:\Users\KBloemer\Desktop\Archive\eigen-3.3.7\eigen-3.3.7
 //      C:\Users\KBloemer\Desktop\Archive\frugally-deep-master\include
 #include "fdeep/fdeep.hpp"
+#include <nlohmann/json.hpp>
+#include "fplus/stopwatch.hpp"
+#include "NumCpp.hpp"
+#include "lstm.h"
 
 #pragma once
 
@@ -93,6 +97,11 @@ public:
 
     int input_size = 100;
     //const fdeep::model model = fdeep::load_model("C:/Users/rache/Desktop/func_ts9_in100.json");
+
+    ModelLoader loader;
+    lstm LSTM;
+
+    nc::NdArray<float> input = nc::random::rand<float>(nc::Shape(input_size, 1));
 
 private:
     Eq4Band eq4band; // Amp EQ

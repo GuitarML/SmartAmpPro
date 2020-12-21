@@ -26,6 +26,13 @@ SmartAmpProAudioProcessor::SmartAmpProAudioProcessor()
     
 #endif
 {
+    loader.load_json("C:/Users/rache/Desktop/dev/SmartAmpPro/models/nol_small_120.json");
+
+    LSTM.setParams(loader.hidden_size, loader.conv1d_kernel_size, loader.conv1d_1_kernel_size,
+        loader.conv1d_num_channels, loader.conv1d_1_num_channels, loader.conv1d_bias_nc,
+        loader.conv1d_1_bias_nc, loader.conv1d_kernel_nc, loader.conv1d_1_kernel_nc,
+        loader.lstm_bias_nc, loader.lstm_kernel_nc,
+        loader.dense_bias_nc, loader.dense_kernel_nc, input_size);
 
 }
 
@@ -152,15 +159,22 @@ void SmartAmpProAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
         //for (int i = 0; i < numSamples - input_size; i++)
         for (int i = 0; i < numSamples; i++)
         {
-            //std::vector<float> range(&buffer[0][i], &buffer[0][i] + input_size); // does this need to be a std::vector<std::vector<double>>?
 
-            //const fdeep::tensor input = fdeep::tensor(fdeep::tensor_shape(input_size, 1), 0.01);
+            //std::vector<float> range(&audioFile.samples[0][i], &audioFile.samples[0][i] + input_size);
+
+            //for (int j = 0; j < input_size; j++) {
+            //    input[j] = range[j];
+            //}
+            //std::cout << input_test << std::endl;
+            //const fdeep::tensor input = fdeep::tensor(fdeep::tensor_shape(input_size, 1), range);
             //const auto result = model.predict({ input });
 
-            //const std::vector<float> result_vec = result.front().to_vector();
-            //double result_double = result_vec[0];
+            LSTM.conv1d_out = LSTM.conv1d_layer(input, LSTM.conv1d_kernel, LSTM.conv1d_bias, LSTM.conv1d_Kernel_Size, LSTM.conv1d_Num_Channels, 12); // 12 is stride
+            LSTM.conv1d_1_out = LSTM.conv1d_layer(LSTM.conv1d_out, LSTM.conv1d_1_kernel, LSTM.conv1d_1_bias, LSTM.conv1d_1_Kernel_Size, LSTM.conv1d_1_Num_Channels, 12); // 12 is stride
+            LSTM.lstm_out = LSTM.lstm_layer(LSTM.conv1d_1_out);
+            LSTM.dense_out = LSTM.dense_layer(LSTM.lstm_out);
 
-            //buffer[0][i] = result.front().to_vector()[0];
+            //buffer[0][i] = LSTM.dense_out[0];
         }
 
         //    Master Volume 
@@ -213,7 +227,13 @@ void SmartAmpProAudioProcessor::loadConfig(File configFile)
 {
     this->suspendProcessing(true);
 
-    // Load model here
+    loader.load_json("C:/Users/rache/Desktop/dev/SmartAmpPro/models/nol_small_120.json");
+
+    LSTM.setParams(loader.hidden_size, loader.conv1d_kernel_size, loader.conv1d_1_kernel_size,
+        loader.conv1d_num_channels, loader.conv1d_1_num_channels, loader.conv1d_bias_nc,
+        loader.conv1d_1_bias_nc, loader.conv1d_kernel_nc, loader.conv1d_1_kernel_nc,
+        loader.lstm_bias_nc, loader.lstm_kernel_nc,
+        loader.dense_bias_nc, loader.dense_kernel_nc, input_size);
 
     this->suspendProcessing(false);
 }
