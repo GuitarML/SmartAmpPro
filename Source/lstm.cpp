@@ -73,21 +73,6 @@ void lstm::setParams(int hidden_size, int conv1d_kernel_size, int conv1d_1_kerne
         new_bias2 = nc::append(new_bias2, conv1d_1_bias_temp, nc::Axis::ROW);
     }
     conv1d_1_bias = new_bias2;
-    
-
-    // Set inferred arrays
-    //Run 1 sample of dummy data to determine sizes
-    /*
-    nc::NdArray<float> test_conv1d = conv1d_layer(dummy_input, conv1d_kernel, conv1d_bias, conv1d_Kernel_Size, conv1d_Num_Channels, 12); // 12 is stride
-    nc::NdArray<float> test_conv1d_1 = conv1d_layer(test_conv1d, conv1d_1_kernel, conv1d_1_bias, conv1d_1_Kernel_Size, conv1d_1_Num_Channels, 12); // 12 is stride
-    //nc::NdArray<float> out = lstm_layer(xt);
-    //nc::NdArray<float> out2 = dense_layer(out);
-    conv1d_out = nc::zeros<float>(test_conv1d.shape().rows, test_conv1d.shape().cols);
-    conv1d_1_out = nc::zeros<float>(test_conv1d_1.shape().rows, test_conv1d_1.shape().cols);
-    lstm_out = nc::zeros<float>(1, hidden_size);
-    dense_out = nc::zeros<float>(1, 1);
-    */
-
 
 }
 
@@ -162,22 +147,9 @@ nc::NdArray<float> lstm::conv1d_layer(nc::NdArray<float> xt, std::vector<nc::NdA
             out(i, o) = total; //Faster to sum all here, or in the k loop?
         }
     }
-    /*
-    nc::NdArray<float> new_bias = nc::random::rand<float>(nc::Shape(unfolded_xt.size(), bias.shape().cols));;
-    new_bias = bias;
-    for (int i = 0; i < unfolded_xt.size()-1; i++)
-    {
-        new_bias = nc::append(new_bias, bias, nc::Axis::ROW);
-    }
-    */
-    //std::cout << "out  " << out.shape() << std::endl;
-    //std::cout << "new_bias  " << new_bias.shape() << std::endl;
-    //std::cout << "bias  " << bias.shape() << std::endl;
+
     out = out + bias;
 
-    
-
-    //std::cout << out.shape() << std::endl;
     return out;
 }
 
@@ -188,8 +160,7 @@ nc::NdArray<float> lstm::lstm_layer(nc::NdArray<float> xt)
     gates = nc::dot(xt, W) + bias; 
 
     // Check if using slicing notation is faster here         np: a[2:5, 5:8]	NC :   a(nc::Slice(2, 5), nc::Slice(5, 8))
-    for (auto i : boost::irange(0, HS)) {
-        //c_t[i] = sigmoid(gates[i]* nc::tanh(gates[2*HS+i])) // c_t not needed later, just use calculation
+    for (int i = 0; i < HS; i++) {
         h_t[i] = sigmoid(gates[3 * HS + i]) * nc::tanh(sigmoid(gates[i]) * nc::tanh(gates[2 * HS + i]));
     }
 
