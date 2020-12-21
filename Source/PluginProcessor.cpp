@@ -139,6 +139,21 @@ bool SmartAmpProAudioProcessor::isBusesLayoutSupported (const BusesLayout& layou
 }
 #endif
 
+std::vector<float> SmartAmpProAudioProcessor::set_data(const float **inputData, int numSamples, int input_size)
+{
+    const float *chData = inputData[0];
+    for (int i = 0; i < numSamples - input_size; i++)
+    {
+
+    }
+    std::vector<float> range(chData[i], chData[i] + input_size);
+
+    for (int j = 0; j < input_size; j++) {
+        data[j] = range[j];
+    }
+
+}
+
 void SmartAmpProAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
     ScopedNoDenormals noDenormals;
@@ -157,6 +172,7 @@ void SmartAmpProAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
 
 		// Apply LSTM model
         //for (int i = 0; i < numSamples - input_size; i++)
+        data = set_data(buffer.getArrayOfReadPointers(), numSamples, LSTM.input_size);
         for (int i = 0; i < numSamples; i++)
         {
 

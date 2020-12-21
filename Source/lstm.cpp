@@ -27,6 +27,7 @@ void lstm::setParams(int hidden_size, int conv1d_kernel_size, int conv1d_1_kerne
                     nc::NdArray<float> lstm_bias_nc, nc::NdArray<float> lstm_kernel_nc, 
                     nc::NdArray<float> dense_bias_nc, nc::NdArray<float> dense_kernel_nc, int input_size)
 {
+    input_size = input_size;
     HS = hidden_size;
 
     conv1d_Kernel_Size = conv1d_kernel_size;

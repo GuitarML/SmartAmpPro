@@ -102,6 +102,8 @@ public:
     lstm LSTM;
 
     nc::NdArray<float> input = nc::random::rand<float>(nc::Shape(input_size, 1));
+    std::vector<float> data;
+    std::vector<float> set_data(const float **inputData, int numSamples, int input_size);
 
 private:
     Eq4Band eq4band; // Amp EQ
