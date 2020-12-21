@@ -14,12 +14,9 @@
 //      C:\Users\KBloemer\Desktop\Archive\FunctionalPlus-master\include
 //      C:\Users\KBloemer\Desktop\Archive\eigen-3.3.7\eigen-3.3.7
 //      C:\Users\KBloemer\Desktop\Archive\frugally-deep-master\include
-#include "fdeep/fdeep.hpp"
 #include <nlohmann/json.hpp>
-#include "fplus/stopwatch.hpp"
 #include "NumCpp.hpp"
 #include "lstm.h"
-
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
@@ -95,15 +92,21 @@ public:
     float ampGainKnobState = 10.0;
     float ampMasterKnobState = -12.0;
 
-    int input_size = 100;
+    int input_size = 120;
     //const fdeep::model model = fdeep::load_model("C:/Users/rache/Desktop/func_ts9_in100.json");
 
     ModelLoader loader;
     lstm LSTM;
 
     nc::NdArray<float> input = nc::random::rand<float>(nc::Shape(input_size, 1));
-    std::vector<float> data;
-    std::vector<float> set_data(const float **inputData, int numSamples, int input_size);
+    
+    std::vector<float> new_buffer;
+
+    std::vector<float> old_buffer;
+    std::vector<std::vector<float>> data;
+
+    std::vector<std::vector<float>> set_data(const float **inputData, int numSamples, int input_size);
+    void check_buffer(int numSamples, int input_size);
 
 private:
     Eq4Band eq4band; // Amp EQ
