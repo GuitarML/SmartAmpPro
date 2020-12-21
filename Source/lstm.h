@@ -19,11 +19,11 @@ class lstm
 
         // Math and vector operations
         double sigmoid(double x);
-        nc::NdArray<float> lstm::pad(nc::NdArray<float> xt, int kernel_size, int stride);
-        std::vector<nc::NdArray<float>> lstm::unfold(nc::NdArray<float> padded_xt, int kernel_size, int stride);
+        nc::NdArray<float> pad(nc::NdArray<float> xt, int kernel_size, int stride);
+        std::vector<nc::NdArray<float>> unfold(nc::NdArray<float> padded_xt, int kernel_size, int stride);
 
         // Layers
-        nc::NdArray<float> lstm::conv1d_layer(nc::NdArray<float> xt, std::vector<nc::NdArray<float>> weight,
+        nc::NdArray<float> conv1d_layer(nc::NdArray<float> xt, std::vector<nc::NdArray<float>> weight,
             nc::NdArray<float> bias, int kernel_size, int channels, int stride);
         nc::NdArray<float> lstm_layer(nc::NdArray<float> xt);
         nc::NdArray<float> dense_layer(nc::NdArray<float> xt);

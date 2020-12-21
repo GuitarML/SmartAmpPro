@@ -10,7 +10,7 @@ public:
 	ModelLoader();
 	nc::NdArray<float> vector_to_nc(std::vector<float> in_vec);
 	nc::NdArray<float> matrix_to_nc(std::vector<std::vector<float>> in_mat);
-    std::vector<nc::NdArray<float>> ModelLoader::matrix3d_to_nc(nlohmann::json in_mat);
+    std::vector<nc::NdArray<float>> matrix3d_to_nc(nlohmann::json in_mat);
 	void load_json(const char *filename);
 
 
