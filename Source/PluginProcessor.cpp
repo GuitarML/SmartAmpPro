@@ -26,7 +26,7 @@ SmartAmpProAudioProcessor::SmartAmpProAudioProcessor()
     
 #endif
 {
-    loader.load_json("C:/Users/KBloemer/Desktop/Archive/SmartAmpPro/models/nol_small_120.json");
+    loader.load_json("C:/Users/rache/Desktop/dev/SmartAmpPro/models/ts9_tiny4.json");
 
     LSTM.setParams(loader.hidden_size, loader.conv1d_kernel_size, loader.conv1d_1_kernel_size,
         loader.conv1d_num_channels, loader.conv1d_1_num_channels, loader.conv1d_bias_nc,
@@ -155,18 +155,18 @@ std::vector<std::vector <float>> SmartAmpProAudioProcessor::set_data(const float
     for (int i = 0; i < numSamples; i++)
     {
         new_buffer[i + input_size - 1] = chData[i]; // TODO double check indexing
+        for (int j = 0; j < input_size; j++) {
+            data[i][j] = chData[i + j];
+        }
     }
 
     // Build a vector of sample ranges (size of input_size) to use for LSTM input
-    for (int i = 0; i < numSamples; i++)
-    {
-        for (int j = 0; j < input_size; j++) {
-
-            data[i][j] = chData[i + j];
-        }
-        //std::vector<float> range(chData[i], chData[i] + input_size);
-        //data[i] = range;  // TODO FIX ranges arent being assigned correctly
-    }
+    //for (int i = 0; i < numSamples; i++)
+    //{
+    //    for (int j = 0; j < input_size; j++) {
+    //        data[i][j] = chData[i + j];
+    //    }
+    //}
     // Set the new_buffer data to old_buffer for the next block of audio
     old_buffer = new_buffer;
     
@@ -178,9 +178,7 @@ void SmartAmpProAudioProcessor::check_buffer(int numSamples, int input_size)  //
     if (old_buffer.size() != numSamples + input_size - 1) {
         std::vector<float> temp(numSamples + input_size - 1, 0.0);
         old_buffer = temp;
-
-        std::vector<float> temp2(numSamples + input_size - 1, 0.0);// for numSamples = 128, input_size = 120, vector size 247
-        new_buffer = temp2;
+        new_buffer = temp;
         std::vector<std::vector<float>> temp3(numSamples, std::vector<float>(input_size, 0.0));  //vector<vector> 128, 120
         data = temp3;
     }
@@ -198,9 +196,9 @@ void SmartAmpProAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
     // Amp =============================================================================
     if (amp_state == 1) {
         //    EQ (Presence, Bass, Mid, Treble)
-        eq4band.process(buffer, midiMessages, numSamples, numInputChannels);
+        //eq4band.process(buffer, midiMessages, numSamples, numInputChannels);
 
-        buffer.applyGain(ampDrive);
+        //buffer.applyGain(ampDrive);
 
 		// Apply LSTM model
         
@@ -225,7 +223,7 @@ void SmartAmpProAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
         }
         
         //    Master Volume 
-        buffer.applyGain(ampMaster);
+        //buffer.applyGain(ampMaster);
 
         //    Apply levelAdjust from model param (for adjusting quiet models)
 

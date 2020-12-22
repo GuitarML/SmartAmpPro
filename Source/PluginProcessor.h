@@ -92,12 +92,12 @@ public:
     float ampGainKnobState = 10.0;
     float ampMasterKnobState = -12.0;
 
-    int input_size = 120; //TODO read from file
+    int input_size = 4; //TODO read from file
 
     ModelLoader loader;
     lstm LSTM;
 
-    nc::NdArray<float> input = nc::random::rand<float>(nc::Shape(input_size, 1));
+    nc::NdArray<float> input = nc::zeros<float>(nc::Shape(input_size, 1));
     
     std::vector<float> new_buffer;
 
