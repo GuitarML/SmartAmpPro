@@ -155,8 +155,13 @@ std::vector<std::vector <float>> SmartAmpProAudioProcessor::set_data(const float
     for (int i = 0; i < numSamples; i++)
     {
         new_buffer[i + input_size - 1] = chData[i]; // TODO double check indexing
+    }
+
+    for (int i = 0; i < numSamples; i++)
+    {
         for (int j = 0; j < input_size; j++) {
-            data[i][j] = chData[i + j];
+            //data[i][j] = chData[i + j];
+            data[i][j] = new_buffer[i + j];
         }
     }
 
@@ -196,9 +201,9 @@ void SmartAmpProAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
     // Amp =============================================================================
     if (amp_state == 1) {
         //    EQ (Presence, Bass, Mid, Treble)
-        //eq4band.process(buffer, midiMessages, numSamples, numInputChannels);
+        eq4band.process(buffer, midiMessages, numSamples, numInputChannels);
 
-        //buffer.applyGain(ampDrive);
+        buffer.applyGain(ampDrive);
 
 		// Apply LSTM model
         
@@ -223,7 +228,7 @@ void SmartAmpProAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
         }
         
         //    Master Volume 
-        //buffer.applyGain(ampMaster);
+        buffer.applyGain(ampMaster);
 
         //    Apply levelAdjust from model param (for adjusting quiet models)
 
