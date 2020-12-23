@@ -146,9 +146,9 @@ std::vector<std::vector <float>> SmartAmpProAudioProcessor::set_data(const float
 
 
     // Move input_size-1 of last buffer to the beginning of new_buffer
-    for (int i = 0; i < input_size - 1; i++)
+    for (int k = 0; k < input_size - 1; k++)
     {
-        new_buffer[i] = old_buffer[numSamples + i]; // TODO double check indexing
+        new_buffer[k] = old_buffer[numSamples + k]; // TODO double check indexing
     }
 
     // Update new_buffer with current buffer data
