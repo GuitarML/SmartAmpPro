@@ -172,8 +172,8 @@ void SmartAmpProAudioProcessorEditor::resized()
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
 
-    loadButton.setBounds(50, 40, 125, 25);
-    modelLabel.setBounds(50, 65, 400, 25);
+    loadButton.setBounds(50, 20, 125, 25);
+    modelLabel.setBounds(50, 45, 400, 25);
     // Amp Widgets
     ampPresenceKnob.setBounds(495, 242, 55, 75);
     ampBassKnob.setBounds(253, 242, 55, 75);

@@ -20,11 +20,11 @@ class lstm
         // Math and vector operations
         double sigmoid(double x);
         nc::NdArray<float> pad(nc::NdArray<float> xt, int kernel_size, int stride);
-        std::vector<nc::NdArray<float>> unfold(nc::NdArray<float> padded_xt, int kernel_size, int stride);
+        std::vector<nc::NdArray<float>> unfold(nc::NdArray<float> padded_xt, int kernel_size, int stride, int layer_num);
 
         // Layers
         nc::NdArray<float> conv1d_layer(nc::NdArray<float> xt, std::vector<nc::NdArray<float>> weight,
-            nc::NdArray<float> bias, int kernel_size, int channels, int stride);
+            nc::NdArray<float> bias, int kernel_size, int channels, int stride, int layer_num);
         nc::NdArray<float> lstm_layer(nc::NdArray<float> xt);
         nc::NdArray<float> dense_layer(nc::NdArray<float> xt);
 
@@ -37,6 +37,7 @@ class lstm
 
         // Network Parameters
         int input_size = 120; // TODO read from file
+        int layer_num = 1;
 
         int HS = 1;
         int conv1d_Kernel_Size = 0;
