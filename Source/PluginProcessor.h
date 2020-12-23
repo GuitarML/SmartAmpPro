@@ -65,7 +65,7 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    void loadConfigAmp();
+    void loadDefault();
     void loadConfig(File configFile);
 
     // Overdrive Pedal
@@ -83,6 +83,7 @@ public:
     int custom_tone = 0; // 0 = custom tone loaded, 1 = default channel tone
     File loaded_tone;
     juce::String loaded_tone_name;
+    const char* char_filename;
 
     // Amp knob states
     float ampPresenceKnobState = 0.0;
@@ -92,12 +93,11 @@ public:
     float ampGainKnobState = 10.0;
     float ampMasterKnobState = -12.0;
 
-    int input_size = 4; //TODO read from file
+    //int input_size = 4; //TODO read from file
 
     ModelLoader loader;
     lstm LSTM;
-
-    nc::NdArray<float> input = nc::zeros<float>(nc::Shape(input_size, 1));
+    nc::NdArray<float> input = nc::zeros<float>(nc::Shape(LSTM.input_size, 1));
     
     std::vector<float> new_buffer;
 

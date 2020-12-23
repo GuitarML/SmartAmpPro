@@ -66,6 +66,7 @@ void ModelLoader::load_json(const char *filename)
     nlohmann::json weights_json;
     i2 >> weights_json;
     
+    input_size_loader = weights_json["/input_size"_json_pointer];
 
     std::vector<float> conv1d_bias = weights_json["/conv1d/bias:0"_json_pointer];
     conv1d_bias_nc = vector_to_nc(conv1d_bias);

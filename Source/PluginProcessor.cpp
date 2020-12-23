@@ -23,17 +23,16 @@ SmartAmpProAudioProcessor::SmartAmpProAudioProcessor()
 #endif
     )
 
-    
 #endif
 {
-    loader.load_json("C:/Users/rache/Desktop/dev/SmartAmpPro/models/ts9_tiny4.json");
+
+    loader.load_json("C:/Users/KBloemer/Desktop/Archive/SmartAmpPro/models/nol_small_120.json");
 
     LSTM.setParams(loader.hidden_size, loader.conv1d_kernel_size, loader.conv1d_1_kernel_size,
         loader.conv1d_num_channels, loader.conv1d_1_num_channels, loader.conv1d_bias_nc,
         loader.conv1d_1_bias_nc, loader.conv1d_kernel_nc, loader.conv1d_1_kernel_nc,
         loader.lstm_bias_nc, loader.lstm_kernel_nc,
-        loader.dense_bias_nc, loader.dense_kernel_nc, input_size);
-
+        loader.dense_bias_nc, loader.dense_kernel_nc, loader.input_size_loader);
 }
 
 SmartAmpProAudioProcessor::~SmartAmpProAudioProcessor()
@@ -186,6 +185,8 @@ void SmartAmpProAudioProcessor::check_buffer(int numSamples, int input_size)  //
         new_buffer = temp;
         std::vector<std::vector<float>> temp3(numSamples, std::vector<float>(input_size, 0.0));  //vector<vector> 128, 120
         data = temp3;
+        // Reset the input
+        input = nc::zeros<float>(nc::Shape(input_size, 1));
     }
 }
 
@@ -207,12 +208,12 @@ void SmartAmpProAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
 
 		// Apply LSTM model
         
-        check_buffer(numSamples, input_size);
+        check_buffer(numSamples, LSTM.input_size);
         data = set_data(buffer.getArrayOfReadPointers(), numSamples, LSTM.input_size);
         for (int i = 0; i < numSamples; i++)
         {
             // Set the current sample input to LSTM
-            for (int j = 0; j < input_size; j++) {
+            for (int j = 0; j < LSTM.input_size; j++) {
                 input[j] = data[i][j];
             }
 
@@ -264,26 +265,34 @@ void SmartAmpProAudioProcessor::setStateInformation (const void* data, int sizeI
 }
 
 
-void SmartAmpProAudioProcessor::loadConfigAmp() 
+void SmartAmpProAudioProcessor::loadDefault()
 {
     this->suspendProcessing(true);
-    
-    // Load new model here
-    
+
+    loader.load_json("nol_small_120.json");  // TODO: Change ModelLoader to use JUCE json to read .json files    ***EDIT HERE***
+    //loader.load_json(BinaryData::nol_small_120_json);
+    LSTM.setParams(loader.hidden_size, loader.conv1d_kernel_size, loader.conv1d_1_kernel_size,
+        loader.conv1d_num_channels, loader.conv1d_1_num_channels, loader.conv1d_bias_nc,
+        loader.conv1d_1_bias_nc, loader.conv1d_kernel_nc, loader.conv1d_1_kernel_nc,
+        loader.lstm_bias_nc, loader.lstm_kernel_nc,
+        loader.dense_bias_nc, loader.dense_kernel_nc, loader.input_size_loader);
+
     this->suspendProcessing(false);
 }
+
 
 void SmartAmpProAudioProcessor::loadConfig(File configFile)
 {
     this->suspendProcessing(true);
 
-    loader.load_json("C:/Users/rache/Desktop/dev/SmartAmpPro/models/nol_small_120.json");  // TODO CHANGE
-
+    String path = configFile.getFullPathName();
+    char_filename = path.toUTF8();
+    loader.load_json(char_filename);
     LSTM.setParams(loader.hidden_size, loader.conv1d_kernel_size, loader.conv1d_1_kernel_size,
         loader.conv1d_num_channels, loader.conv1d_1_num_channels, loader.conv1d_bias_nc,
         loader.conv1d_1_bias_nc, loader.conv1d_kernel_nc, loader.conv1d_1_kernel_nc,
         loader.lstm_bias_nc, loader.lstm_kernel_nc,
-        loader.dense_bias_nc, loader.dense_kernel_nc, input_size);
+        loader.dense_bias_nc, loader.dense_kernel_nc, loader.input_size_loader);
 
     this->suspendProcessing(false);
 }

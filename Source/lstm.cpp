@@ -13,6 +13,7 @@
 //==============================================================================
 lstm::lstm()
 {
+
 }
 
 
@@ -25,9 +26,9 @@ void lstm::setParams(int hidden_size, int conv1d_kernel_size, int conv1d_1_kerne
                     nc::NdArray<float> conv1d_bias_nc, nc::NdArray<float> conv1d_1_bias_nc, 
                     std::vector<nc::NdArray<float>> conv1d_kernel_nc, std::vector<nc::NdArray<float>> conv1d_1_kernel_nc,
                     nc::NdArray<float> lstm_bias_nc, nc::NdArray<float> lstm_kernel_nc, 
-                    nc::NdArray<float> dense_bias_nc, nc::NdArray<float> dense_kernel_nc, int input_size)
+                    nc::NdArray<float> dense_bias_nc, nc::NdArray<float> dense_kernel_nc, int input_size_loader)
 {
-    input_size = input_size;
+    input_size = input_size_loader;
     HS = hidden_size;
 
     conv1d_Kernel_Size = conv1d_kernel_size;

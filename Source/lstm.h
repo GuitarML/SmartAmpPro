@@ -33,10 +33,10 @@ class lstm
             nc::NdArray<float> conv1d_bias_nc, nc::NdArray<float> conv1d_1_bias_nc,
             std::vector<nc::NdArray<float>> conv1d_kernel_nc, std::vector<nc::NdArray<float>> conv1d_1_kernel_nc,
             nc::NdArray<float> lstm_bias_nc, nc::NdArray<float> lstm_kernel_nc,
-            nc::NdArray<float> dense_bias_nc, nc::NdArray<float> dense_kernel_nc, int input_size);
+            nc::NdArray<float> dense_bias_nc, nc::NdArray<float> dense_kernel_nc, int input_size_loader);
 
         // Network Parameters
-        int input_size = 4; // TODO read from file
+        int input_size = 120; // TODO read from file
 
         int HS = 1;
         int conv1d_Kernel_Size = 0;

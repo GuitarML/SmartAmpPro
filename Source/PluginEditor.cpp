@@ -111,7 +111,7 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     setSize(790, 390);
     // Load the preset model from the project resources
     if (processor.custom_tone == 0) {
-        processor.loadConfigAmp();
+        processor.loadDefault();
     } else {
         processor.loadConfig(processor.loaded_tone);
     }
@@ -194,6 +194,8 @@ void SmartAmpProAudioProcessorEditor::loadButtonClicked()
     if (chooser.browseForFileToOpen())
     {
         File file = chooser.getResult();
+        //String path = file.getFullPathName();
+        
         processor.loadConfig(file);
         fname = file.getFileName();
         modelLabel.setText(fname, juce::NotificationType::dontSendNotification);

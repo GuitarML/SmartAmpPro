@@ -13,7 +13,7 @@ public:
     std::vector<nc::NdArray<float>> matrix3d_to_nc(nlohmann::json in_mat);
 	void load_json(const char *filename);
 
-
+    int input_size_loader = 0;
     int hidden_size = 0;
 
     int conv1d_kernel_size = 0;
