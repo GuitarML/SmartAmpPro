@@ -83,7 +83,7 @@ public:
     int custom_tone = 0; // 0 = custom tone loaded, 1 = default channel tone
     File loaded_tone;
     juce::String loaded_tone_name;
-    const char* char_filename;
+    const char* char_filename = "";
 
     // Amp knob states
     float ampPresenceKnobState = 0.0;
@@ -92,8 +92,6 @@ public:
     float ampTrebleKnobState = 0.0;
     float ampGainKnobState = 10.0;
     float ampMasterKnobState = -12.0;
-
-    //int input_size = 4; //TODO read from file
 
     ModelLoader loader;
     lstm LSTM;

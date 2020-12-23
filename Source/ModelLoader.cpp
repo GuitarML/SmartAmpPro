@@ -50,8 +50,6 @@ std::vector<nc::NdArray<float>> ModelLoader::matrix3d_to_nc(nlohmann::json in_ma
         }
         out_mat.push_back(nc_2D_matrix);
     }
-    
-    //std::cout << out_mat.size() << out_mat[0].shape() << std::endl;
    
     return out_mat;
 }

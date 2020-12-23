@@ -54,9 +54,9 @@ void lstm::setParams(int hidden_size, int conv1d_kernel_size, int conv1d_1_kerne
 
     nc::NdArray<float> dummy_input = nc::zeros<float>(nc::Shape(input_size, 1));
 
-    // Set up bias matrices for calculation (TODO figure out how to calculate from output sizes)
-    nc::NdArray<float> padded_dummy = pad(dummy_input, conv1d_Kernel_Size, 12);
-    int bias_shape = padded_dummy.shape().rows / 12;
+    // Set up bias matrices for calculation 
+    nc::NdArray<float> padded_dummy = pad(dummy_input, conv1d_Kernel_Size, 12);  // TODO handle different strides
+    int bias_shape = padded_dummy.shape().rows / 12; // TODO handle different strides
     conv1d_bias = nc::zeros<float>(nc::Shape(bias_shape, conv1d_bias_temp.shape().cols));;
     nc::NdArray<float> new_bias = conv1d_bias_temp;
     for (int i = 0; i < bias_shape - 1; i++)

@@ -218,8 +218,8 @@ void SmartAmpProAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
             }
 
             // Process LSTM for a single sample
-            LSTM.conv1d_out = LSTM.conv1d_layer(input, LSTM.conv1d_kernel, LSTM.conv1d_bias, LSTM.conv1d_Kernel_Size, LSTM.conv1d_Num_Channels, 12, 1); // 12 is stride
-            LSTM.conv1d_1_out = LSTM.conv1d_layer(LSTM.conv1d_out, LSTM.conv1d_1_kernel, LSTM.conv1d_1_bias, LSTM.conv1d_1_Kernel_Size, LSTM.conv1d_1_Num_Channels, 12, 2); // 12 is stride
+            LSTM.conv1d_out = LSTM.conv1d_layer(input, LSTM.conv1d_kernel, LSTM.conv1d_bias, LSTM.conv1d_Kernel_Size, LSTM.conv1d_Num_Channels, 12, 1); // 12 is stride // TODO handle different strides
+            LSTM.conv1d_1_out = LSTM.conv1d_layer(LSTM.conv1d_out, LSTM.conv1d_1_kernel, LSTM.conv1d_1_bias, LSTM.conv1d_1_Kernel_Size, LSTM.conv1d_1_Num_Channels, 12, 2); // 12 is stride // TODO handle different strides
             LSTM.lstm_out = LSTM.lstm_layer(LSTM.conv1d_1_out);
             LSTM.dense_out = LSTM.dense_layer(LSTM.lstm_out);
 
