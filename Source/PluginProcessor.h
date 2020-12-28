@@ -102,7 +102,7 @@ public:
     std::vector<float> old_buffer;
     std::vector<std::vector<float>> data;
 
-    std::vector<std::vector<float>> set_data(const float **inputData, int numSamples, int input_size);
+    void set_data(const float **inputData, int numSamples, int input_size);
     void check_buffer(int numSamples, int input_size);
 
 private:

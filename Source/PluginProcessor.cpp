@@ -26,7 +26,7 @@ SmartAmpProAudioProcessor::SmartAmpProAudioProcessor()
 #endif
 {
 
-    loader.load_json("C:/Users/rache/Desktop/dev/SmartAmpPro/models/nol_small_120.json");
+    loader.load_json("C:/Users/KBloemer/Desktop/Archive/SmartAmpPro/models/nol_small_120.json");
 
     LSTM.setParams(loader.hidden_size, loader.conv1d_kernel_size, loader.conv1d_1_kernel_size,
         loader.conv1d_num_channels, loader.conv1d_1_num_channels, loader.conv1d_bias_nc,
@@ -138,11 +138,10 @@ bool SmartAmpProAudioProcessor::isBusesLayoutSupported (const BusesLayout& layou
 }
 #endif
 
-std::vector<std::vector <float>> SmartAmpProAudioProcessor::set_data(const float **inputData, int numSamples, int input_size)
+void SmartAmpProAudioProcessor::set_data(const float **inputData, int numSamples, int input_size)
 {
 
     const float *chData = inputData[0];
-
 
     // Move input_size-1 of last buffer to the beginning of new_buffer
     for (int k = 0; k < input_size - 1; k++)
@@ -156,25 +155,16 @@ std::vector<std::vector <float>> SmartAmpProAudioProcessor::set_data(const float
         new_buffer[i + input_size - 1] = chData[i]; // TODO double check indexing
     }
 
+    // Build array of inputs to the network from the new_buffer
     for (int i = 0; i < numSamples; i++)
     {
         for (int j = 0; j < input_size; j++) {
-            //data[i][j] = chData[i + j];
             data[i][j] = new_buffer[i + j];
         }
     }
 
-    // Build a vector of sample ranges (size of input_size) to use for LSTM input
-    //for (int i = 0; i < numSamples; i++)
-    //{
-    //    for (int j = 0; j < input_size; j++) {
-    //        data[i][j] = chData[i + j];
-    //    }
-    //}
     // Set the new_buffer data to old_buffer for the next block of audio
     old_buffer = new_buffer;
-    
-    return data;
 }
 
 void SmartAmpProAudioProcessor::check_buffer(int numSamples, int input_size)  //TODO this is called every block, how to call just at beginning and when buffer size changes?
@@ -196,10 +186,12 @@ void SmartAmpProAudioProcessor::check_buffer(int numSamples, int input_size)  //
             LSTM.placeholder = LSTM.padded_xt(nc::Slice(i * 12, i * 12 + LSTM.conv1d_Kernel_Size), 0);
             LSTM.unfolded_xt.push_back(LSTM.placeholder);
         }
+        LSTM.conv1d_out = nc::zeros<float>(nc::Shape(LSTM.unfolded_xt.size(), LSTM.conv1d_kernel[0].shape().cols));
         // Set initial conv1d layer 2 array
         LSTM.unfolded_xt2.clear();
         nc::NdArray<float> placeholder_temp;
         LSTM.unfolded_xt2.push_back(placeholder_temp);
+        LSTM.conv1d_1_out = nc::zeros<float>(nc::Shape(LSTM.unfolded_xt2.size(), LSTM.conv1d_1_kernel[0].shape().cols));
     }
 }
 
@@ -222,7 +214,7 @@ void SmartAmpProAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
 		// Apply LSTM model
         
         check_buffer(numSamples, LSTM.input_size);
-        data = set_data(buffer.getArrayOfReadPointers(), numSamples, LSTM.input_size);
+        set_data(buffer.getArrayOfReadPointers(), numSamples, LSTM.input_size);
         for (int i = 0; i < numSamples; i++)
         {
             // Set the current sample input to LSTM
@@ -231,10 +223,10 @@ void SmartAmpProAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
             }
 
             // Process LSTM for a single sample
-            LSTM.conv1d_layer(input, LSTM.conv1d_kernel, LSTM.conv1d_bias, LSTM.conv1d_Kernel_Size, LSTM.conv1d_Num_Channels, 12, 1); // 12 is stride // TODO handle different strides
-            LSTM.conv1d_layer2(LSTM.conv1d_out, LSTM.conv1d_1_kernel, LSTM.conv1d_1_bias, LSTM.conv1d_1_Kernel_Size, LSTM.conv1d_1_Num_Channels, 12, 2); // 12 is stride // TODO handle different strides
-            LSTM.lstm_layer(LSTM.conv1d_1_out);
-            LSTM.dense_layer(LSTM.lstm_out);
+            LSTM.conv1d_layer(input, 12); // 12 is stride // TODO handle different strides
+            LSTM.conv1d_layer2(12); // 12 is stride // TODO handle different strides
+            LSTM.lstm_layer();
+            LSTM.dense_layer();
 
             // Write the LSTM result to the output buffer
             channelData[i] = LSTM.dense_out[0];
@@ -282,7 +274,7 @@ void SmartAmpProAudioProcessor::loadDefault()
 {
     this->suspendProcessing(true);
 
-    loader.load_json("C:/Users/rache/Desktop/dev/SmartAmpPro/models/nol_small_120.json");  // TODO: Change ModelLoader to use JUCE json to read .json files    ***EDIT HERE***
+    loader.load_json("C:/Users/KBloemer/Desktop/Archive/SmartAmpPro/models/nol_small_120.json");  // TODO: Change ModelLoader to use JUCE json to read .json files    ***EDIT HERE***
     //loader.load_json(BinaryData::nol_small_120_json);
     LSTM.setParams(loader.hidden_size, loader.conv1d_kernel_size, loader.conv1d_1_kernel_size,
         loader.conv1d_num_channels, loader.conv1d_1_num_channels, loader.conv1d_bias_nc,
