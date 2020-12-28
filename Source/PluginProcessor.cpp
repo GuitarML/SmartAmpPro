@@ -179,6 +179,7 @@ std::vector<std::vector <float>> SmartAmpProAudioProcessor::set_data(const float
 
 void SmartAmpProAudioProcessor::check_buffer(int numSamples, int input_size)  //TODO this is called every block, how to call just at beginning and when buffer size changes?
 {
+    //This is done at plugin start up and when a new model is loaded
     if (old_buffer.size() != numSamples + input_size - 1) {
         std::vector<float> temp(numSamples + input_size - 1, 0.0);
         old_buffer = temp;

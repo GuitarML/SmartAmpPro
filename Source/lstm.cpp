@@ -98,7 +98,7 @@ nc::NdArray<float> lstm::pad(nc::NdArray<float> xt, int kernel_size, int stride)
 
 
 
-std::vector<nc::NdArray<float>> lstm::unfold(nc::NdArray<float> padded_xt, int kernel_size, int stride, int layer_num)
+void lstm::unfold(nc::NdArray<float> padded_xt, int kernel_size, int stride, int layer_num)
 {
     //std::vector<nc::NdArray<float>> unfolded_xt;
 
@@ -116,10 +116,11 @@ std::vector<nc::NdArray<float>> lstm::unfold(nc::NdArray<float> padded_xt, int k
     }
     //}
 
-    return unfolded_xt;
+    //return unfolded_xt;
 }
 
 //TODO REMOVE if unused
+/*
 std::vector<nc::NdArray<float>> lstm::unfold2(nc::NdArray<float> padded_xt, int kernel_size, int stride, int layer_num)
 {
     //std::vector<nc::NdArray<float>> unfolded_xt2;
@@ -129,7 +130,7 @@ std::vector<nc::NdArray<float>> lstm::unfold2(nc::NdArray<float> padded_xt, int 
         //placeholder = padded_xt;
     unfolded_xt2[0] = padded_xt;
     //}
-    /*
+    
     else {
 
         for (int i = 0; i < padded_xt.shape().rows / stride; i++)
@@ -138,17 +139,18 @@ std::vector<nc::NdArray<float>> lstm::unfold2(nc::NdArray<float> padded_xt, int 
             unfolded_xt.push_back(placeholder);
         }
     }
-    */
+    
 
     return unfolded_xt;
 }
+*/
 
 
 void lstm::conv1d_layer(nc::NdArray<float> xt, std::vector<nc::NdArray<float>> weight,
                                       nc::NdArray<float> bias,int kernel_size, int channels, int stride, int layer_num)
 {
     padded_xt = pad(xt, kernel_size, stride);
-    unfolded_xt = unfold(padded_xt, kernel_size, stride, layer_num); // unfolded xt (9, 12, 1) .  weight shape (12, 1, 16), (tensordot(unfolded_xt, weight) = (9,16))
+    unfold(padded_xt, kernel_size, stride, layer_num); // unfolded xt (9, 12, 1) .  weight shape (12, 1, 16), (tensordot(unfolded_xt, weight) = (9,16))
 
     out = nc::zeros<float>(nc::Shape(unfolded_xt.size(), weight[0].shape().cols)); //zeros instead of random faster?
     // Compute tensordot
