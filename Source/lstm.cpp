@@ -78,7 +78,7 @@ void lstm::setParams(int hidden_size, int conv1d_kernel_size, int conv1d_1_kerne
 
 
 
-nc::NdArray<float> lstm::pad(nc::NdArray<float> xt, int kernel_size, int stride)
+nc::NdArray<float> lstm::pad(nc::NdArray<float> xt, int kernel_size, int stride) //TODO optimize these calculations, one for each conv1d layer, only do once
 {
     seq_len = xt.shape().rows;
     local_channels = xt.shape().cols;
@@ -206,6 +206,7 @@ void lstm::check_buffer(int numSamples)  //TODO this is called every block, how 
         }
         conv1d_out = nc::zeros<float>(nc::Shape(unfolded_xt.size(), conv1d_kernel[0].shape().cols));
         // Set initial conv1d layer 2 array
+        //padded_xt2 = pad2(input, conv1d_Kernel_Size, 12); //TODO ability to set stride
         unfolded_xt2.clear();
         nc::NdArray<float> placeholder_temp;
         unfolded_xt2.push_back(placeholder_temp);
@@ -250,12 +251,17 @@ void lstm::process(const float* inData, float* outData, int stride, int numSampl
     for (int i = 0; i < numSamples; i++)
     {
 
-
         // Set the current sample input to LSTM
         for (int j = 0; j < input_size; j++) {
             input[j] = data[i][j];
         }
+        conv1d_layer(input, 12);
+        conv1d_layer2(12);
+        lstm_layer();
+        dense_layer();
+        outData[i] = dense_out[0];
 
+        /*
         // CONV1D LAYER
         padded_xt = pad(input, conv1d_Kernel_Size, stride);
         unfold(conv1d_Kernel_Size, stride); // unfolded xt (9, 12, 1) .  weight shape (12, 1, 16), (tensordot(unfolded_xt, weight) = (9,16))
@@ -324,9 +330,10 @@ void lstm::process(const float* inData, float* outData, int stride, int numSampl
 
         // DENSE LAYER
         dense_out = nc::dot(lstm_out, dense_kernel) + dense_bias;
-
+        
         // Write to buffer
         outData[i] = dense_out[0];
+        */
     }
 
 }

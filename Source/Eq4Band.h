@@ -17,7 +17,7 @@ class Eq4Band
 {
 public:
     Eq4Band();
-    void process (float* channelData, MidiBuffer& midiMessages, const int numSamples, const int numInputChannels);
+    void process (const float* inData, float* outData, MidiBuffer& midiMessages, const int numSamples, const int numInputChannels);
     void setParameters(float bass_slider, float mid_slider, float treble_slider, float presence_slider);
 
 private:

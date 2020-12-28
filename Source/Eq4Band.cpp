@@ -13,7 +13,7 @@ Eq4Band::Eq4Band()
     setParameters(0.0, 0.0, 0.0, 0.0);
 }
 
-void Eq4Band::process (float* channelData,
+void Eq4Band::process (const float* inData, float* outData,
                                     MidiBuffer& midiMessages, 
                                     const int numSamples, 
                                     const int numInputChannels)
@@ -22,7 +22,7 @@ void Eq4Band::process (float* channelData,
         //float* channelData = buffer.getWritePointer(channel);
         // For each sample in the block of audio, apply filter
     for (int sample = 0; sample < numSamples; ++sample) {
-        spl0 = channelData[sample];
+        spl0 = inData[sample];
         s0 = spl0;
         low0 = (tmplMID = a0MID * s0 - b1MID * tmplMID + cDenorm);
         spl0 = (tmplLOW = a0LOW * low0 - b1LOW * tmplLOW + cDenorm);
@@ -32,7 +32,7 @@ void Eq4Band::process (float* channelData,
         highS0 = hi0 - midS0;
         spl0 = (spl0 * lVol + lowS0 * lmVol + midS0 * hmVol + highS0 * hVol);// * outVol;
    
-        channelData[sample] = spl0;
+        outData[sample] = spl0;
     }
     //}
 }
