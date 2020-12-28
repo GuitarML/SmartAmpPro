@@ -80,18 +80,12 @@ class lstm
         nc::NdArray<float> dense_out;
 
         // conv1d arrays
-        nc::NdArray<float> placeholder;
-        nc::NdArray<float> placeholder2;
         std::vector<nc::NdArray<float>> unfolded_xt;
         nc::NdArray<float> padded_xt;
         std::vector<nc::NdArray<float>> unfolded_xt2;
         nc::NdArray<float> padded_xt2;
-        nc::NdArray<float> out;
-        nc::NdArray<float> out2;
         
-
     private:
-
 
 };
 

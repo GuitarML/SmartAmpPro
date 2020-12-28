@@ -169,7 +169,7 @@ void SmartAmpProAudioProcessor::set_data(const float **inputData, int numSamples
 
 void SmartAmpProAudioProcessor::check_buffer(int numSamples, int input_size)  //TODO this is called every block, how to call just at beginning and when buffer size changes?
 {
-    //This is done at plugin start up and when a new model is loaded
+    //This is done at plugin start up and when a new model is loaded, or when the buffer size is changed (numSamples)
     if (old_buffer.size() != numSamples + input_size - 1) {
         std::vector<float> temp(numSamples + input_size - 1, 0.0);
         old_buffer = temp;
@@ -183,8 +183,7 @@ void SmartAmpProAudioProcessor::check_buffer(int numSamples, int input_size)  //
         LSTM.unfolded_xt.clear();
         for (int i = 0; i < LSTM.padded_xt.shape().rows / 12; i++)
         {
-            LSTM.placeholder = LSTM.padded_xt(nc::Slice(i * 12, i * 12 + LSTM.conv1d_Kernel_Size), 0);
-            LSTM.unfolded_xt.push_back(LSTM.placeholder);
+            LSTM.unfolded_xt.push_back(LSTM.padded_xt(nc::Slice(i * 12, i * 12 + LSTM.conv1d_Kernel_Size), 0));
         }
         LSTM.conv1d_out = nc::zeros<float>(nc::Shape(LSTM.unfolded_xt.size(), LSTM.conv1d_kernel[0].shape().cols));
         // Set initial conv1d layer 2 array

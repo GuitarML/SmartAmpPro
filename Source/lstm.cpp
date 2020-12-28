@@ -100,8 +100,7 @@ void lstm::unfold(int kernel_size, int stride)
 {
     for (int i = 0; i < padded_xt.shape().rows / stride; i++)
     {
-        placeholder = padded_xt(nc::Slice(i * stride, i * stride + kernel_size), 0);
-        unfolded_xt[i] = placeholder;
+        unfolded_xt[i] = padded_xt(nc::Slice(i * stride, i * stride + kernel_size), 0);
     }
 }
 
@@ -184,3 +183,4 @@ void lstm::dense_layer()
 {
     dense_out = nc::dot(lstm_out, dense_kernel) + dense_bias;
 }
+
