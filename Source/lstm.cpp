@@ -26,7 +26,8 @@ void lstm::setParams(int hidden_size, int conv1d_kernel_size, int conv1d_1_kerne
                     nc::NdArray<float> conv1d_bias_nc, nc::NdArray<float> conv1d_1_bias_nc, 
                     std::vector<nc::NdArray<float>> conv1d_kernel_nc, std::vector<nc::NdArray<float>> conv1d_1_kernel_nc,
                     nc::NdArray<float> lstm_bias_nc, nc::NdArray<float> lstm_kernel_nc, 
-                    nc::NdArray<float> dense_bias_nc, nc::NdArray<float> dense_kernel_nc, int input_size_loader)
+                    nc::NdArray<float> dense_bias_nc, nc::NdArray<float> dense_kernel_nc, int input_size_loader, 
+                    int conv1d_stride_loader, int conv1d_1_stride_loader)
 {
     input_size = input_size_loader;
     HS = hidden_size;
@@ -35,6 +36,8 @@ void lstm::setParams(int hidden_size, int conv1d_kernel_size, int conv1d_1_kerne
     conv1d_Num_Channels = conv1d_num_channels;
     conv1d_1_Kernel_Size = conv1d_1_kernel_size;
     conv1d_1_Num_Channels = conv1d_1_num_channels;
+    conv1d_stride = conv1d_stride_loader;
+    conv1d_1_stride = conv1d_1_stride_loader;
 
     nc::NdArray<float> conv1d_bias_temp = conv1d_bias_nc;
     conv1d_kernel = conv1d_kernel_nc;
@@ -55,8 +58,8 @@ void lstm::setParams(int hidden_size, int conv1d_kernel_size, int conv1d_1_kerne
     nc::NdArray<float> dummy_input = nc::zeros<float>(nc::Shape(input_size, 1));
 
     // Set up bias matrices for calculation 
-    nc::NdArray<float> padded_dummy = pad(dummy_input, conv1d_Kernel_Size, 12);  // TODO handle different strides
-    int bias_shape = padded_dummy.shape().rows / 12; // TODO handle different strides
+    nc::NdArray<float> padded_dummy = pad(dummy_input, conv1d_Kernel_Size, conv1d_stride);  // TODO handle different strides
+    int bias_shape = padded_dummy.shape().rows / conv1d_stride; // TODO handle different strides
     conv1d_bias = nc::zeros<float>(nc::Shape(bias_shape, conv1d_bias_temp.shape().cols));;
     nc::NdArray<float> new_bias = conv1d_bias_temp;
     for (int i = 0; i < bias_shape - 1; i++)
@@ -98,6 +101,7 @@ nc::NdArray<float> lstm::pad(nc::NdArray<float> xt, int kernel_size, int stride)
 
 void lstm::unfold(int kernel_size, int stride)
 {
+    // TODO Having a kernel_size and stride that are not equal for the same conv1d layer breaks here (indexing issue), figure out why
     for (int i = 0; i < padded_xt.shape().rows / stride; i++)
     {
         unfolded_xt[i] = padded_xt(nc::Slice(i * stride, i * stride + kernel_size), 0);
@@ -105,10 +109,10 @@ void lstm::unfold(int kernel_size, int stride)
 }
 
 
-void lstm::conv1d_layer(nc::NdArray<float> xt, int stride)
+void lstm::conv1d_layer(nc::NdArray<float> xt)
 {
-    padded_xt = pad(xt, conv1d_Kernel_Size, stride);
-    unfold(conv1d_Kernel_Size, stride); // unfolded xt (9, 12, 1) .  weight shape (12, 1, 16), (tensordot(unfolded_xt, weight) = (9,16))
+    padded_xt = pad(xt, conv1d_Kernel_Size, conv1d_stride);
+    unfold(conv1d_Kernel_Size, conv1d_stride); // unfolded xt (9, 12, 1) .  weight shape (12, 1, 16), (tensordot(unfolded_xt, weight) = (9,16))
 
     // Compute tensordot
     len_i = unfolded_xt.size(); //9
@@ -137,10 +141,10 @@ void lstm::conv1d_layer(nc::NdArray<float> xt, int stride)
 }
 
 
-void lstm::conv1d_layer2(int stride)
+void lstm::conv1d_layer2()
 {
-    padded_xt2 = pad(conv1d_out, conv1d_1_Kernel_Size, stride);
-    unfolded_xt2[0] = padded_xt;
+    padded_xt2 = pad(conv1d_out, conv1d_1_Kernel_Size, conv1d_1_stride);
+    unfolded_xt2[0] = padded_xt2;
 
     // Compute tensordot
     len_i = unfolded_xt2.size(); //9
@@ -198,15 +202,14 @@ void lstm::check_buffer(int numSamples)  //TODO this is called every block, how 
         // Reset the input
         input = nc::zeros<float>(nc::Shape(input_size, 1));
         //Set initial conv1d layer 1 arrays
-        padded_xt = pad(input, conv1d_Kernel_Size, 12); //TODO ability to set stride
+        padded_xt = pad(input, conv1d_Kernel_Size, conv1d_stride); //TODO ability to set stride
         unfolded_xt.clear();
-        for (int i = 0; i < padded_xt.shape().rows / 12; i++)
+        for (int i = 0; i < padded_xt.shape().rows / conv1d_stride; i++)
         {
-            unfolded_xt.push_back(padded_xt(nc::Slice(i * 12, i * 12 + conv1d_Kernel_Size), 0));
+            unfolded_xt.push_back(padded_xt(nc::Slice(i * conv1d_stride, i * conv1d_stride + conv1d_Kernel_Size), 0));
         }
         conv1d_out = nc::zeros<float>(nc::Shape(unfolded_xt.size(), conv1d_kernel[0].shape().cols));
         // Set initial conv1d layer 2 array
-        //padded_xt2 = pad2(input, conv1d_Kernel_Size, 12); //TODO ability to set stride
         unfolded_xt2.clear();
         nc::NdArray<float> placeholder_temp;
         unfolded_xt2.push_back(placeholder_temp);
@@ -243,7 +246,7 @@ void lstm::set_data(const float* chData, int numSamples)
     old_buffer = new_buffer;
 }
 
-void lstm::process(const float* inData, float* outData, int stride, int numSamples)
+void lstm::process(const float* inData, float* outData, int numSamples)
 {
     check_buffer(numSamples);
     set_data(inData, numSamples);
@@ -255,8 +258,8 @@ void lstm::process(const float* inData, float* outData, int stride, int numSampl
         for (int j = 0; j < input_size; j++) {
             input[j] = data[i][j];
         }
-        conv1d_layer(input, 12);
-        conv1d_layer2(12);
+        conv1d_layer(input);
+        conv1d_layer2();
         lstm_layer();
         dense_layer();
         outData[i] = dense_out[0];

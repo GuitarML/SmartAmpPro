@@ -66,17 +66,21 @@ void ModelLoader::load_json(const char *filename)
     
     input_size_loader = weights_json["/input_size"_json_pointer];
 
+
+
     std::vector<float> conv1d_bias = weights_json["/conv1d/bias:0"_json_pointer];
     conv1d_bias_nc = vector_to_nc(conv1d_bias);
     conv1d_kernel_nc = matrix3d_to_nc(weights_json["/conv1d/kernel:0"_json_pointer]);
+    conv1d_stride_loader = weights_json["/conv1d_stride"_json_pointer];
 
     conv1d_kernel_size = conv1d_kernel_nc.size();  //num channels, not kernel_size
-    conv1d_1_num_channels = conv1d_1_bias_nc.size();
+    conv1d_num_channels = conv1d_bias_nc.size();
     //conv1d_stride = conv1d_kernel_nc.size();
     
     std::vector<float> conv1d_1_bias = weights_json["/conv1d_1/bias:0"_json_pointer];
     conv1d_1_bias_nc = vector_to_nc(conv1d_1_bias);
     conv1d_1_kernel_nc = matrix3d_to_nc(weights_json["/conv1d_1/kernel:0"_json_pointer]);
+    conv1d_1_stride_loader = weights_json["/conv1d_1_stride"_json_pointer];
 
     conv1d_1_kernel_size = conv1d_1_kernel_nc.size();  //num channels, not kernel_size
     conv1d_1_num_channels = conv1d_1_bias_nc.size();
@@ -93,7 +97,6 @@ void ModelLoader::load_json(const char *filename)
     std::vector<std::vector<float>> dense_kernel = weights_json["/dense/kernel:0"_json_pointer];
     dense_bias_nc = vector_to_nc(dense_bias);
     dense_kernel_nc = matrix_to_nc(dense_kernel);
-
 
 }
 

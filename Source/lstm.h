@@ -23,20 +23,21 @@ class lstm
         void unfold(int kernel_size, int stride);
 
         // Layers
-        void conv1d_layer(nc::NdArray<float> xt, int stride);
-        void conv1d_layer2(int stride);
+        void conv1d_layer(nc::NdArray<float> xt);
+        void conv1d_layer2();
         void lstm_layer();
         void dense_layer();
 
         void lstm::check_buffer(int numSamples);
         void lstm::set_data(const float* inData, int numSamples);
-        void lstm::process(const float* inData, float* outData, int stride, int numSamples);
+        void lstm::process(const float* inData, float* outData, int numSamples);
 
         void setParams(int hidden_size, int conv1d_num_kernels, int conv1d_1_num_kernels, int conv1d_stride, int conv1d_1_stride,
             nc::NdArray<float> conv1d_bias_nc, nc::NdArray<float> conv1d_1_bias_nc,
             std::vector<nc::NdArray<float>> conv1d_kernel_nc, std::vector<nc::NdArray<float>> conv1d_1_kernel_nc,
             nc::NdArray<float> lstm_bias_nc, nc::NdArray<float> lstm_kernel_nc,
-            nc::NdArray<float> dense_bias_nc, nc::NdArray<float> dense_kernel_nc, int input_size_loader);
+            nc::NdArray<float> dense_bias_nc, nc::NdArray<float> dense_kernel_nc, int input_size_loader,
+            int conv1d_stride_loader, int conv1d_1_stride_loader);
 
 
         // Data processing
@@ -53,6 +54,8 @@ class lstm
         int conv1d_Num_Channels = 0;
         int conv1d_1_Kernel_Size = 0;
         int conv1d_1_Num_Channels = 0;
+        int conv1d_stride = 0;
+        int conv1d_1_stride = 0;
 
         int seq_len = 1;
         int local_channels = 1;

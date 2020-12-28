@@ -26,13 +26,13 @@ SmartAmpProAudioProcessor::SmartAmpProAudioProcessor()
 #endif
 {
 
-    loader.load_json("C:/Users/KBloemer/Desktop/Archive/SmartAmpPro/models/nol_small_120.json");
+    loader.load_json("C:/Users/KBloemer/Desktop/Archive/SmartAmpPro/models/gran_con4_hs24_in120d.json");
 
     LSTM.setParams(loader.hidden_size, loader.conv1d_kernel_size, loader.conv1d_1_kernel_size,
         loader.conv1d_num_channels, loader.conv1d_1_num_channels, loader.conv1d_bias_nc,
         loader.conv1d_1_bias_nc, loader.conv1d_kernel_nc, loader.conv1d_1_kernel_nc,
         loader.lstm_bias_nc, loader.lstm_kernel_nc,
-        loader.dense_bias_nc, loader.dense_kernel_nc, loader.input_size_loader);
+        loader.dense_bias_nc, loader.dense_kernel_nc, loader.input_size_loader, loader.conv1d_stride_loader, loader.conv1d_1_stride_loader);
 }
 
 SmartAmpProAudioProcessor::~SmartAmpProAudioProcessor()
@@ -156,7 +156,7 @@ void SmartAmpProAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
         buffer.applyGain(ampDrive);
 
 		// Apply LSTM model
-        LSTM.process(buffer.getReadPointer(0), buffer.getWritePointer(0), 12, numSamples);
+        LSTM.process(buffer.getReadPointer(0), buffer.getWritePointer(0), numSamples);
 
         //    Master Volume 
         buffer.applyGain(ampMaster);
@@ -199,13 +199,13 @@ void SmartAmpProAudioProcessor::loadDefault()
 {
     this->suspendProcessing(true);
 
-    loader.load_json("C:/Users/KBloemer/Desktop/Archive/SmartAmpPro/models/nol_small_120.json");  // TODO: Change ModelLoader to use JUCE json to read .json files    ***EDIT HERE***
+    loader.load_json("C:/Users/KBloemer/Desktop/Archive/SmartAmpPro/models/gran_con4_hs24_in120d.json");  // TODO: Change ModelLoader to use JUCE json to read .json files    ***EDIT HERE***
     //loader.load_json(BinaryData::nol_small_120_json);
     LSTM.setParams(loader.hidden_size, loader.conv1d_kernel_size, loader.conv1d_1_kernel_size,
         loader.conv1d_num_channels, loader.conv1d_1_num_channels, loader.conv1d_bias_nc,
         loader.conv1d_1_bias_nc, loader.conv1d_kernel_nc, loader.conv1d_1_kernel_nc,
         loader.lstm_bias_nc, loader.lstm_kernel_nc,
-        loader.dense_bias_nc, loader.dense_kernel_nc, loader.input_size_loader);
+        loader.dense_bias_nc, loader.dense_kernel_nc, loader.input_size_loader, loader.conv1d_stride_loader, loader.conv1d_1_stride_loader);
 
     this->suspendProcessing(false);
 }
@@ -222,7 +222,7 @@ void SmartAmpProAudioProcessor::loadConfig(File configFile)
         loader.conv1d_num_channels, loader.conv1d_1_num_channels, loader.conv1d_bias_nc,
         loader.conv1d_1_bias_nc, loader.conv1d_kernel_nc, loader.conv1d_1_kernel_nc,
         loader.lstm_bias_nc, loader.lstm_kernel_nc,
-        loader.dense_bias_nc, loader.dense_kernel_nc, loader.input_size_loader);
+        loader.dense_bias_nc, loader.dense_kernel_nc, loader.input_size_loader, loader.conv1d_stride_loader, loader.conv1d_1_stride_loader);
 
     this->suspendProcessing(false);
 }
