@@ -21,12 +21,14 @@ class lstm
         double sigmoid(double x);
         nc::NdArray<float> pad(nc::NdArray<float> xt, int kernel_size, int stride);
         std::vector<nc::NdArray<float>> unfold(nc::NdArray<float> padded_xt, int kernel_size, int stride, int layer_num);
-
+        std::vector<nc::NdArray<float>> unfold2(nc::NdArray<float> padded_xt, int kernel_size, int stride, int layer_num);
         // Layers
-        nc::NdArray<float> conv1d_layer(nc::NdArray<float> xt, std::vector<nc::NdArray<float>> weight,
+        void conv1d_layer(nc::NdArray<float> xt, std::vector<nc::NdArray<float>> weight,
             nc::NdArray<float> bias, int kernel_size, int channels, int stride, int layer_num);
-        nc::NdArray<float> lstm_layer(nc::NdArray<float> xt);
-        nc::NdArray<float> dense_layer(nc::NdArray<float> xt);
+        void conv1d_layer2(nc::NdArray<float> xt, std::vector<nc::NdArray<float>> weight,
+            nc::NdArray<float> bias, int kernel_size, int channels, int stride, int layer_num);
+        void lstm_layer(nc::NdArray<float> xt);
+        void dense_layer(nc::NdArray<float> xt);
 
 
         void setParams(int hidden_size, int conv1d_num_kernels, int conv1d_1_num_kernels, int conv1d_stride, int conv1d_1_stride,
@@ -83,6 +85,19 @@ class lstm
         nc::NdArray<float> conv1d_1_out;
         nc::NdArray<float> lstm_out;
         nc::NdArray<float> dense_out;
+
+        // conv1d arrays
+        
+        nc::NdArray<float> placeholder;
+        nc::NdArray<float> placeholder2;
+        std::vector<nc::NdArray<float>> unfolded_xt;
+        nc::NdArray<float> padded_xt;
+        std::vector<nc::NdArray<float>> unfolded_xt2;
+        //unfolded_xt2.reserve(1);
+        nc::NdArray<float> padded_xt2;
+        nc::NdArray<float> out;
+        nc::NdArray<float> out2;
+        
 
     private:
 

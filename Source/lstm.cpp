@@ -100,13 +100,37 @@ nc::NdArray<float> lstm::pad(nc::NdArray<float> xt, int kernel_size, int stride)
 
 std::vector<nc::NdArray<float>> lstm::unfold(nc::NdArray<float> padded_xt, int kernel_size, int stride, int layer_num)
 {
-    std::vector<nc::NdArray<float>> unfolded_xt;
+    //std::vector<nc::NdArray<float>> unfolded_xt;
 
     //if (padded_xt.shape().rows == 12) {  // if 2nd conv1d layer TODO figure out how to get both to work with same code
-    if (layer_num > 1) {
-        nc::NdArray<float> placeholder = padded_xt;
-        unfolded_xt.push_back(placeholder);
-    } else {
+    //if (layer_num > 1) {
+    //    nc::NdArray<float> placeholder = padded_xt;
+    //    unfolded_xt.push_back(placeholder);
+    //} else {
+
+    for (int i = 0; i < padded_xt.shape().rows / stride; i++)
+    {
+        placeholder = padded_xt(nc::Slice(i * stride, i * stride + kernel_size), 0);
+        //unfolded_xt.push_back(placeholder);
+        unfolded_xt[i] = placeholder;
+    }
+    //}
+
+    return unfolded_xt;
+}
+
+
+std::vector<nc::NdArray<float>> lstm::unfold2(nc::NdArray<float> padded_xt, int kernel_size, int stride, int layer_num)
+{
+    //std::vector<nc::NdArray<float>> unfolded_xt2;
+
+    //if (padded_xt.shape().rows == 12) {  // if 2nd conv1d layer TODO figure out how to get both to work with same code
+    //if (layer_num > 1) {
+        //placeholder = padded_xt;
+    unfolded_xt[0] = padded_xt;
+    //}
+    /*
+    else {
 
         for (int i = 0; i < padded_xt.shape().rows / stride; i++)
         {
@@ -114,19 +138,19 @@ std::vector<nc::NdArray<float>> lstm::unfold(nc::NdArray<float> padded_xt, int k
             unfolded_xt.push_back(placeholder);
         }
     }
+    */
 
     return unfolded_xt;
 }
 
 
-
-nc::NdArray<float> lstm::conv1d_layer(nc::NdArray<float> xt, std::vector<nc::NdArray<float>> weight,
+void lstm::conv1d_layer(nc::NdArray<float> xt, std::vector<nc::NdArray<float>> weight,
                                       nc::NdArray<float> bias,int kernel_size, int channels, int stride, int layer_num)
 {
-    nc::NdArray<float> padded_xt = pad(xt, kernel_size, stride);
-    std::vector<nc::NdArray<float>> unfolded_xt = unfold(padded_xt, kernel_size, stride, layer_num); // unfolded xt (9, 12, 1) .  weight shape (12, 1, 16), (tensordot(unfolded_xt, weight) = (9,16))
+    padded_xt = pad(xt, kernel_size, stride);
+    unfolded_xt = unfold(padded_xt, kernel_size, stride, layer_num); // unfolded xt (9, 12, 1) .  weight shape (12, 1, 16), (tensordot(unfolded_xt, weight) = (9,16))
 
-    nc::NdArray<float> out = nc::zeros<float>(nc::Shape(unfolded_xt.size(), weight[0].shape().cols)); //zeros instead of random faster?
+    out = nc::zeros<float>(nc::Shape(unfolded_xt.size(), weight[0].shape().cols)); //zeros instead of random faster?
     // Compute tensordot
     len_i = unfolded_xt.size(); //9
     len_o = weight[0].shape().cols; //16
@@ -152,11 +176,47 @@ nc::NdArray<float> lstm::conv1d_layer(nc::NdArray<float> xt, std::vector<nc::NdA
 
     out = out + bias;
 
-    return out;
+    //return out;
+}
+
+
+void lstm::conv1d_layer2(nc::NdArray<float> xt, std::vector<nc::NdArray<float>> weight,
+    nc::NdArray<float> bias, int kernel_size, int channels, int stride, int layer_num)
+{
+    padded_xt2 = pad(xt, kernel_size, stride);
+    unfolded_xt2 = unfold2(padded_xt, kernel_size, stride, layer_num); // unfolded xt (9, 12, 1) .  weight shape (12, 1, 16), (tensordot(unfolded_xt, weight) = (9,16))
+
+    out2 = nc::zeros<float>(nc::Shape(unfolded_xt.size(), weight[0].shape().cols)); //zeros instead of random faster?
+    // Compute tensordot
+    len_i = unfolded_xt.size(); //9
+    len_o = weight[0].shape().cols; //16
+    len_j = weight.size(); //12
+    len_k = unfolded_xt[0].shape().cols; //1
+    total = 0.0;
+    //std::cout << len_i << " " << len_o << " " << len_j << " " << len_k << " " << std::endl;
+    for (int i = 0; i < len_i; i++)
+    {
+        for (int o = 0; o < len_o; o++)
+        {
+            total = 0.0;
+            for (int j = 0; j < len_j; j++)
+            {
+                for (int k = 0; k < len_k; k++)
+                {
+                    total += unfolded_xt[i](j, k) * weight[j](k, o);
+                }
+            }
+            out2(i, o) = total; //Faster to sum all here, or in the k loop?
+        }
+    }
+
+    out2 = out2 + bias;
+
+    //return out2;
 }
 
 //==============================================================================
-nc::NdArray<float> lstm::lstm_layer(nc::NdArray<float> xt)
+void lstm::lstm_layer(nc::NdArray<float> xt)
 {
 
     gates = nc::dot(xt, W) + bias; 
@@ -166,10 +226,10 @@ nc::NdArray<float> lstm::lstm_layer(nc::NdArray<float> xt)
         h_t[i] = sigmoid(gates[3 * HS + i]) * nc::tanh(sigmoid(gates[i]) * nc::tanh(gates[2 * HS + i]));
     }
 
-    return h_t;
+    //return h_t;
 }
 
-nc::NdArray<float> lstm::dense_layer(nc::NdArray<float> xt)
+void lstm::dense_layer(nc::NdArray<float> xt)
 {
-    return nc::dot(xt, dense_kernel) + dense_bias;
+    dense_out = nc::dot(xt, dense_kernel) + dense_bias;
 }

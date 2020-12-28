@@ -26,7 +26,7 @@ SmartAmpProAudioProcessor::SmartAmpProAudioProcessor()
 #endif
 {
 
-    loader.load_json("C:/Users/KBloemer/Desktop/Archive/SmartAmpPro/models/nol_small_120.json");
+    loader.load_json("C:/Users/rache/Desktop/dev/SmartAmpPro/models/nol_small_120.json");
 
     LSTM.setParams(loader.hidden_size, loader.conv1d_kernel_size, loader.conv1d_1_kernel_size,
         loader.conv1d_num_channels, loader.conv1d_1_num_channels, loader.conv1d_bias_nc,
@@ -187,6 +187,18 @@ void SmartAmpProAudioProcessor::check_buffer(int numSamples, int input_size)  //
         data = temp3;
         // Reset the input
         input = nc::zeros<float>(nc::Shape(input_size, 1));
+        //Set initial conv1d layer 1 arrays
+        LSTM.padded_xt = LSTM.pad(input, LSTM.conv1d_Kernel_Size, 12); //TODO ability to set stride
+        LSTM.unfolded_xt.clear();
+        for (int i = 0; i < LSTM.padded_xt.shape().rows / 12; i++)
+        {
+            LSTM.placeholder = LSTM.padded_xt(nc::Slice(i * 12, i * 12 + LSTM.conv1d_Kernel_Size), 0);
+            LSTM.unfolded_xt.push_back(LSTM.placeholder);
+        }
+        // Set initial conv1d layer 2 array
+        LSTM.unfolded_xt2.clear();
+        nc::NdArray<float> placeholder_temp;
+        LSTM.unfolded_xt2.push_back(placeholder_temp);
     }
 }
 
@@ -218,10 +230,10 @@ void SmartAmpProAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
             }
 
             // Process LSTM for a single sample
-            LSTM.conv1d_out = LSTM.conv1d_layer(input, LSTM.conv1d_kernel, LSTM.conv1d_bias, LSTM.conv1d_Kernel_Size, LSTM.conv1d_Num_Channels, 12, 1); // 12 is stride // TODO handle different strides
-            LSTM.conv1d_1_out = LSTM.conv1d_layer(LSTM.conv1d_out, LSTM.conv1d_1_kernel, LSTM.conv1d_1_bias, LSTM.conv1d_1_Kernel_Size, LSTM.conv1d_1_Num_Channels, 12, 2); // 12 is stride // TODO handle different strides
-            LSTM.lstm_out = LSTM.lstm_layer(LSTM.conv1d_1_out);
-            LSTM.dense_out = LSTM.dense_layer(LSTM.lstm_out);
+            LSTM.conv1d_layer(input, LSTM.conv1d_kernel, LSTM.conv1d_bias, LSTM.conv1d_Kernel_Size, LSTM.conv1d_Num_Channels, 12, 1); // 12 is stride // TODO handle different strides
+            LSTM.conv1d_layer2(LSTM.conv1d_out, LSTM.conv1d_1_kernel, LSTM.conv1d_1_bias, LSTM.conv1d_1_Kernel_Size, LSTM.conv1d_1_Num_Channels, 12, 2); // 12 is stride // TODO handle different strides
+            LSTM.lstm_layer(LSTM.conv1d_1_out);
+            LSTM.dense_layer(LSTM.lstm_out);
 
             // Write the LSTM result to the output buffer
             channelData[i] = LSTM.dense_out[0];
@@ -269,7 +281,7 @@ void SmartAmpProAudioProcessor::loadDefault()
 {
     this->suspendProcessing(true);
 
-    loader.load_json("C:/Users/KBloemer/Desktop/Archive/SmartAmpPro/models/nol_small_120.json");  // TODO: Change ModelLoader to use JUCE json to read .json files    ***EDIT HERE***
+    loader.load_json("C:/Users/rache/Desktop/dev/SmartAmpPro/models/nol_small_120.json");  // TODO: Change ModelLoader to use JUCE json to read .json files    ***EDIT HERE***
     //loader.load_json(BinaryData::nol_small_120_json);
     LSTM.setParams(loader.hidden_size, loader.conv1d_kernel_size, loader.conv1d_1_kernel_size,
         loader.conv1d_num_channels, loader.conv1d_1_num_channels, loader.conv1d_bias_nc,
