@@ -28,6 +28,9 @@ class lstm
         void lstm_layer();
         void dense_layer();
 
+        void lstm::check_buffer(int numSamples);
+        void lstm::set_data(const float* inData, int numSamples);
+        void lstm::process(const float* inData, float* outData, int stride, int numSamples);
 
         void setParams(int hidden_size, int conv1d_num_kernels, int conv1d_1_num_kernels, int conv1d_stride, int conv1d_1_stride,
             nc::NdArray<float> conv1d_bias_nc, nc::NdArray<float> conv1d_1_bias_nc,
@@ -35,9 +38,15 @@ class lstm
             nc::NdArray<float> lstm_bias_nc, nc::NdArray<float> lstm_kernel_nc,
             nc::NdArray<float> dense_bias_nc, nc::NdArray<float> dense_kernel_nc, int input_size_loader);
 
+
+        // Data processing
+        nc::NdArray<float> input = nc::zeros<float>(nc::Shape(input_size, 1));
+        std::vector<float> new_buffer;
+        std::vector<float> old_buffer;
+        std::vector<std::vector<float>> data;
+
         // Network Parameters
         int input_size = 120; // TODO read from file
-        int layer_num = 1;
 
         int HS = 1;
         int conv1d_Kernel_Size = 0;

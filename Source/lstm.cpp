@@ -184,3 +184,149 @@ void lstm::dense_layer()
     dense_out = nc::dot(lstm_out, dense_kernel) + dense_bias;
 }
 
+
+
+void lstm::check_buffer(int numSamples)  //TODO this is called every block, how to call just at beginning and when buffer size changes?
+{
+    //This is done at plugin start up and when a new model is loaded, or when the buffer size is changed (numSamples)
+    if (old_buffer.size() != numSamples + input_size - 1) {
+        std::vector<float> temp(numSamples + input_size - 1, 0.0);
+        old_buffer = temp;
+        new_buffer = temp;
+        std::vector<std::vector<float>> temp3(numSamples, std::vector<float>(input_size, 0.0));  //vector<vector> 128, 120
+        data = temp3;
+        // Reset the input
+        input = nc::zeros<float>(nc::Shape(input_size, 1));
+        //Set initial conv1d layer 1 arrays
+        padded_xt = pad(input, conv1d_Kernel_Size, 12); //TODO ability to set stride
+        unfolded_xt.clear();
+        for (int i = 0; i < padded_xt.shape().rows / 12; i++)
+        {
+            unfolded_xt.push_back(padded_xt(nc::Slice(i * 12, i * 12 + conv1d_Kernel_Size), 0));
+        }
+        conv1d_out = nc::zeros<float>(nc::Shape(unfolded_xt.size(), conv1d_kernel[0].shape().cols));
+        // Set initial conv1d layer 2 array
+        unfolded_xt2.clear();
+        nc::NdArray<float> placeholder_temp;
+        unfolded_xt2.push_back(placeholder_temp);
+        conv1d_1_out = nc::zeros<float>(nc::Shape(unfolded_xt2.size(), conv1d_1_kernel[0].shape().cols));
+    }
+}
+
+void lstm::set_data(const float* chData, int numSamples)
+{
+
+    //const float* chData = inputData[0];
+
+    // Move input_size-1 of last buffer to the beginning of new_buffer
+    for (int k = 0; k < input_size - 1; k++)
+    {
+        new_buffer[k] = old_buffer[numSamples + k]; // TODO double check indexing
+    }
+
+    // Update new_buffer with current buffer data
+    for (int i = 0; i < numSamples; i++)
+    {
+        new_buffer[i + input_size - 1] = chData[i]; // TODO double check indexing
+    }
+
+    // Build array of inputs to the network from the new_buffer
+    for (int i = 0; i < numSamples; i++)
+    {
+        for (int j = 0; j < input_size; j++) {
+            data[i][j] = new_buffer[i + j];
+        }
+    }
+
+    // Set the new_buffer data to old_buffer for the next block of audio
+    old_buffer = new_buffer;
+}
+
+void lstm::process(const float* inData, float* outData, int stride, int numSamples)
+{
+    check_buffer(numSamples);
+    set_data(inData, numSamples);
+
+    for (int i = 0; i < numSamples; i++)
+    {
+
+
+        // Set the current sample input to LSTM
+        for (int j = 0; j < input_size; j++) {
+            input[j] = data[i][j];
+        }
+
+        // CONV1D LAYER
+        padded_xt = pad(input, conv1d_Kernel_Size, stride);
+        unfold(conv1d_Kernel_Size, stride); // unfolded xt (9, 12, 1) .  weight shape (12, 1, 16), (tensordot(unfolded_xt, weight) = (9,16))
+
+        // Compute tensordot
+        len_i = unfolded_xt.size(); //9
+        len_o = conv1d_kernel[0].shape().cols; //16
+        len_j = conv1d_kernel.size(); //12
+        len_k = unfolded_xt[0].shape().cols; //1
+        total = 0.0;
+
+        for (int i = 0; i < len_i; i++)
+        {
+            for (int o = 0; o < len_o; o++)
+            {
+                total = 0.0;
+                for (int j = 0; j < len_j; j++)
+                {
+                    for (int k = 0; k < len_k; k++)
+                    {
+                        total += unfolded_xt[i](j, k) * conv1d_kernel[j](k, o);
+                    }
+                }
+                conv1d_out(i, o) = total; //Faster to sum all here
+            }
+        }
+
+        conv1d_out = conv1d_out + conv1d_bias;
+
+
+        // CONV1D_1 LAYER
+        padded_xt2 = pad(conv1d_out, conv1d_1_Kernel_Size, stride);
+        unfolded_xt2[0] = padded_xt;
+
+        // Compute tensordot
+        len_i = unfolded_xt2.size(); //9
+        len_o = conv1d_1_kernel[0].shape().cols; //16
+        len_j = conv1d_1_kernel.size(); //12
+        len_k = unfolded_xt2[0].shape().cols; //1
+        total = 0.0;
+        for (int i = 0; i < len_i; i++)
+        {
+            for (int o = 0; o < len_o; o++)
+            {
+                total = 0.0;
+                for (int j = 0; j < len_j; j++)
+                {
+                    for (int k = 0; k < len_k; k++)
+                    {
+                        total += unfolded_xt2[i](j, k) * conv1d_1_kernel[j](k, o);
+                    }
+                }
+                conv1d_1_out(i, o) = total; //Faster to sum all here
+            }
+        }
+        conv1d_1_out = conv1d_1_out + conv1d_1_bias;
+
+        // LSTM LAYER
+        gates = nc::dot(conv1d_1_out, W) + bias;
+
+        // Check if using slicing notation is faster here         np: a[2:5, 5:8]	NC :   a(nc::Slice(2, 5), nc::Slice(5, 8))
+        for (int i = 0; i < HS; i++) {
+            h_t[i] = sigmoid(gates[3 * HS + i]) * nc::tanh(sigmoid(gates[i]) * nc::tanh(gates[2 * HS + i]));
+        }
+        lstm_out = h_t;
+
+        // DENSE LAYER
+        dense_out = nc::dot(lstm_out, dense_kernel) + dense_bias;
+
+        // Write to buffer
+        outData[i] = dense_out[0];
+    }
+
+}

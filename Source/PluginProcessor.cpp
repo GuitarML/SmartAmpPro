@@ -138,61 +138,6 @@ bool SmartAmpProAudioProcessor::isBusesLayoutSupported (const BusesLayout& layou
 }
 #endif
 
-void SmartAmpProAudioProcessor::set_data(const float **inputData, int numSamples, int input_size)
-{
-
-    const float *chData = inputData[0];
-
-    // Move input_size-1 of last buffer to the beginning of new_buffer
-    for (int k = 0; k < input_size - 1; k++)
-    {
-        new_buffer[k] = old_buffer[numSamples + k]; // TODO double check indexing
-    }
-
-    // Update new_buffer with current buffer data
-    for (int i = 0; i < numSamples; i++)
-    {
-        new_buffer[i + input_size - 1] = chData[i]; // TODO double check indexing
-    }
-
-    // Build array of inputs to the network from the new_buffer
-    for (int i = 0; i < numSamples; i++)
-    {
-        for (int j = 0; j < input_size; j++) {
-            data[i][j] = new_buffer[i + j];
-        }
-    }
-
-    // Set the new_buffer data to old_buffer for the next block of audio
-    old_buffer = new_buffer;
-}
-
-void SmartAmpProAudioProcessor::check_buffer(int numSamples, int input_size)  //TODO this is called every block, how to call just at beginning and when buffer size changes?
-{
-    //This is done at plugin start up and when a new model is loaded, or when the buffer size is changed (numSamples)
-    if (old_buffer.size() != numSamples + input_size - 1) {
-        std::vector<float> temp(numSamples + input_size - 1, 0.0);
-        old_buffer = temp;
-        new_buffer = temp;
-        std::vector<std::vector<float>> temp3(numSamples, std::vector<float>(input_size, 0.0));  //vector<vector> 128, 120
-        data = temp3;
-        // Reset the input
-        input = nc::zeros<float>(nc::Shape(input_size, 1));
-        //Set initial conv1d layer 1 arrays
-        LSTM.padded_xt = LSTM.pad(input, LSTM.conv1d_Kernel_Size, 12); //TODO ability to set stride
-        LSTM.unfolded_xt.clear();
-        for (int i = 0; i < LSTM.padded_xt.shape().rows / 12; i++)
-        {
-            LSTM.unfolded_xt.push_back(LSTM.padded_xt(nc::Slice(i * 12, i * 12 + LSTM.conv1d_Kernel_Size), 0));
-        }
-        LSTM.conv1d_out = nc::zeros<float>(nc::Shape(LSTM.unfolded_xt.size(), LSTM.conv1d_kernel[0].shape().cols));
-        // Set initial conv1d layer 2 array
-        LSTM.unfolded_xt2.clear();
-        nc::NdArray<float> placeholder_temp;
-        LSTM.unfolded_xt2.push_back(placeholder_temp);
-        LSTM.conv1d_1_out = nc::zeros<float>(nc::Shape(LSTM.unfolded_xt2.size(), LSTM.conv1d_1_kernel[0].shape().cols));
-    }
-}
 
 void SmartAmpProAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
@@ -206,32 +151,13 @@ void SmartAmpProAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
     // Amp =============================================================================
     if (amp_state == 1) {
         //    EQ (Presence, Bass, Mid, Treble)
-        eq4band.process(buffer, midiMessages, numSamples, numInputChannels);
+        eq4band.process(buffer.getWritePointer(0), midiMessages, numSamples, numInputChannels); 
 
         buffer.applyGain(ampDrive);
 
 		// Apply LSTM model
-        
-        check_buffer(numSamples, LSTM.input_size);
-        set_data(buffer.getArrayOfReadPointers(), numSamples, LSTM.input_size);
-        for (int i = 0; i < numSamples; i++)
-        {
-            // Set the current sample input to LSTM
-            for (int j = 0; j < LSTM.input_size; j++) {
-                input[j] = data[i][j];
-            }
+        LSTM.process(buffer.getReadPointer(0), buffer.getWritePointer(0), 12, numSamples);
 
-            // Process LSTM for a single sample
-            LSTM.conv1d_layer(input, 12); // 12 is stride // TODO handle different strides
-            LSTM.conv1d_layer2(12); // 12 is stride // TODO handle different strides
-            LSTM.lstm_layer();
-            LSTM.dense_layer();
-
-            // Write the LSTM result to the output buffer
-            channelData[i] = LSTM.dense_out[0];
-
-        }
-        
         //    Master Volume 
         buffer.applyGain(ampMaster);
 

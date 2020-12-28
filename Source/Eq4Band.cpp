@@ -13,28 +13,28 @@ Eq4Band::Eq4Band()
     setParameters(0.0, 0.0, 0.0, 0.0);
 }
 
-void Eq4Band::process (AudioBuffer<float>& buffer, 
+void Eq4Band::process (float* channelData,
                                     MidiBuffer& midiMessages, 
                                     const int numSamples, 
                                     const int numInputChannels)
 {
-    for (int channel = 0; channel < numInputChannels; ++channel) {
-        float* channelData = buffer.getWritePointer(channel);
+    //for (int channel = 0; channel < numInputChannels; ++channel) {
+        //float* channelData = buffer.getWritePointer(channel);
         // For each sample in the block of audio, apply filter
-        for (int sample = 0; sample < numSamples; ++sample) {
-            spl0 = channelData[sample];
-            s0 = spl0;
-            low0 = (tmplMID = a0MID * s0 - b1MID * tmplMID + cDenorm);
-            spl0 = (tmplLOW = a0LOW * low0 - b1LOW * tmplLOW + cDenorm);
-            lowS0 = low0 - spl0;
-            hi0 = s0 - low0;
-            midS0 = (tmplHI = a0HI * hi0 - b1HI * tmplHI + cDenorm);
-            highS0 = hi0 - midS0;
-            spl0 = (spl0 * lVol + lowS0 * lmVol + midS0 * hmVol + highS0 * hVol);// * outVol;
+    for (int sample = 0; sample < numSamples; ++sample) {
+        spl0 = channelData[sample];
+        s0 = spl0;
+        low0 = (tmplMID = a0MID * s0 - b1MID * tmplMID + cDenorm);
+        spl0 = (tmplLOW = a0LOW * low0 - b1LOW * tmplLOW + cDenorm);
+        lowS0 = low0 - spl0;
+        hi0 = s0 - low0;
+        midS0 = (tmplHI = a0HI * hi0 - b1HI * tmplHI + cDenorm);
+        highS0 = hi0 - midS0;
+        spl0 = (spl0 * lVol + lowS0 * lmVol + midS0 * hmVol + highS0 * hVol);// * outVol;
    
-            channelData[sample] = spl0;
-        }
+        channelData[sample] = spl0;
     }
+    //}
 }
 
 void Eq4Band::setParameters(float bass_slider, float mid_slider, float treble_slider, float presence_slider)

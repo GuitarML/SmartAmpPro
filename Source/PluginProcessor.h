@@ -95,15 +95,6 @@ public:
 
     ModelLoader loader;
     lstm LSTM;
-    nc::NdArray<float> input = nc::zeros<float>(nc::Shape(LSTM.input_size, 1));
-    
-    std::vector<float> new_buffer;
-
-    std::vector<float> old_buffer;
-    std::vector<std::vector<float>> data;
-
-    void set_data(const float **inputData, int numSamples, int input_size);
-    void check_buffer(int numSamples, int input_size);
 
 private:
     Eq4Band eq4band; // Amp EQ
