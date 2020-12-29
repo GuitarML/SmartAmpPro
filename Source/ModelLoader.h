@@ -20,6 +20,8 @@ public:
     int conv1d_num_channels = 0;
     int conv1d_1_kernel_size = 0;
     int conv1d_1_num_channels = 0;
+    int conv1d_stride_loader = 0;
+    int conv1d_1_stride_loader = 0;
 
     nc::NdArray<float> conv1d_bias_nc;
     std::vector<nc::NdArray<float>> conv1d_kernel_nc;
