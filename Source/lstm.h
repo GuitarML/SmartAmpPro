@@ -18,7 +18,7 @@ class lstm
         lstm();
 
         // Math and vector operations
-        double sigmoid(double x);
+        double sigmoid(float x);
         nc::NdArray<float> pad(nc::NdArray<float> xt, int kernel_size, int stride);
         void unfold(int kernel_size, int stride);
 

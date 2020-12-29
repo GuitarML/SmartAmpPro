@@ -10,14 +10,23 @@
 #include <boost/range/irange.hpp>
 #include <iostream>
 
-//==============================================================================
+
 lstm::lstm()
+//====================================================================
+// Description: Default constructor for lstm class
+//
+//====================================================================
 {
 
 }
 
 
-double lstm::sigmoid(double x)
+double lstm::sigmoid(float x)
+//====================================================================
+// Description: Takes the sigmoid of a sample of audio. Used in 
+//   lstm gates.
+//
+//====================================================================
 {
     return 1.0f / (1.0f + expf(-x));
 }
@@ -28,6 +37,13 @@ void lstm::setParams(int hidden_size, int conv1d_kernel_size, int conv1d_1_kerne
                     nc::NdArray<float> lstm_bias_nc, nc::NdArray<float> lstm_kernel_nc, 
                     nc::NdArray<float> dense_bias_nc, nc::NdArray<float> dense_kernel_nc, int input_size_loader, 
                     int conv1d_stride_loader, int conv1d_1_stride_loader)
+//====================================================================
+// Description: Sets the parameters for the lstm class from the 
+//   model loader class. These are set once when the default model 
+//   is loaded, and are reset when a new model is loaded. Certain
+//   arrays are initialized here based on the model params.
+//
+//====================================================================
 {
     input_size = input_size_loader;
     HS = hidden_size;
@@ -82,6 +98,13 @@ void lstm::setParams(int hidden_size, int conv1d_kernel_size, int conv1d_1_kerne
 
 
 nc::NdArray<float> lstm::pad(nc::NdArray<float> xt, int kernel_size, int stride) //TODO optimize these calculations, one for each conv1d layer, only do once
+//====================================================================
+// Description: Used in the in conv1d layers. This function applies
+//   'same' padding to the input data to the conv1d layer. The padding
+//   is all zeros. The amount of padding is based on the kernel_size
+//   and stride of the conv1d layer.
+//
+//====================================================================
 {
     seq_len = xt.shape().rows;
     local_channels = xt.shape().cols;
@@ -100,6 +123,13 @@ nc::NdArray<float> lstm::pad(nc::NdArray<float> xt, int kernel_size, int stride)
 
 
 void lstm::unfold(int kernel_size, int stride)
+//====================================================================
+// Description: Used in the conv1d layers. This creates and 'unfolded'
+//   array from the input data, and depends on the kernel_size and
+//   stride. Each unfolded array is the 'sliding window' of size
+//   kernel_size used in the convolution.
+//
+//====================================================================
 {
     // TODO Having a kernel_size and stride that are not equal for the same conv1d layer breaks here (indexing issue), figure out why
     for (int i = 0; i < padded_xt.shape().rows / stride; i++)
@@ -110,6 +140,14 @@ void lstm::unfold(int kernel_size, int stride)
 
 
 void lstm::conv1d_layer(nc::NdArray<float> xt)
+//====================================================================
+// Description: This is the first conv1d layer. It performes a 1 dimentional
+//   convolution on the input data, and applies 'same' padding.
+//   This is not a full implementation of a conv1d, and is specific
+//   to this project. Kernel size and stride are determined based
+//   on the trained model. 
+//
+//====================================================================
 {
     padded_xt = pad(xt, conv1d_Kernel_Size, conv1d_stride);
     unfold(conv1d_Kernel_Size, conv1d_stride); // unfolded xt (9, 12, 1) .  weight shape (12, 1, 16), (tensordot(unfolded_xt, weight) = (9,16))
@@ -142,6 +180,14 @@ void lstm::conv1d_layer(nc::NdArray<float> xt)
 
 
 void lstm::conv1d_layer2()
+//====================================================================
+// Description: This is the second conv1d layer. It performes a 
+//   1-D convolution on the input data, and applies 'same' padding.
+//   This is not a full implementation of a conv1d, and is specific
+//   to this project. Kernel size and stride are determined based
+//   on the trained model. 
+//
+//====================================================================
 {
     padded_xt2 = pad(conv1d_out, conv1d_1_Kernel_Size, conv1d_1_stride);
     unfolded_xt2[0] = padded_xt2;
@@ -172,6 +218,12 @@ void lstm::conv1d_layer2()
 
 //==============================================================================
 void lstm::lstm_layer()
+//====================================================================
+// Description: This is the lstm layer. It has been simplified from
+//   the full implementation to use stateful=False (the default setting
+//   in Keras). This is the third layer in the stack.
+//
+//====================================================================
 {
 
     gates = nc::dot(conv1d_1_out, W) + bias;
@@ -184,6 +236,13 @@ void lstm::lstm_layer()
 }
 
 void lstm::dense_layer()
+//====================================================================
+// Description: This is the dense layer, and the 4th and last layer
+//   in the stack. It takes the output from the lstm layer and
+//   performs a dot product to reduce the network output to a single
+//   predicted sample of audio.
+//
+//====================================================================
 {
     dense_out = nc::dot(lstm_out, dense_kernel) + dense_bias;
 }
@@ -191,6 +250,12 @@ void lstm::dense_layer()
 
 
 void lstm::check_buffer(int numSamples)  //TODO this is called every block, how to call just at beginning and when buffer size changes?
+//====================================================================
+// Description: This checks if either the model or the buffer size
+//   has changed, and if so, initializes certain arrays used for
+//   calculating the output audio buffer. 
+//
+//====================================================================
 {
     //This is done at plugin start up and when a new model is loaded, or when the buffer size is changed (numSamples)
     if (old_buffer.size() != numSamples + input_size - 1) {
@@ -218,6 +283,15 @@ void lstm::check_buffer(int numSamples)  //TODO this is called every block, how 
 }
 
 void lstm::set_data(const float* chData, int numSamples)
+//====================================================================
+// Description: This is called for each block of audio (each buffer).
+//   It updates the buffer with the previous samples of length 
+//   'input_size'.  The input_size is determined by the model, and
+//   is used to predict each output sample of audio. For each output
+//   sample of audio, the previous 'input_size' of samples are 
+//   required to run the prediction.
+//
+//====================================================================
 {
 
     //const float* chData = inputData[0];
@@ -247,6 +321,13 @@ void lstm::set_data(const float* chData, int numSamples)
 }
 
 void lstm::process(const float* inData, float* outData, int numSamples)
+//====================================================================
+// Description: This processes each block (buffer) of audio data. 
+//   It calls the initial data preparation functions, and then 
+//   runs each sample of audio through the deep learning network.
+//   The output is written to the write buffer. 
+//
+//====================================================================
 {
     check_buffer(numSamples);
     set_data(inData, numSamples);
@@ -264,79 +345,6 @@ void lstm::process(const float* inData, float* outData, int numSamples)
         dense_layer();
         outData[i] = dense_out[0];
 
-        /*
-        // CONV1D LAYER
-        padded_xt = pad(input, conv1d_Kernel_Size, stride);
-        unfold(conv1d_Kernel_Size, stride); // unfolded xt (9, 12, 1) .  weight shape (12, 1, 16), (tensordot(unfolded_xt, weight) = (9,16))
-
-        // Compute tensordot
-        len_i = unfolded_xt.size(); //9
-        len_o = conv1d_kernel[0].shape().cols; //16
-        len_j = conv1d_kernel.size(); //12
-        len_k = unfolded_xt[0].shape().cols; //1
-        total = 0.0;
-
-        for (int i = 0; i < len_i; i++)
-        {
-            for (int o = 0; o < len_o; o++)
-            {
-                total = 0.0;
-                for (int j = 0; j < len_j; j++)
-                {
-                    for (int k = 0; k < len_k; k++)
-                    {
-                        total += unfolded_xt[i](j, k) * conv1d_kernel[j](k, o);
-                    }
-                }
-                conv1d_out(i, o) = total; //Faster to sum all here
-            }
-        }
-
-        conv1d_out = conv1d_out + conv1d_bias;
-
-
-        // CONV1D_1 LAYER
-        padded_xt2 = pad(conv1d_out, conv1d_1_Kernel_Size, stride);
-        unfolded_xt2[0] = padded_xt;
-
-        // Compute tensordot
-        len_i = unfolded_xt2.size(); //9
-        len_o = conv1d_1_kernel[0].shape().cols; //16
-        len_j = conv1d_1_kernel.size(); //12
-        len_k = unfolded_xt2[0].shape().cols; //1
-        total = 0.0;
-        for (int i = 0; i < len_i; i++)
-        {
-            for (int o = 0; o < len_o; o++)
-            {
-                total = 0.0;
-                for (int j = 0; j < len_j; j++)
-                {
-                    for (int k = 0; k < len_k; k++)
-                    {
-                        total += unfolded_xt2[i](j, k) * conv1d_1_kernel[j](k, o);
-                    }
-                }
-                conv1d_1_out(i, o) = total; //Faster to sum all here
-            }
-        }
-        conv1d_1_out = conv1d_1_out + conv1d_1_bias;
-
-        // LSTM LAYER
-        gates = nc::dot(conv1d_1_out, W) + bias;
-
-        // Check if using slicing notation is faster here         np: a[2:5, 5:8]	NC :   a(nc::Slice(2, 5), nc::Slice(5, 8))
-        for (int i = 0; i < HS; i++) {
-            h_t[i] = sigmoid(gates[3 * HS + i]) * nc::tanh(sigmoid(gates[i]) * nc::tanh(gates[2 * HS + i]));
-        }
-        lstm_out = h_t;
-
-        // DENSE LAYER
-        dense_out = nc::dot(lstm_out, dense_kernel) + dense_bias;
-        
-        // Write to buffer
-        outData[i] = dense_out[0];
-        */
     }
 
 }
