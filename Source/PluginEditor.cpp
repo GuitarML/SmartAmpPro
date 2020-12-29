@@ -33,6 +33,10 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     loadButton.setButtonText("Load Tone");
     loadButton.addListener(this);
 
+    addAndMakeVisible(recordButton);
+    recordButton.setButtonText("Record");
+    recordButton.addListener(this);
+
     addAndMakeVisible(modelLabel);
     modelLabel.setText(processor.loaded_tone_name, juce::NotificationType::dontSendNotification);
     modelLabel.setJustificationType(juce::Justification::left);
@@ -171,9 +175,9 @@ void SmartAmpProAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
-
-    loadButton.setBounds(50, 20, 125, 25);
-    modelLabel.setBounds(50, 45, 400, 25);
+    recordButton.setBounds(590, 20, 125, 25);
+    loadButton.setBounds(70, 20, 125, 25);
+    modelLabel.setBounds(70, 45, 400, 25);
     // Amp Widgets
     ampPresenceKnob.setBounds(495, 242, 55, 75);
     ampBassKnob.setBounds(253, 242, 55, 75);
@@ -211,6 +215,8 @@ void SmartAmpProAudioProcessorEditor::buttonClicked(juce::Button* button)
         ampOnButtonClicked();
     } else if (button == &loadButton) {
         loadButtonClicked();
+    } else if (button == &recordButton) {
+        recordButtonClicked();
     }
 }
 
@@ -223,6 +229,20 @@ void SmartAmpProAudioProcessorEditor::ampOnButtonClicked() {
         processor.amp_state = 0;
     }
     repaint();
+}
+
+void SmartAmpProAudioProcessorEditor::recordButtonClicked() {
+    if (processor.recording == 0) {
+        processor.audio_recorder.startRecording();
+        processor.recording = 1;
+        recordButton.setColour(TextButton::buttonColourId, Colours::red);
+    }
+    else {
+        processor.audio_recorder.stopRecording();
+        processor.recording = 0;
+        recordButton.setColour(TextButton::buttonColourId, Colours::black);
+    }
+
 }
 
 void SmartAmpProAudioProcessorEditor::sliderValueChanged(Slider* slider)

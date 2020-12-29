@@ -54,6 +54,7 @@ private:
     Image background;
     int current_background = 1;
 
+    TextButton recordButton;
     TextButton loadButton;
     Label modelLabel;
     juce::String fname;
@@ -61,7 +62,7 @@ private:
     void loadButtonClicked();
     virtual void sliderValueChanged(Slider* slider) override;
     void ampOnButtonClicked();
-    void ampCleanLeadButtonClicked();
+    void recordButtonClicked();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SmartAmpProAudioProcessorEditor)
 };
