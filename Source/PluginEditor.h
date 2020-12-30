@@ -19,7 +19,8 @@
 */
 class SmartAmpProAudioProcessorEditor  : public AudioProcessorEditor,
                                        private Button::Listener,
-                                       private Slider::Listener
+                                       private Slider::Listener,
+                                       private Timer
                                 
 {
 public:
@@ -29,7 +30,6 @@ public:
     //==============================================================================
     void paint (Graphics&) override;
     void resized() override;
-
 
 
 private:
@@ -55,6 +55,7 @@ private:
     int current_background = 1;
 
     TextButton recordButton;
+    Label timerLabel;
     TextButton loadButton;
     Label modelLabel;
     juce::String fname;
@@ -63,6 +64,14 @@ private:
     virtual void sliderValueChanged(Slider* slider) override;
     void ampOnButtonClicked();
     void recordButtonClicked();
+
+    // Recording Timer
+    void timerCallback() override;
+    void timer_start();
+    void timer_stop();
+    int t = 0;
+    String seconds = "0";
+    String minutes = "0";
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SmartAmpProAudioProcessorEditor)
 };

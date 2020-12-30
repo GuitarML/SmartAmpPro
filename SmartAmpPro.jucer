@@ -8,12 +8,6 @@
       <FILE id="Uieb0X" name="led_blue_off.png" compile="0" resource="1"
             file="resources/led_blue_off.png"/>
       <FILE id="ceij5f" name="led_blue_on.png" compile="0" resource="1" file="resources/led_blue_on.png"/>
-      <FILE id="uOpSYt" name="nol_default_100.json" compile="0" resource="1"
-            file="models/nol_default_100.json"/>
-      <FILE id="XD3kLN" name="nol_small_120.json" compile="0" resource="1"
-            file="models/nol_small_120.json"/>
-      <FILE id="mH7P2h" name="nol_tiny2_100.json" compile="0" resource="1"
-            file="models/nol_tiny2_100.json"/>
       <FILE id="kSnGrA" name="Power_switch_off.png" compile="0" resource="1"
             file="resources/Power_switch_off.png"/>
       <FILE id="VU1K05" name="Power_switch_on.png" compile="0" resource="1"
@@ -26,6 +20,11 @@
             file="resources/Vintage_Knob_alt.png"/>
     </GROUP>
     <GROUP id="{0C30E6D7-5E80-A33B-74CB-A4BA09196080}" name="Source">
+      <FILE id="zIkWlp" name="AudioLiveScrollingDisplay.h" compile="0" resource="0"
+            file="Source/AudioLiveScrollingDisplay.h"/>
+      <FILE id="sisDyq" name="AudioRecordingDemo.h" compile="0" resource="0"
+            file="Source/AudioRecordingDemo.h"/>
+      <FILE id="T12vBi" name="DemoUtilities.h" compile="0" resource="0" file="Source/DemoUtilities.h"/>
       <FILE id="cc0yTU" name="Eq4Band.cpp" compile="1" resource="0" file="Source/Eq4Band.cpp"/>
       <FILE id="V8n6fV" name="Eq4Band.h" compile="0" resource="0" file="Source/Eq4Band.h"/>
       <FILE id="YU6QF3" name="lstm.cpp" compile="1" resource="0" file="Source/lstm.cpp"/>
