@@ -33,10 +33,28 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     loadButton.setButtonText("Load Tone");
     loadButton.addListener(this);
 
+    addAndMakeVisible(recordButton);
+    recordButton.setButtonText("Record");
+    recordButton.addListener(this);
+
     addAndMakeVisible(modelLabel);
     modelLabel.setText(processor.loaded_tone_name, juce::NotificationType::dontSendNotification);
     modelLabel.setJustificationType(juce::Justification::left);
     modelLabel.setColour(juce::Label::textColourId, juce::Colours::black);
+    
+    addAndMakeVisible(timerLabel);
+    timerLabel.setText(minutes + ":" + seconds, juce::NotificationType::dontSendNotification);
+    timerLabel.setJustificationType(juce::Justification::horizontallyCentred);
+    timerLabel.setColour(juce::Label::textColourId, juce::Colours::black);
+    timerLabel.setFont(juce::Font(32.0f, juce::Font::bold));
+    timerLabel.setVisible(0);
+
+    addAndMakeVisible(helpLabel);
+    helpLabel.setText("Get Ready for Tone Capture..", juce::NotificationType::dontSendNotification);
+    helpLabel.setJustificationType(juce::Justification::horizontallyCentred);
+    helpLabel.setColour(juce::Label::textColourId, juce::Colours::black);
+    helpLabel.setFont(juce::Font(20.0f, juce::Font::bold));
+    helpLabel.setVisible(0);
 
 
     ampLED.setImages(true, true, true,
@@ -171,9 +189,11 @@ void SmartAmpProAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
-
-    loadButton.setBounds(50, 20, 125, 25);
-    modelLabel.setBounds(50, 45, 400, 25);
+    recordButton.setBounds(590, 20, 125, 25);
+    timerLabel.setBounds(350, 20, 70, 25);
+    helpLabel.setBounds(240, 50, 300, 25);
+    loadButton.setBounds(70, 20, 125, 25);
+    modelLabel.setBounds(70, 45, 400, 25);
     // Amp Widgets
     ampPresenceKnob.setBounds(495, 242, 55, 75);
     ampBassKnob.setBounds(253, 242, 55, 75);
@@ -211,6 +231,8 @@ void SmartAmpProAudioProcessorEditor::buttonClicked(juce::Button* button)
         ampOnButtonClicked();
     } else if (button == &loadButton) {
         loadButtonClicked();
+    } else if (button == &recordButton) {
+        recordButtonClicked();
     }
 }
 
@@ -223,6 +245,35 @@ void SmartAmpProAudioProcessorEditor::ampOnButtonClicked() {
         processor.amp_state = 0;
     }
     repaint();
+}
+
+void SmartAmpProAudioProcessorEditor::recordButtonClicked() {
+    if (processor.recording == 0) {
+        processor.recording = 1;
+        recordButton.setColour(TextButton::buttonColourId, Colours::red);
+        recordButton.setButtonText("Stop Recording");
+        timer_start();
+        timerLabel.setText(minutes + ":0" + seconds, juce::NotificationType::sendNotification);
+        timerLabel.setVisible(1);
+        helpLabel.setText("Get Ready for Tone Capture..", juce::NotificationType::sendNotification);
+        helpLabel.setVisible(1);
+
+    }
+    else {
+        processor.audio_recorder.stopRecording();
+        processor.recording = 0;
+        recordButton.setColour(TextButton::buttonColourId, Colours::black);
+        recordButton.setButtonText("Record");
+        timerLabel.setText(minutes + ":" + seconds, juce::NotificationType::sendNotification);
+        timer_stop();
+        timerLabel.setVisible(0);
+        helpLabel.setVisible(0);
+        minutes = "-0";
+        seconds = "5";
+
+
+    }
+
 }
 
 void SmartAmpProAudioProcessorEditor::sliderValueChanged(Slider* slider)
@@ -245,3 +296,64 @@ void SmartAmpProAudioProcessorEditor::sliderValueChanged(Slider* slider)
 
 }
 
+void SmartAmpProAudioProcessorEditor::timer_start()
+{
+    startTimer(1000);
+}
+
+void SmartAmpProAudioProcessorEditor::timer_stop()
+{
+    stopTimer();
+    t = -5;
+}
+
+void SmartAmpProAudioProcessorEditor::timerCallback()
+{
+    //std::cout << "time tick" << std::endl;
+    t += 1;
+    seconds = std::to_string(std::abs(t % 60));
+    minutes = std::to_string(t / 60);
+    //t_label = std::to_string(t);
+    if (t < 0) {
+        minutes = "-" + minutes;
+    } else if (t == 0) {
+        processor.audio_recorder.startRecording();
+        helpLabel.setText("Begin 3 minutes of guitar playing!", juce::NotificationType::sendNotification);
+    }
+
+    if (t % 60 < 10) {
+            seconds = "0" + seconds;
+    }
+
+    timerLabel.setText(minutes + ":" + seconds, juce::NotificationType::sendNotification);
+    if (t > 179) {
+        timer_stop();
+        processor.audio_recorder.stopRecording();
+        processor.recording = 0;
+        recordButton.setColour(TextButton::buttonColourId, Colours::black);
+        recordButton.setButtonText("Record");
+        timer_stop();
+        timerLabel.setText(minutes + ":" + seconds, juce::NotificationType::sendNotification);
+        timerLabel.setVisible(0);
+        helpLabel.setVisible(0);
+        helpLabel.setText("Begin 3 minutes of guitar playing!", juce::NotificationType::sendNotification);
+    } else if (t == 10) {
+        helpLabel.setText("Play some chords", juce::NotificationType::sendNotification);
+    } else if (t == 30) {
+        helpLabel.setText("Play some notes", juce::NotificationType::sendNotification);
+    } else if (t == 50) {
+        helpLabel.setText("Play your favorite song", juce::NotificationType::sendNotification);
+    } else if (t == 80) {
+        helpLabel.setText("Play quiet", juce::NotificationType::sendNotification);
+    } else if (t == 100) {
+        helpLabel.setText("Play loud!", juce::NotificationType::sendNotification);
+    } else if (t == 120) {
+        helpLabel.setText("Make some mistakes", juce::NotificationType::sendNotification);
+    } else if (t == 130) {
+        helpLabel.setText("Play some high notes", juce::NotificationType::sendNotification);
+    } else if (t == 150) {
+        helpLabel.setText("Play some low notes", juce::NotificationType::sendNotification);
+    } else if (t == 170) {
+        helpLabel.setText("Almost done.. Let it ring out!", juce::NotificationType::sendNotification);
+    }
+}

@@ -22,6 +22,8 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Eq4Band.h"
 
+#include "AudioRecordingDemo.h"
+
 //==============================================================================
 /**
 */
@@ -95,6 +97,9 @@ public:
 
     ModelLoader loader;
     lstm LSTM;
+
+    AudioRecordingDemo audio_recorder;
+    int recording = 0;
 
 private:
     Eq4Band eq4band; // Amp EQ
