@@ -56,6 +56,7 @@ private:
 
     TextButton recordButton;
     Label timerLabel;
+    Label helpLabel;
     TextButton loadButton;
     Label modelLabel;
     juce::String fname;
@@ -69,9 +70,9 @@ private:
     void timerCallback() override;
     void timer_start();
     void timer_stop();
-    int t = 0;
-    String seconds = "0";
-    String minutes = "0";
+    int t = -5;
+    String seconds = "5";
+    String minutes = "-0";
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SmartAmpProAudioProcessorEditor)
 };
