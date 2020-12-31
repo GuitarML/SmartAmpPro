@@ -71,9 +71,9 @@ private:
     void timerCallback() override;
     void timer_start();
     void timer_stop();
-    int t = -5;
+    int t = 185;
     String seconds = "5";
-    String minutes = "-0";
+    String minutes = "";
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SmartAmpProAudioProcessorEditor)
 };
