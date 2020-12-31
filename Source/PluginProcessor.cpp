@@ -25,7 +25,7 @@ SmartAmpProAudioProcessor::SmartAmpProAudioProcessor()
 
 #endif
 {
-
+    //loader.load_json("C:/Users/rache/Desktop/dev/SmartAmpPro/models/gran_con4_hs24_in120d.json");
     loader.load_json("C:/Users/KBloemer/Desktop/Archive/SmartAmpPro/models/gran_con4_hs24_in120d.json");
 
     LSTM.setParams(loader.hidden_size, loader.conv1d_kernel_size, loader.conv1d_1_kernel_size,
@@ -199,8 +199,9 @@ void SmartAmpProAudioProcessor::loadDefault()
 {
     this->suspendProcessing(true);
 
-    loader.load_json("C:/Users/KBloemer/Desktop/Archive/SmartAmpPro/models/gran_con4_hs24_in120d.json");  // TODO: Change ModelLoader to use JUCE json to read .json files    ***EDIT HERE***
-    //loader.load_json(BinaryData::nol_small_120_json);
+    //loader.load_json("C:/Users/rache/Desktop/dev/SmartAmpPro/models/gran_con4_hs24_in120d.json");
+    loader.load_json("C:/Users/KBloemer/Desktop/Archive/SmartAmpPro/models/gran_con4_hs24_in120d.json");
+
     LSTM.setParams(loader.hidden_size, loader.conv1d_kernel_size, loader.conv1d_1_kernel_size,
         loader.conv1d_num_channels, loader.conv1d_1_num_channels, loader.conv1d_bias_nc,
         loader.conv1d_1_bias_nc, loader.conv1d_kernel_nc, loader.conv1d_1_kernel_nc,
