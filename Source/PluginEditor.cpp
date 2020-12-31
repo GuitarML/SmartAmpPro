@@ -198,7 +198,7 @@ void SmartAmpProAudioProcessorEditor::resized()
     modelLabel.setBounds(20, 45, 400, 25);
     // Amp Widgets
     ampPresenceKnob.setBounds(445, 242, 55, 75);
-    ampBassKnob.setBounds(213, 242, 55, 75);
+    ampBassKnob.setBounds(203, 242, 55, 75);
     ampMidKnob.setBounds(283, 242, 55, 75);
     ampTrebleKnob.setBounds(368, 242, 55, 75);
     ampGainKnob.setBounds(100, 225, 75, 95);
