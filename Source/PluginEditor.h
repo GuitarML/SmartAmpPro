@@ -13,6 +13,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
 #include "myLookAndFeel.h"
+#include <stdlib.h>
 
 //==============================================================================
 /**

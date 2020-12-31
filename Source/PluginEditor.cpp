@@ -34,7 +34,7 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     loadButton.addListener(this);
 
     addAndMakeVisible(recordButton);
-    recordButton.setButtonText("Record");
+    recordButton.setButtonText("Start Capture");
     recordButton.addListener(this);
 
     addAndMakeVisible(modelLabel);
@@ -251,7 +251,7 @@ void SmartAmpProAudioProcessorEditor::recordButtonClicked() {
     if (processor.recording == 0) {
         processor.recording = 1;
         recordButton.setColour(TextButton::buttonColourId, Colours::red);
-        recordButton.setButtonText("Stop Recording");
+        recordButton.setButtonText("Start Capture");
         timer_start();
         timerLabel.setText(minutes + ":0" + seconds, juce::NotificationType::sendNotification);
         timerLabel.setVisible(1);
@@ -331,12 +331,14 @@ void SmartAmpProAudioProcessorEditor::timerCallback()
         processor.audio_recorder.stopRecording();
         processor.recording = 0;
         recordButton.setColour(TextButton::buttonColourId, Colours::black);
-        recordButton.setButtonText("Record");
+        recordButton.setButtonText("Start Capture");
         timer_stop();
         timerLabel.setText(minutes + ":" + seconds, juce::NotificationType::sendNotification);
         timerLabel.setVisible(0);
         helpLabel.setVisible(0);
         helpLabel.setText("Begin 3 minutes of guitar playing!", juce::NotificationType::sendNotification);
+        //system() // call to training program
+
     } else if (t == 10) {
         helpLabel.setText("Play some chords", juce::NotificationType::sendNotification);
     } else if (t == 30) {
