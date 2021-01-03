@@ -1,0 +1,1 @@
+c:\Users\rache\AppData\Local\Programs\Python\Python38-32\python.exe train_smp.py *%
