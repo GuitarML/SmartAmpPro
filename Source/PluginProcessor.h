@@ -67,9 +67,8 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    void loadDefault();
     void loadConfig(File configFile);
-
+    void setupDataDirectories();
     // Overdrive Pedal
     float convertLogScale(float in_value, float x_min, float x_max, float y_min, float y_max);
 
@@ -80,12 +79,17 @@ public:
 
     float decibelToLinear(float dbValue);
 
+    void addDirectory(const File& file);
+    std::vector<File> jsonFiles;
+    File currentDirectory = File::getCurrentWorkingDirectory().getFullPathName();
+
     // Pedal/amp states
     int amp_state = 1; // 0 = off, 1 = on
     int custom_tone = 0; // 0 = custom tone loaded, 1 = default channel tone
     File loaded_tone;
     juce::String loaded_tone_name;
     const char* char_filename = "";
+    int model_loaded = 0;
 
     // Amp knob states
     float ampPresenceKnobState = 0.0;

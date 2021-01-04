@@ -20,6 +20,16 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to
 
+    addAndMakeVisible(modelSelect);
+    modelSelect.setColour(juce::Label::textColourId, juce::Colours::black);
+    int c = 1;
+    for (const auto& jsonFile : processor.jsonFiles) {
+        modelSelect.addItem(jsonFile.getFileName(), c);
+        c += 1;
+    }
+    modelSelect.onChange = [this] {modelSelectChanged(); };
+    modelSelect.setSelectedItemIndex(0, juce::NotificationType::sendNotification);
+
     // Set Widget Graphics
     ampSilverKnobLAF.setLookAndFeel(ImageCache::getFromMemory(BinaryData::Vintage_Knob_png, BinaryData::Vintage_Knob_pngSize));
 
@@ -31,7 +41,7 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     addAndMakeVisible(ampOnButton);
     ampOnButton.addListener(this);
 
-    addAndMakeVisible(loadButton);
+    //addAndMakeVisible(loadButton);
     loadButton.setButtonText("Load Tone");
     loadButton.addListener(this);
 
@@ -39,7 +49,7 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     recordButton.setButtonText("Start Capture");
     recordButton.addListener(this);
 
-    addAndMakeVisible(modelLabel);
+    //addAndMakeVisible(modelLabel);
     modelLabel.setText(processor.loaded_tone_name, juce::NotificationType::dontSendNotification);
     modelLabel.setJustificationType(juce::Justification::left);
     modelLabel.setColour(juce::Label::textColourId, juce::Colours::black);
@@ -130,11 +140,9 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     // Size of plugin GUI
     setSize(694, 376);
     // Load the preset model from the project resources
-    if (processor.custom_tone == 0) {
-        processor.loadDefault();
-    } else {
-        processor.loadConfig(processor.loaded_tone);
-    }
+
+    //processor.loadConfig(processor.loaded_tone);
+
 }
 
 SmartAmpProAudioProcessorEditor::~SmartAmpProAudioProcessorEditor()
@@ -191,6 +199,7 @@ void SmartAmpProAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
+    modelSelect.setBounds(20, 15, 225, 25);
     recordButton.setBounds(540, 15, 125, 25);
     timerLabel.setBounds(300, 10, 70, 25);
     helpLabel.setBounds(190, 50, 300, 25);
@@ -206,6 +215,14 @@ void SmartAmpProAudioProcessorEditor::resized()
 
     ampOnButton.setBounds(54, 259, 15, 25);
     ampLED.setBounds(636, 240, 15, 25);
+}
+
+void SmartAmpProAudioProcessorEditor::modelSelectChanged()
+{
+    const int selectedFileIndex = modelSelect.getSelectedItemIndex();
+    if (selectedFileIndex >= 0 && selectedFileIndex < processor.jsonFiles.size()) {
+        processor.loadConfig(processor.jsonFiles[selectedFileIndex]);
+    }
 }
 
 void SmartAmpProAudioProcessorEditor::loadButtonClicked()
@@ -297,6 +314,7 @@ void SmartAmpProAudioProcessorEditor::sliderValueChanged(Slider* slider)
     }
 
 }
+
 
 void SmartAmpProAudioProcessorEditor::timer_start()
 {

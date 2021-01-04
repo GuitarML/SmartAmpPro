@@ -25,14 +25,10 @@ SmartAmpProAudioProcessor::SmartAmpProAudioProcessor()
 
 #endif
 {
-    //loader.load_json("C:/Users/rache/Desktop/dev/SmartAmpPro/models/gran_con4_hs24_in120d.json");
-    loader.load_json("C:/Users/KBloemer/Desktop/Archive/SmartAmpPro/models/gran_con4_hs24_in120d.json");
-
-    LSTM.setParams(loader.hidden_size, loader.conv1d_kernel_size, loader.conv1d_1_kernel_size,
-        loader.conv1d_num_channels, loader.conv1d_1_num_channels, loader.conv1d_bias_nc,
-        loader.conv1d_1_bias_nc, loader.conv1d_kernel_nc, loader.conv1d_1_kernel_nc,
-        loader.lstm_bias_nc, loader.lstm_kernel_nc,
-        loader.dense_bias_nc, loader.dense_kernel_nc, loader.input_size_loader, loader.conv1d_stride_loader, loader.conv1d_1_stride_loader);
+    setupDataDirectories();
+    if (jsonFiles.size() > 0) {
+        loadConfig(jsonFiles[0]);
+    }
 }
 
 SmartAmpProAudioProcessor::~SmartAmpProAudioProcessor()
@@ -156,7 +152,9 @@ void SmartAmpProAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
         buffer.applyGain(ampDrive);
 
 		// Apply LSTM model
-        LSTM.process(buffer.getReadPointer(0), buffer.getWritePointer(0), numSamples);
+        if (model_loaded == 1) {
+            LSTM.process(buffer.getReadPointer(0), buffer.getWritePointer(0), numSamples);
+        }
 
         //    Master Volume 
         buffer.applyGain(ampMaster);
@@ -194,7 +192,7 @@ void SmartAmpProAudioProcessor::setStateInformation (const void* data, int sizeI
     // whose contents will have been created by the getStateInformation() call.
 }
 
-
+/*
 void SmartAmpProAudioProcessor::loadDefault()
 {
     this->suspendProcessing(true);
@@ -210,12 +208,13 @@ void SmartAmpProAudioProcessor::loadDefault()
 
     this->suspendProcessing(false);
 }
+*/
 
 
 void SmartAmpProAudioProcessor::loadConfig(File configFile)
 {
     this->suspendProcessing(true);
-
+    model_loaded = 1;
     String path = configFile.getFullPathName();
     char_filename = path.toUTF8();
     loader.load_json(char_filename);
@@ -226,6 +225,41 @@ void SmartAmpProAudioProcessor::loadConfig(File configFile)
         loader.dense_bias_nc, loader.dense_kernel_nc, loader.input_size_loader, loader.conv1d_stride_loader, loader.conv1d_1_stride_loader);
 
     this->suspendProcessing(false);
+}
+
+void SmartAmpProAudioProcessor::addDirectory(const File& file)
+{
+    if (file.isDirectory())
+    {
+        juce::Array<juce::File> results;
+        file.findChildFiles(results, juce::File::findFiles, false, "*.json");
+        for (int i = results.size(); --i >= 0;)
+            jsonFiles.push_back(File(results.getReference(i).getFullPathName()));
+    }
+}
+
+void SmartAmpProAudioProcessor::setupDataDirectories()
+{
+    // ========
+    // Current working directory
+    addDirectory(currentDirectory);
+
+    // ========
+    // User app data directory
+    File userAppDataDirectory = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile(JucePlugin_Manufacturer).getChildFile(JucePlugin_Name);
+    File userAppDataTempFile = userAppDataDirectory.getChildFile("tmp.pdl");
+
+    // Create (and delete) temp file if necessary, so that user doesn't have
+    // to manually create directories
+    if (!userAppDataDirectory.exists()) {
+        userAppDataTempFile.create();
+    }
+    if (userAppDataTempFile.existsAsFile()) {
+        userAppDataTempFile.deleteFile();
+    }
+
+    // Add the directory
+    addDirectory(userAppDataDirectory);
 }
 
 float SmartAmpProAudioProcessor::convertLogScale(float in_value, float x_min, float x_max, float y_min, float y_max)

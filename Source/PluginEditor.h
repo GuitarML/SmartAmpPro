@@ -47,7 +47,7 @@ private:
     Slider ampMasterKnob;
     ImageButton ampOnButton;
     ImageButton ampLED;
-
+    ComboBox modelSelect;
     
     // LookandFeels 
     myLookAndFeel ampSilverKnobLAF;
@@ -62,6 +62,7 @@ private:
     Label modelLabel;
     juce::String fname;
     virtual void buttonClicked(Button* button) override;
+    void modelSelectChanged();
     void loadButtonClicked();
     virtual void sliderValueChanged(Slider* slider) override;
     void ampOnButtonClicked();
