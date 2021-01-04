@@ -41,8 +41,8 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     addAndMakeVisible(ampOnButton);
     ampOnButton.addListener(this);
 
-    //addAndMakeVisible(loadButton);
-    loadButton.setButtonText("Load Tone");
+    addAndMakeVisible(loadButton);
+    loadButton.setButtonText("Add Tone");
     loadButton.addListener(this);
 
     addAndMakeVisible(recordButton);
@@ -199,11 +199,11 @@ void SmartAmpProAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
-    modelSelect.setBounds(20, 15, 225, 25);
+    modelSelect.setBounds(15, 15, 225, 25);
     recordButton.setBounds(540, 15, 125, 25);
     timerLabel.setBounds(300, 10, 70, 25);
     helpLabel.setBounds(190, 50, 300, 25);
-    loadButton.setBounds(20, 15, 125, 25);
+    loadButton.setBounds(15, 50, 100, 25);
     modelLabel.setBounds(20, 45, 400, 25);
     // Amp Widgets
     ampPresenceKnob.setBounds(445, 242, 55, 75);
@@ -233,14 +233,26 @@ void SmartAmpProAudioProcessorEditor::loadButtonClicked()
     if (chooser.browseForFileToOpen())
     {
         File file = chooser.getResult();
-        //String path = file.getFullPathName();
-        
-        processor.loadConfig(file);
-        fname = file.getFileName();
-        modelLabel.setText(fname, juce::NotificationType::dontSendNotification);
-        processor.loaded_tone = file;
-        processor.loaded_tone_name = fname;
-        processor.custom_tone = 1;
+        File userAppDataDirectory = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile(JucePlugin_Manufacturer).getChildFile(JucePlugin_Name);
+        File fullpath = userAppDataDirectory.getFullPathName() + "/" + file.getFileName();
+        bool b = fullpath.existsAsFile();
+        if (b == false) {
+
+            processor.loadConfig(file);
+            fname = file.getFileName();
+            modelLabel.setText(fname, juce::NotificationType::dontSendNotification);
+            processor.loaded_tone = file;
+            processor.loaded_tone_name = fname;
+            processor.custom_tone = 1;
+
+            // Copy selected file to model directory and load into dropdown menu
+            bool a = file.copyFileTo(fullpath);
+            if (a == true) {
+                modelSelect.addItem(file.getFileName(), processor.jsonFiles.size() + 1);
+                modelSelect.setSelectedItemIndex(processor.jsonFiles.size(), juce::NotificationType::sendNotification);
+                processor.jsonFiles.push_back(file);
+            }
+        }
     }
 }
 
@@ -289,8 +301,6 @@ void SmartAmpProAudioProcessorEditor::recordButtonClicked() {
         helpLabel.setVisible(0);
         minutes = "";
         seconds = "5";
-
-
     }
 
 }
@@ -312,7 +322,6 @@ void SmartAmpProAudioProcessorEditor::sliderValueChanged(Slider* slider)
     else if (slider == &ampPresenceKnob) {
             processor.set_ampEQ(ampBassKnob.getValue(), ampMidKnob.getValue(), ampTrebleKnob.getValue(), ampPresenceKnob.getValue());
     }
-
 }
 
 

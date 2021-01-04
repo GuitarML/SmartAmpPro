@@ -8,12 +8,6 @@
   ==============================================================================
 */
 
-// Include the following:
-//      C:\Users\KBloemer\Desktop\Archive\AudioFile-master\AudioFile-master
-//      C:\Users\KBloemer\Desktop\Archive\json-develop\json-develop\include
-//      C:\Users\KBloemer\Desktop\Archive\FunctionalPlus-master\include
-//      C:\Users\KBloemer\Desktop\Archive\eigen-3.3.7\eigen-3.3.7
-//      C:\Users\KBloemer\Desktop\Archive\frugally-deep-master\include
 #include <nlohmann/json.hpp>
 #include "NumCpp.hpp"
 #include "lstm.h"

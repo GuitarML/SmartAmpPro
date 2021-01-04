@@ -192,25 +192,6 @@ void SmartAmpProAudioProcessor::setStateInformation (const void* data, int sizeI
     // whose contents will have been created by the getStateInformation() call.
 }
 
-/*
-void SmartAmpProAudioProcessor::loadDefault()
-{
-    this->suspendProcessing(true);
-
-    //loader.load_json("C:/Users/rache/Desktop/dev/SmartAmpPro/models/gran_con4_hs24_in120d.json");
-    loader.load_json("C:/Users/KBloemer/Desktop/Archive/SmartAmpPro/models/gran_con4_hs24_in120d.json");
-
-    LSTM.setParams(loader.hidden_size, loader.conv1d_kernel_size, loader.conv1d_1_kernel_size,
-        loader.conv1d_num_channels, loader.conv1d_1_num_channels, loader.conv1d_bias_nc,
-        loader.conv1d_1_bias_nc, loader.conv1d_kernel_nc, loader.conv1d_1_kernel_nc,
-        loader.lstm_bias_nc, loader.lstm_kernel_nc,
-        loader.dense_bias_nc, loader.dense_kernel_nc, loader.input_size_loader, loader.conv1d_stride_loader, loader.conv1d_1_stride_loader);
-
-    this->suspendProcessing(false);
-}
-*/
-
-
 void SmartAmpProAudioProcessor::loadConfig(File configFile)
 {
     this->suspendProcessing(true);
