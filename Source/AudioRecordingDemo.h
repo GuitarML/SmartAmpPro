@@ -329,11 +329,14 @@ public:
                                          });
             return;
         }
-
+        File userAppDataDirectory = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile(JucePlugin_Manufacturer).getChildFile(JucePlugin_Name);
        #if (JUCE_ANDROID || JUCE_IOS)
-        auto parentDir = File::getSpecialLocation (File::tempDirectory);
+        //auto parentDir = File::getSpecialLocation (File::tempDirectory);
+        auto parentDir = userAppDataDirectory;
        #else
-        auto parentDir = File::getSpecialLocation (File::userDocumentsDirectory);
+
+        //auto parentDir = File::getSpecialLocation (File::userDocumentsDirectory);
+        auto parentDir = userAppDataDirectory;
        #endif
 
         lastRecording = parentDir.getNonexistentChildFile ("SmartAmpProSample", ".wav");
