@@ -26,9 +26,9 @@ SmartAmpProAudioProcessor::SmartAmpProAudioProcessor()
 #endif
 {
     setupDataDirectories();
-    //if (jsonFiles.size() > 0) {
-    //    loadConfig(jsonFiles[0]);
-    //}
+    if (jsonFiles.size() > 0) {
+        loadConfig(jsonFiles[0]);
+    }
 }
 
 SmartAmpProAudioProcessor::~SmartAmpProAudioProcessor()
