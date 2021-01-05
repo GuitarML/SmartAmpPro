@@ -26,9 +26,9 @@ SmartAmpProAudioProcessor::SmartAmpProAudioProcessor()
 #endif
 {
     setupDataDirectories();
-    if (jsonFiles.size() > 0) {
-        loadConfig(jsonFiles[0]);
-    }
+    //if (jsonFiles.size() > 0) {
+    //    loadConfig(jsonFiles[0]);
+    //}
 }
 
 SmartAmpProAudioProcessor::~SmartAmpProAudioProcessor()
@@ -223,7 +223,7 @@ void SmartAmpProAudioProcessor::setupDataDirectories()
 {
     // ========
     // Current working directory
-    addDirectory(currentDirectory);
+    //addDirectory(currentDirectory);
 
     // ========
     // User app data directory
