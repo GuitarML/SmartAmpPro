@@ -208,6 +208,18 @@ void SmartAmpProAudioProcessor::loadConfig(File configFile)
     this->suspendProcessing(false);
 }
 
+void SmartAmpProAudioProcessor::resetDirectory(const File& file)
+{
+    jsonFiles.clear();
+    if (file.isDirectory())
+    {
+        juce::Array<juce::File> results;
+        file.findChildFiles(results, juce::File::findFiles, false, "*.json");
+        for (int i = results.size(); --i >= 0;)
+            jsonFiles.push_back(File(results.getReference(i).getFullPathName()));
+    }
+}
+
 void SmartAmpProAudioProcessor::addDirectory(const File& file)
 {
     if (file.isDirectory())

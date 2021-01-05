@@ -195,24 +195,10 @@ def main(args):
     f.close()
 
 
-
-    # Create Analysis Plots ###########################################
-    if args.create_plots == 1:
-        print("Plotting results..")
-        import plot
-
-        plot.analyze_pred_vs_actual({   'output_wav':'models/'+name+'/y_test.wav',
-                                            'pred_wav':'models/'+name+'/y_pred.wav', 
-                                            'input_wav':'models/'+name+'/x_test.wav',
-                                            'model_name':name,
-                                            'show_plots':1,
-                                            'path':'models/'+name
-                                        })
-
-
     # Generate json model ################################
     filename = 'models/'+name+'/'+ args.name +'.h5'
-    json_filename = 'models/'+name+'/'+ args.name
+    #json_filename = 'models/'+name+'/'+ args.name
+    json_filename = args.name
     f = h5py.File(filename, 'r')
     # List all groups
     #print("Keys: %s" % f.keys())
@@ -252,6 +238,19 @@ def main(args):
         json.dump(data, outfile)
     print("SmartAmpPro model generated: ", json_filename + ".json")
 
+    # Create Analysis Plots ###########################################
+    if args.create_plots == 1:
+        print("Plotting results..")
+        import plot
+
+        plot.analyze_pred_vs_actual({   'output_wav':'models/'+name+'/y_test.wav',
+                                            'pred_wav':'models/'+name+'/y_pred.wav', 
+                                            'input_wav':'models/'+name+'/x_test.wav',
+                                            'model_name':name,
+                                            'show_plots':1,
+                                            'path':'models/'+name
+                                        })
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("in_file")
@@ -260,7 +259,7 @@ if __name__ == "__main__":
     parser.add_argument("--batch_size", type=int, default=4096)
     parser.add_argument("--max_epochs", type=int, default=1)
     parser.add_argument("--create_plots", type=int, default=1)
-    parser.add_argument("--input_size", type=int, default=100)
-    parser.add_argument("--split_data", type=int, default=1)
+    parser.add_argument("--input_size", type=int, default=180)
+    parser.add_argument("--split_data", type=int, default=6)
     args = parser.parse_args()
     main(args)

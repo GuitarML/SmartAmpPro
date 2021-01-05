@@ -74,6 +74,7 @@ public:
     float decibelToLinear(float dbValue);
 
     void addDirectory(const File& file);
+    void resetDirectory(const File& file);
     std::vector<File> jsonFiles;
     File currentDirectory = File::getCurrentWorkingDirectory().getFullPathName();
 
@@ -95,7 +96,6 @@ public:
 
     ModelLoader loader;
     lstm LSTM;
-
     AudioRecordingDemo audio_recorder;
     int recording = 0;
 

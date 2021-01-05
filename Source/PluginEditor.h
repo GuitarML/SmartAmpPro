@@ -56,6 +56,7 @@ private:
     int current_background = 1;
 
     TextButton recordButton;
+    TextButton trainButton;
     Label timerLabel;
     Label helpLabel;
     TextButton loadButton;
@@ -64,11 +65,13 @@ private:
     virtual void buttonClicked(Button* button) override;
     void modelSelectChanged();
     void loadButtonClicked();
+    void trainButtonClicked();
     virtual void sliderValueChanged(Slider* slider) override;
     void ampOnButtonClicked();
     void recordButtonClicked();
 
     // Recording Timer
+    String record_file = "";
     void timerCallback() override;
     void timer_start();
     void timer_stop();
