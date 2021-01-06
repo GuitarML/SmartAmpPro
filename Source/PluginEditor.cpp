@@ -233,30 +233,32 @@ void SmartAmpProAudioProcessorEditor::modelSelectChanged()
 
 void SmartAmpProAudioProcessorEditor::loadButtonClicked()
 {
-    FileChooser chooser("Select a .json tone to add to import",
+    FileChooser chooser("Select one or more .json tone files to import",
         {},
         "*.json");
-    if (chooser.browseForFileToOpen())
+    if (chooser.browseForMultipleFilesToOpen())
     {
-        File file = chooser.getResult();
-        File userAppDataDirectory = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile(JucePlugin_Manufacturer).getChildFile(JucePlugin_Name);
-        File fullpath = userAppDataDirectory.getFullPathName() + "/" + file.getFileName();
-        bool b = fullpath.existsAsFile();
-        if (b == false) {
+        Array<File> files = chooser.getResults();
+        for (auto file : files) {
+            File userAppDataDirectory = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile(JucePlugin_Manufacturer).getChildFile(JucePlugin_Name);
+            File fullpath = userAppDataDirectory.getFullPathName() + "/" + file.getFileName();
+            bool b = fullpath.existsAsFile();
+            if (b == false) {
 
-            processor.loadConfig(file);
-            fname = file.getFileName();
-            modelLabel.setText(fname, juce::NotificationType::dontSendNotification);
-            processor.loaded_tone = file;
-            processor.loaded_tone_name = fname;
-            processor.custom_tone = 1;
+                processor.loadConfig(file);
+                fname = file.getFileName();
+                modelLabel.setText(fname, juce::NotificationType::dontSendNotification);
+                processor.loaded_tone = file;
+                processor.loaded_tone_name = fname;
+                processor.custom_tone = 1;
 
-            // Copy selected file to model directory and load into dropdown menu
-            bool a = file.copyFileTo(fullpath);
-            if (a == true) {
-                modelSelect.addItem(file.getFileNameWithoutExtension(), processor.jsonFiles.size() + 1);
-                modelSelect.setSelectedItemIndex(processor.jsonFiles.size(), juce::NotificationType::sendNotification);
-                processor.jsonFiles.push_back(file);
+                // Copy selected file to model directory and load into dropdown menu
+                bool a = file.copyFileTo(fullpath);
+                if (a == true) {
+                    modelSelect.addItem(file.getFileNameWithoutExtension(), processor.jsonFiles.size() + 1);
+                    modelSelect.setSelectedItemIndex(processor.jsonFiles.size(), juce::NotificationType::sendNotification);
+                    processor.jsonFiles.push_back(file);
+                }
             }
         }
     }
