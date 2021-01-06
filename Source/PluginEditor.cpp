@@ -240,8 +240,7 @@ void SmartAmpProAudioProcessorEditor::loadButtonClicked()
     {
         Array<File> files = chooser.getResults();
         for (auto file : files) {
-            File userAppDataDirectory = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile(JucePlugin_Manufacturer).getChildFile(JucePlugin_Name);
-            File fullpath = userAppDataDirectory.getFullPathName() + "/" + file.getFileName();
+            File fullpath = processor.userAppDataDirectory.getFullPathName() + "/" + file.getFileName();
             bool b = fullpath.existsAsFile();
             if (b == false) {
 
@@ -290,14 +289,12 @@ void SmartAmpProAudioProcessorEditor::ampOnButtonClicked() {
 
 void SmartAmpProAudioProcessorEditor::recordButtonClicked() {
     if (processor.recording == 0) {
-        File userAppDataDirectory = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile(JucePlugin_Manufacturer).getChildFile(JucePlugin_Name);
         FileChooser chooser("Enter a descriptive tone name",
-            userAppDataDirectory,
+            processor.userAppDataDirectory,
             "*.wav");
-        if (chooser.browseForFileToSave(true))  // TODO Overwriting existing file seems to lock up the plugin - fix
+        if (chooser.browseForFileToSave(false))  // TODO Overwriting existing file seems to lock up the plugin - fix
         {
             File file = chooser.getResult(); // TODO: Fix to handle spaces in filename
-            //File fullpath = userAppDataDirectory.getFullPathName();
             record_file = file.getFileName();
 
             processor.recording = 1;
@@ -328,15 +325,14 @@ void SmartAmpProAudioProcessorEditor::recordButtonClicked() {
 
 void SmartAmpProAudioProcessorEditor::trainButtonClicked() 
 {
-    File userAppDataDirectory = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile(JucePlugin_Manufacturer).getChildFile(JucePlugin_Name);
     FileChooser chooser("Select a recorded .wav sample for tone capture",
-        userAppDataDirectory,
+        processor.userAppDataDirectory,
         "*.wav");
     if (chooser.browseForFileToOpen())
     {
         File file = chooser.getResult(); // TODO: Fix to handle spaces in filename
-        File fullpath = userAppDataDirectory.getFullPathName();
-        File train_script = userAppDataDirectory.getFullPathName() + "/train_smp.py";
+        File fullpath = processor.userAppDataDirectory.getFullPathName();
+        File train_script = processor.userAppDataDirectory.getFullPathName() + "/train_smp.py";
 
         bool b = train_script.existsAsFile();
         if (b == true) {
@@ -344,7 +340,7 @@ void SmartAmpProAudioProcessorEditor::trainButtonClicked()
             std::string string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "python train_smp.py " + file.getFileName().toStdString() + " " + file.getFileNameWithoutExtension().toStdString();
             const char *char_command = &string_command[0];
             system(char_command); // call to training program
-            processor.resetDirectory(userAppDataDirectory);
+            processor.resetDirectory(processor.userAppDataDirectory);
             modelSelect.clear();
             int c = 1;
             for (const auto& jsonFile : processor.jsonFiles) {

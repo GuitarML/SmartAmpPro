@@ -200,11 +200,7 @@ def main(args):
     #json_filename = 'models/'+name+'/'+ args.name
     json_filename = args.name
     f = h5py.File(filename, 'r')
-    # List all groups
-    #print("Keys: %s" % f.keys())
-    # List all layers
-    #print("Layers: %s" % f[list(f.keys())[0]].keys())
-
+   
     # Load the model data
     data = {}
     for layer in f["model_weights"].keys():

@@ -10,6 +10,8 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include <iostream>
+#include <fstream>
 
 //==============================================================================
 SmartAmpProAudioProcessor::SmartAmpProAudioProcessor()
@@ -29,6 +31,7 @@ SmartAmpProAudioProcessor::SmartAmpProAudioProcessor()
     if (jsonFiles.size() > 0) {
         loadConfig(jsonFiles[0]);
     }
+    installPythonScripts();
 }
 
 SmartAmpProAudioProcessor::~SmartAmpProAudioProcessor()
@@ -233,13 +236,8 @@ void SmartAmpProAudioProcessor::addDirectory(const File& file)
 
 void SmartAmpProAudioProcessor::setupDataDirectories()
 {
-    // ========
-    // Current working directory
-    //addDirectory(currentDirectory);
 
-    // ========
     // User app data directory
-    File userAppDataDirectory = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile(JucePlugin_Manufacturer).getChildFile(JucePlugin_Name);
     File userAppDataTempFile = userAppDataDirectory.getChildFile("tmp.pdl");
 
     // Create (and delete) temp file if necessary, so that user doesn't have
@@ -253,6 +251,37 @@ void SmartAmpProAudioProcessor::setupDataDirectories()
 
     // Add the directory
     addDirectory(userAppDataDirectory);
+}
+
+void SmartAmpProAudioProcessor::installPythonScripts()
+{
+    File train_script = userAppDataDirectory.getFullPathName() + "/train_smp.py";
+    File plot_script = userAppDataDirectory.getFullPathName() + "/plot.py";
+
+    bool b = train_script.existsAsFile();
+    bool p = plot_script.existsAsFile();
+    if (b == false) {
+
+        std::string string_command = train_script.getFullPathName().toStdString();
+        const char* char_train_script = &string_command[0];
+
+        std::ofstream myfile;
+        myfile.open(char_train_script);
+        myfile << BinaryData::train_smp_py;
+
+        myfile.close();
+    }
+    if (p == false) {
+
+        std::string string_command = plot_script.getFullPathName().toStdString();
+        const char* char_plot_script = &string_command[0];
+
+        std::ofstream myfile;
+        myfile.open(char_plot_script);
+        myfile << BinaryData::plot_py;
+
+        myfile.close();
+    }
 }
 
 float SmartAmpProAudioProcessor::convertLogScale(float in_value, float x_min, float x_max, float y_min, float y_max)
