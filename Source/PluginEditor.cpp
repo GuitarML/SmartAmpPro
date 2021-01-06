@@ -67,7 +67,8 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
 
     addAndMakeVisible(helpLabel);
     helpLabel.setText("Get Ready for Tone Capture..", juce::NotificationType::dontSendNotification);
-    helpLabel.setJustificationType(juce::Justification::horizontallyCentred);
+    //helpLabel.setJustificationType(juce::Justification::horizontallyCentred);
+    helpLabel.setJustificationType(juce::Justification::centredTop);
     helpLabel.setColour(juce::Label::textColourId, juce::Colours::black);
     helpLabel.setFont(juce::Font(20.0f, juce::Font::bold));
     helpLabel.setVisible(0);
@@ -207,7 +208,7 @@ void SmartAmpProAudioProcessorEditor::resized()
     recordButton.setBounds(540, 10, 125, 25);
     trainButton.setBounds(540, 42, 125, 25);
     timerLabel.setBounds(300, 10, 70, 25);
-    helpLabel.setBounds(190, 50, 300, 25);
+    helpLabel.setBounds(190, 36, 300, 65);
     loadButton.setBounds(15, 42, 100, 25);
     modelLabel.setBounds(20, 45, 400, 25);
     // Amp Widgets
@@ -303,7 +304,7 @@ void SmartAmpProAudioProcessorEditor::recordButtonClicked() {
             timerLabel.setText(minutes + ":0" + seconds, juce::NotificationType::sendNotification);
             timerLabel.setVisible(1);
             timer_start();
-            helpLabel.setText("Get Ready for Tone Capture..", juce::NotificationType::sendNotification);
+            helpLabel.setText("Get Ready for Tone Capture..\nEnsure input is on Channel 1 and target is on Channel 2", juce::NotificationType::sendNotification);
             helpLabel.setVisible(1);
         }
 
@@ -318,7 +319,7 @@ void SmartAmpProAudioProcessorEditor::recordButtonClicked() {
         timerLabel.setVisible(0);
         helpLabel.setVisible(0);
         minutes = "";
-        seconds = "5";
+        seconds = "10";
     }
 
 }
@@ -381,7 +382,7 @@ void SmartAmpProAudioProcessorEditor::timer_start()
 void SmartAmpProAudioProcessorEditor::timer_stop()
 {
     stopTimer();
-    t = 185;
+    t = 190;
 }
 
 void SmartAmpProAudioProcessorEditor::timerCallback()
@@ -412,13 +413,13 @@ void SmartAmpProAudioProcessorEditor::timerCallback()
         recordButton.setColour(TextButton::buttonColourId, Colours::black);
         recordButton.setButtonText("Start Capture");
         timer_stop();
-        timerLabel.setText(":5", juce::NotificationType::sendNotification);
-        t = 185;
+        timerLabel.setText(":10", juce::NotificationType::sendNotification);
+        t = 190;
         timerLabel.setVisible(0);
         helpLabel.setVisible(0);
         helpLabel.setText("Begin 3 minutes of guitar playing!", juce::NotificationType::sendNotification);
         minutes = "";
-        seconds = "5";
+        seconds = "10";
         //system("C:/Users/KBloemer/Desktop/Archive/SmartAmpPro/train.bat"); // call to training program
 
     } else if (t == 170) {
