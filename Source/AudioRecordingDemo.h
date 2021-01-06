@@ -338,9 +338,9 @@ public:
         //auto parentDir = File::getSpecialLocation (File::userDocumentsDirectory);
         auto parentDir = userAppDataDirectory;
        #endif
-
-        lastRecording = parentDir.getNonexistentChildFile ("SmartAmpProSample", ".wav");
-
+        //lastRecording = parentDir.getNonexistentChildFile("SmartAmpProSample", ".wav");
+        lastRecording = parentDir.getNonexistentChildFile (record_name, "");
+        
         recorder.startRecording (lastRecording);
 
         recordButton.setButtonText ("Stop");
@@ -374,6 +374,13 @@ public:
         recordButton.setButtonText ("Record");
         recordingThumbnail.setDisplayFullThumbnail (true);
     }
+
+    void setRecordName(String record_file) {
+        record_name = record_file;
+    }
+
+    String record_name = "asdf";
+
     private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioRecordingDemo)

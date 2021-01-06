@@ -63,6 +63,8 @@ public:
 
     void loadConfig(File configFile);
     void setupDataDirectories();
+    void installPythonScripts();
+    
     // Overdrive Pedal
     float convertLogScale(float in_value, float x_min, float x_max, float y_min, float y_max);
 
@@ -74,9 +76,10 @@ public:
     float decibelToLinear(float dbValue);
 
     void addDirectory(const File& file);
+    void resetDirectory(const File& file);
     std::vector<File> jsonFiles;
     File currentDirectory = File::getCurrentWorkingDirectory().getFullPathName();
-
+    File userAppDataDirectory = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile(JucePlugin_Manufacturer).getChildFile(JucePlugin_Name);
     // Pedal/amp states
     int amp_state = 1; // 0 = off, 1 = on
     int custom_tone = 0; // 0 = custom tone loaded, 1 = default channel tone
@@ -95,7 +98,6 @@ public:
 
     ModelLoader loader;
     lstm LSTM;
-
     AudioRecordingDemo audio_recorder;
     int recording = 0;
 

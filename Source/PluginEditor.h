@@ -56,6 +56,7 @@ private:
     int current_background = 1;
 
     TextButton recordButton;
+    TextButton trainButton;
     Label timerLabel;
     Label helpLabel;
     TextButton loadButton;
@@ -64,16 +65,18 @@ private:
     virtual void buttonClicked(Button* button) override;
     void modelSelectChanged();
     void loadButtonClicked();
+    void trainButtonClicked();
     virtual void sliderValueChanged(Slider* slider) override;
     void ampOnButtonClicked();
     void recordButtonClicked();
 
     // Recording Timer
+    String record_file = "";
     void timerCallback() override;
     void timer_start();
     void timer_stop();
-    int t = 185;
-    String seconds = "5";
+    int t = 190;
+    String seconds = "10";
     String minutes = "";
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SmartAmpProAudioProcessorEditor)

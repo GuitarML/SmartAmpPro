@@ -24,7 +24,7 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     modelSelect.setColour(juce::Label::textColourId, juce::Colours::black);
     int c = 1;
     for (const auto& jsonFile : processor.jsonFiles) {
-        modelSelect.addItem(jsonFile.getFileName(), c);
+        modelSelect.addItem(jsonFile.getFileNameWithoutExtension(), c);
         c += 1;
     }
     modelSelect.onChange = [this] {modelSelectChanged(); };
@@ -49,6 +49,10 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     recordButton.setButtonText("Start Capture");
     recordButton.addListener(this);
 
+    addAndMakeVisible(trainButton);
+    trainButton.setButtonText("Train Model");
+    trainButton.addListener(this);
+
     //addAndMakeVisible(modelLabel);
     modelLabel.setText(processor.loaded_tone_name, juce::NotificationType::dontSendNotification);
     modelLabel.setJustificationType(juce::Justification::left);
@@ -63,7 +67,8 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
 
     addAndMakeVisible(helpLabel);
     helpLabel.setText("Get Ready for Tone Capture..", juce::NotificationType::dontSendNotification);
-    helpLabel.setJustificationType(juce::Justification::horizontallyCentred);
+    //helpLabel.setJustificationType(juce::Justification::horizontallyCentred);
+    helpLabel.setJustificationType(juce::Justification::centredTop);
     helpLabel.setColour(juce::Label::textColourId, juce::Colours::black);
     helpLabel.setFont(juce::Font(20.0f, juce::Font::bold));
     helpLabel.setVisible(0);
@@ -199,11 +204,12 @@ void SmartAmpProAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
-    modelSelect.setBounds(15, 15, 225, 25);
-    recordButton.setBounds(540, 15, 125, 25);
+    modelSelect.setBounds(15, 10, 225, 25);
+    recordButton.setBounds(540, 10, 125, 25);
+    trainButton.setBounds(540, 42, 125, 25);
     timerLabel.setBounds(300, 10, 70, 25);
-    helpLabel.setBounds(190, 50, 300, 25);
-    loadButton.setBounds(15, 50, 100, 25);
+    helpLabel.setBounds(190, 36, 300, 65);
+    loadButton.setBounds(15, 42, 100, 25);
     modelLabel.setBounds(20, 45, 400, 25);
     // Amp Widgets
     ampPresenceKnob.setBounds(445, 242, 55, 75);
@@ -227,30 +233,31 @@ void SmartAmpProAudioProcessorEditor::modelSelectChanged()
 
 void SmartAmpProAudioProcessorEditor::loadButtonClicked()
 {
-    FileChooser chooser("Select a .json tone...",
+    FileChooser chooser("Select one or more .json tone files to import",
         {},
         "*.json");
-    if (chooser.browseForFileToOpen())
+    if (chooser.browseForMultipleFilesToOpen())
     {
-        File file = chooser.getResult();
-        File userAppDataDirectory = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile(JucePlugin_Manufacturer).getChildFile(JucePlugin_Name);
-        File fullpath = userAppDataDirectory.getFullPathName() + "/" + file.getFileName();
-        bool b = fullpath.existsAsFile();
-        if (b == false) {
+        Array<File> files = chooser.getResults();
+        for (auto file : files) {
+            File fullpath = processor.userAppDataDirectory.getFullPathName() + "/" + file.getFileName();
+            bool b = fullpath.existsAsFile();
+            if (b == false) {
 
-            processor.loadConfig(file);
-            fname = file.getFileName();
-            modelLabel.setText(fname, juce::NotificationType::dontSendNotification);
-            processor.loaded_tone = file;
-            processor.loaded_tone_name = fname;
-            processor.custom_tone = 1;
+                processor.loadConfig(file);
+                fname = file.getFileName();
+                modelLabel.setText(fname, juce::NotificationType::dontSendNotification);
+                processor.loaded_tone = file;
+                processor.loaded_tone_name = fname;
+                processor.custom_tone = 1;
 
-            // Copy selected file to model directory and load into dropdown menu
-            bool a = file.copyFileTo(fullpath);
-            if (a == true) {
-                modelSelect.addItem(file.getFileName(), processor.jsonFiles.size() + 1);
-                modelSelect.setSelectedItemIndex(processor.jsonFiles.size(), juce::NotificationType::sendNotification);
-                processor.jsonFiles.push_back(file);
+                // Copy selected file to model directory and load into dropdown menu
+                bool a = file.copyFileTo(fullpath);
+                if (a == true) {
+                    modelSelect.addItem(file.getFileNameWithoutExtension(), processor.jsonFiles.size() + 1);
+                    modelSelect.setSelectedItemIndex(processor.jsonFiles.size(), juce::NotificationType::sendNotification);
+                    processor.jsonFiles.push_back(file);
+                }
             }
         }
     }
@@ -264,6 +271,8 @@ void SmartAmpProAudioProcessorEditor::buttonClicked(juce::Button* button)
         loadButtonClicked();
     } else if (button == &recordButton) {
         recordButtonClicked();
+    } else if (button == &trainButton) {
+        trainButtonClicked();
     }
 }
 
@@ -280,14 +289,23 @@ void SmartAmpProAudioProcessorEditor::ampOnButtonClicked() {
 
 void SmartAmpProAudioProcessorEditor::recordButtonClicked() {
     if (processor.recording == 0) {
-        processor.recording = 1;
-        recordButton.setColour(TextButton::buttonColourId, Colours::red);
-        recordButton.setButtonText("Stop Capture");
-        timerLabel.setText(minutes + ":0" + seconds, juce::NotificationType::sendNotification);
-        timerLabel.setVisible(1);
-        timer_start();
-        helpLabel.setText("Get Ready for Tone Capture..", juce::NotificationType::sendNotification);
-        helpLabel.setVisible(1);
+        FileChooser chooser("Enter a descriptive tone name",
+            processor.userAppDataDirectory,
+            "*.wav");
+        if (chooser.browseForFileToSave(false))  // TODO Overwriting existing file seems to lock up the plugin - fix
+        {
+            File file = chooser.getResult(); // TODO: Fix to handle spaces in filename
+            record_file = file.getFileName();
+
+            processor.recording = 1;
+            recordButton.setColour(TextButton::buttonColourId, Colours::red);
+            recordButton.setButtonText("Stop Capture");
+            timerLabel.setText(minutes + ":0" + seconds, juce::NotificationType::sendNotification);
+            timerLabel.setVisible(1);
+            timer_start();
+            helpLabel.setText("Get Ready for Tone Capture..\nEnsure input is on Channel 1 and target is on Channel 2", juce::NotificationType::sendNotification);
+            helpLabel.setVisible(1);
+        }
 
     }
     else {
@@ -300,9 +318,38 @@ void SmartAmpProAudioProcessorEditor::recordButtonClicked() {
         timerLabel.setVisible(0);
         helpLabel.setVisible(0);
         minutes = "";
-        seconds = "5";
+        seconds = "10";
     }
 
+}
+
+void SmartAmpProAudioProcessorEditor::trainButtonClicked() 
+{
+    FileChooser chooser("Select a recorded .wav sample for tone capture",
+        processor.userAppDataDirectory,
+        "*.wav");
+    if (chooser.browseForFileToOpen())
+    {
+        File file = chooser.getResult(); // TODO: Fix to handle spaces in filename
+        File fullpath = processor.userAppDataDirectory.getFullPathName();
+        File train_script = processor.userAppDataDirectory.getFullPathName() + "/train_smp.py";
+
+        bool b = train_script.existsAsFile();
+        if (b == true) {
+            //std::string string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + fullpath.getFullPathName().toStdString() + "/train.bat " + file.getFileName().toStdString() + " " + file.getFileNameWithoutExtension().toStdString();
+            std::string string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "python train_smp.py " + file.getFileName().toStdString() + " " + file.getFileNameWithoutExtension().toStdString();
+            const char *char_command = &string_command[0];
+            system(char_command); // call to training program
+            processor.resetDirectory(processor.userAppDataDirectory);
+            modelSelect.clear();
+            int c = 1;
+            for (const auto& jsonFile : processor.jsonFiles) {
+                modelSelect.addItem(jsonFile.getFileName(), c);
+                c += 1;
+            }
+            modelSelect.setSelectedItemIndex(0, juce::NotificationType::sendNotification);
+        }
+    }
 }
 
 void SmartAmpProAudioProcessorEditor::sliderValueChanged(Slider* slider)
@@ -333,7 +380,7 @@ void SmartAmpProAudioProcessorEditor::timer_start()
 void SmartAmpProAudioProcessorEditor::timer_stop()
 {
     stopTimer();
-    t = 185;
+    t = 190;
 }
 
 void SmartAmpProAudioProcessorEditor::timerCallback()
@@ -347,6 +394,7 @@ void SmartAmpProAudioProcessorEditor::timerCallback()
         minutes = "";
         seconds = std::to_string(std::abs(t - 180));
     } else if (t == 180) {
+        processor.audio_recorder.setRecordName(record_file);
         processor.audio_recorder.startRecording();
         helpLabel.setText("Begin 3 minutes of guitar playing!", juce::NotificationType::sendNotification);
     }
@@ -363,13 +411,13 @@ void SmartAmpProAudioProcessorEditor::timerCallback()
         recordButton.setColour(TextButton::buttonColourId, Colours::black);
         recordButton.setButtonText("Start Capture");
         timer_stop();
-        timerLabel.setText(":5", juce::NotificationType::sendNotification);
-        t = 185;
+        timerLabel.setText(":10", juce::NotificationType::sendNotification);
+        t = 190;
         timerLabel.setVisible(0);
         helpLabel.setVisible(0);
         helpLabel.setText("Begin 3 minutes of guitar playing!", juce::NotificationType::sendNotification);
         minutes = "";
-        seconds = "5";
+        seconds = "10";
         //system("C:/Users/KBloemer/Desktop/Archive/SmartAmpPro/train.bat"); // call to training program
 
     } else if (t == 170) {
