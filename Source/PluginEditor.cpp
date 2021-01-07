@@ -344,7 +344,7 @@ void SmartAmpProAudioProcessorEditor::trainButtonClicked()
             if (files.size() > 1) {
                 File file2 = files[1];
                 // TODO: Currently the two selected files will be in alphabetical order, so the first will be input, second is output. Better way to handle?
-                string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "python train_smp.py " + file.getFullPathName().toStdString() + " " + file.getFileNameWithoutExtension().toStdString() + " --out_file=" + file2.getFullPathName().toStdString();
+                string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "python train_smp.py " + file.getFullPathName().toStdString() + " " + file2.getFileNameWithoutExtension().toStdString() + " --out_file=" + file2.getFullPathName().toStdString();
             } else {
                 string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "python train_smp.py " + file.getFullPathName().toStdString() + " " + file.getFileNameWithoutExtension().toStdString();
             }
