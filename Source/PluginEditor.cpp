@@ -29,6 +29,7 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     }
     modelSelect.onChange = [this] {modelSelectChanged(); };
     modelSelect.setSelectedItemIndex(0, juce::NotificationType::sendNotification);
+    modelSelect.setScrollWheelEnabled(true);
 
     // Set Widget Graphics
     ampSilverKnobLAF.setLookAndFeel(ImageCache::getFromMemory(BinaryData::Vintage_Knob_png, BinaryData::Vintage_Knob_pngSize));
@@ -325,20 +326,29 @@ void SmartAmpProAudioProcessorEditor::recordButtonClicked() {
 
 void SmartAmpProAudioProcessorEditor::trainButtonClicked() 
 {
-    FileChooser chooser("Select a recorded .wav sample for tone capture",
+    FileChooser chooser("Select recorded .wav sample for tone capture",
         processor.userAppDataDirectory,
         "*.wav");
-    if (chooser.browseForFileToOpen())
+    if (chooser.browseForMultipleFilesToOpen())
     {
-        File file = chooser.getResult(); // TODO: Fix to handle spaces in filename
+        Array<File> files = chooser.getResults();
+   
         File fullpath = processor.userAppDataDirectory.getFullPathName();
         File train_script = processor.userAppDataDirectory.getFullPathName() + "/train_smp.py";
 
         bool b = train_script.existsAsFile();
         if (b == true) {
             //std::string string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + fullpath.getFullPathName().toStdString() + "/train.bat " + file.getFileName().toStdString() + " " + file.getFileNameWithoutExtension().toStdString();
-            std::string string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "python train_smp.py " + file.getFileName().toStdString() + " " + file.getFileNameWithoutExtension().toStdString();
-            const char *char_command = &string_command[0];
+            File file = files[0]; // TODO: Fix to handle spaces in filename
+            std::string string_command = "";
+            if (files.size() > 1) {
+                File file2 = files[1];
+                // TODO: Currently the two selected files will be in alphabetical order, so the first will be input, second is output. Better way to handle?
+                string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "python train_smp.py " + file.getFullPathName().toStdString() + " " + file.getFileNameWithoutExtension().toStdString() + " --out_file=" + file2.getFullPathName().toStdString();
+            } else {
+                string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "python train_smp.py " + file.getFullPathName().toStdString() + " " + file.getFileNameWithoutExtension().toStdString();
+            }
+            const char* char_command = &string_command[0];
             system(char_command); // call to training program
             processor.resetDirectory(processor.userAppDataDirectory);
             modelSelect.clear();
@@ -348,7 +358,7 @@ void SmartAmpProAudioProcessorEditor::trainButtonClicked()
                 c += 1;
             }
             modelSelect.setSelectedItemIndex(0, juce::NotificationType::sendNotification);
-        }
+        }     
     }
 }
 
