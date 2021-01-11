@@ -81,7 +81,7 @@ def main(args):
         conv1d_strides = 12
         conv1d_1_strides = 12   
         conv1d_filters = 4
-        hidden_units = 24
+        hidden_units = 32
     elif train_mode == 1:       # Accuracy Training (~10x longer than Speed Training)
         learning_rate = 0.01 
         conv1d_strides = 4
@@ -261,7 +261,7 @@ if __name__ == "__main__":
     parser.add_argument("--out_file", type=str, default="")
     parser.add_argument("--training_mode", type=int, default=0)
     parser.add_argument("--batch_size", type=int, default=4096)
-    parser.add_argument("--max_epochs", type=int, default=1)
+    parser.add_argument("--max_epochs", type=int, default=3)
     parser.add_argument("--create_plots", type=int, default=1)
     parser.add_argument("--input_size", type=int, default=180)
     parser.add_argument("--split_data", type=int, default=6)

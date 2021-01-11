@@ -334,7 +334,7 @@ void SmartAmpProAudioProcessorEditor::trainButtonClicked()
         Array<File> files = chooser.getResults();
    
         File fullpath = processor.userAppDataDirectory.getFullPathName();
-        File train_script = processor.userAppDataDirectory.getFullPathName() + "/train_smp.py";
+        File train_script = processor.userAppDataDirectory.getFullPathName() + "/train.py";
 
         bool b = train_script.existsAsFile();
         if (b == true) {
@@ -344,9 +344,9 @@ void SmartAmpProAudioProcessorEditor::trainButtonClicked()
             if (files.size() > 1) {
                 File file2 = files[1];
                 // TODO: Currently the two selected files will be in alphabetical order, so the first will be input, second is output. Better way to handle?
-                string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "python train_smp.py " + file.getFullPathName().toStdString() + " " + file2.getFileNameWithoutExtension().toStdString() + " --out_file=" + file2.getFullPathName().toStdString();
+                string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "python train.py " + file.getFullPathName().toStdString() + " " + file2.getFileNameWithoutExtension().toStdString() + " --out_file=" + file2.getFullPathName().toStdString();
             } else {
-                string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "python train_smp.py " + file.getFullPathName().toStdString() + " " + file.getFileNameWithoutExtension().toStdString();
+                string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "python train.py " + file.getFullPathName().toStdString() + " " + file.getFileNameWithoutExtension().toStdString();
             }
             const char* char_command = &string_command[0];
             system(char_command); // call to training program
