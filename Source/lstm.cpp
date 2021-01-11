@@ -20,13 +20,12 @@ lstm::lstm()
 
 }
 
+float lstm::tanh(float x)
+{
+    return tanhf(x);
+}
 
-double lstm::sigmoid(float x)
-//====================================================================
-// Description: Takes the sigmoid of a sample of audio. Used in 
-//   lstm gates.
-//
-//====================================================================
+float lstm::sigmoid(float x)
 {
     return 1.0f / (1.0f + expf(-x));
 }
@@ -157,7 +156,6 @@ void lstm::conv1d_layer(nc::NdArray<float> xt)
     len_o = conv1d_kernel[0].shape().cols; //16
     len_j = conv1d_kernel.size(); //12
     len_k = unfolded_xt[0].shape().cols; //1
-    total = 0.0;
 
     for (int i = 0; i < len_i; i++) 
     {
@@ -197,7 +195,7 @@ void lstm::conv1d_layer2()
     len_o = conv1d_1_kernel[0].shape().cols; //16
     len_j = conv1d_1_kernel.size(); //12
     len_k = unfolded_xt2[0].shape().cols; //1
-    total = 0.0;
+
     for (int i = 0; i < len_i; i++)
     {
         for (int o = 0; o < len_o; o++)
@@ -230,7 +228,7 @@ void lstm::lstm_layer()
 
     // Check if using slicing notation is faster here         np: a[2:5, 5:8]	NC :   a(nc::Slice(2, 5), nc::Slice(5, 8))
     for (int i = 0; i < HS; i++) {
-        h_t[i] = sigmoid(gates[3 * HS + i]) * nc::tanh(sigmoid(gates[i]) * nc::tanh(gates[2 * HS + i]));
+        h_t[i] = sigmoid(gates[3 * HS + i]) * tanh(sigmoid(gates[i]) * tanh(gates[2 * HS + i]));
     }
     lstm_out = h_t;
 }

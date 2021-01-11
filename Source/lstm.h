@@ -18,7 +18,8 @@ class lstm
         lstm();
 
         // Math and vector operations
-        double sigmoid(float x);
+        float tanh(float x);
+        float sigmoid(float x);
         nc::NdArray<float> pad(nc::NdArray<float> xt, int kernel_size, int stride);
         void unfold(int kernel_size, int stride);
 
@@ -69,11 +70,16 @@ class lstm
         int pad_left = 0;
         int pad_right = 0;
 
-        int len_i = 0; //9
-        int len_o = 0; //16
-        int len_j = 0; //12
-        int len_k = 0; //1
+        int len_i = 0;
+        int len_o = 0; 
+        int len_j = 0;
+        int len_k = 0;
         float total = 0.0;
+
+        int len_i2 = 0;
+        int len_o2 = 0;
+        int len_j2 = 0;
+        int len_k2 = 0;
 
         // Loaded Model Weights
         nc::NdArray<float> conv1d_bias;
