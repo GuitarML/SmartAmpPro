@@ -73,7 +73,8 @@ void lstm::setParams(int hidden_size, int conv1d_kernel_size, int conv1d_1_kerne
     nc::NdArray<float> dummy_input = nc::zeros<float>(nc::Shape(input_size, 1));
 
     // Set up bias matrices for calculation 
-    nc::NdArray<float> padded_dummy = pad(dummy_input, conv1d_Kernel_Size, conv1d_stride);  // TODO handle different strides
+    pad_init(dummy_input);
+    nc::NdArray<float> padded_dummy = pad(dummy_input);  // TODO handle different strides
     int bias_shape = padded_dummy.shape().rows / conv1d_stride; // TODO handle different strides
     conv1d_bias = nc::zeros<float>(nc::Shape(bias_shape, conv1d_bias_temp.shape().cols));;
     nc::NdArray<float> new_bias = conv1d_bias_temp;
@@ -83,7 +84,7 @@ void lstm::setParams(int hidden_size, int conv1d_kernel_size, int conv1d_1_kerne
     }
     conv1d_bias = new_bias;
 
-
+    
     bias_shape = 1; //TODO fix having to hardcode
     conv1d_1_bias = nc::zeros<float>(nc::Shape(bias_shape, conv1d_1_bias_temp.shape().cols));;
     nc::NdArray<float> new_bias2 = conv1d_1_bias_temp;
@@ -96,7 +97,7 @@ void lstm::setParams(int hidden_size, int conv1d_kernel_size, int conv1d_1_kerne
 
 
 
-nc::NdArray<float> lstm::pad(nc::NdArray<float> xt, int kernel_size, int stride) //TODO optimize these calculations, one for each conv1d layer, only do once
+void lstm::pad_init(nc::NdArray<float> xt) //TODO optimize these calculations, one for each conv1d layer, only do once
 //====================================================================
 // Description: Used in the in conv1d layers. This function applies
 //   'same' padding to the input data to the conv1d layer. The padding
@@ -107,18 +108,60 @@ nc::NdArray<float> lstm::pad(nc::NdArray<float> xt, int kernel_size, int stride)
 {
     seq_len = xt.shape().rows;
     local_channels = xt.shape().cols;
-    seq_mod_stride = seq_len % stride;
+    seq_mod_stride = seq_len % conv1d_stride;
 
     if (seq_mod_stride == 0) {
-        pad_width = std::max(kernel_size - stride, 0);
+        pad_width = std::max(conv1d_Kernel_Size - conv1d_stride, 0);
     } else {
-        pad_width = std::max(kernel_size - seq_mod_stride, 0);
+        pad_width = std::max(conv1d_Kernel_Size - seq_mod_stride, 0);
     }
     pad_left = pad_width / 2; // Integer division here, remainder is left out
     pad_right = pad_width - pad_left;
-    return nc::vstack({ nc::zeros<float>(pad_left, local_channels), xt, nc::zeros<float>(pad_right, local_channels) });
+
+    pad_left_zeros = nc::zeros<float>(pad_left, local_channels);
+    pad_right_zeros = nc::zeros<float>(pad_right, local_channels);
+    //pad_out = nc::vstack({ pad_left_zeros, xt, pad_right_zeros });
+
+    //return nc::vstack({ nc::zeros<float>(pad_left, local_channels), xt, nc::zeros<float>(pad_right, local_channels) });
 }
 
+
+void lstm::pad_init2(nc::NdArray<float> xt) //TODO optimize these calculations, one for each conv1d layer, only do once
+//====================================================================
+// Description: Used in the in conv1d layers. This function applies
+//   'same' padding to the input data to the conv1d layer. The padding
+//   is all zeros. The amount of padding is based on the kernel_size
+//   and stride of the conv1d layer.
+//
+//====================================================================
+{
+    seq_len2 = xt.shape().rows;
+    local_channels2 = xt.shape().cols;
+    seq_mod_stride2 = seq_len2 % conv1d_1_stride;
+
+    if (seq_mod_stride2 == 0) {
+        pad_width2 = std::max(conv1d_1_Kernel_Size - conv1d_1_stride, 0);
+    }
+    else {
+        pad_width2 = std::max(conv1d_1_Kernel_Size - seq_mod_stride2, 0);
+    }
+    pad_left2 = pad_width2 / 2; // Integer division here, remainder is left out
+    pad_right2 = pad_width2 - pad_left2;
+
+    pad_left_zeros2 = nc::zeros<float>(pad_left2, local_channels2);
+    pad_right_zeros2 = nc::zeros<float>(pad_right2, local_channels2);
+    //pad_out2 = nc::vstack({ pad_left_zeros2, xt, pad_right_zeros2 });
+
+    //return nc::vstack({ nc::zeros<float>(pad_left, local_channels), xt, nc::zeros<float>(pad_right, local_channels) });
+}
+
+nc::NdArray<float> lstm::pad(nc::NdArray<float> xt) {
+    return nc::vstack({ pad_left_zeros, xt, pad_right_zeros });
+}
+
+nc::NdArray<float> lstm::pad2(nc::NdArray<float> xt) {
+    return nc::vstack({ pad_left_zeros2, xt, pad_right_zeros2 });
+}
 
 
 void lstm::unfold(int kernel_size, int stride)
@@ -148,7 +191,7 @@ void lstm::conv1d_layer(nc::NdArray<float> xt)
 //
 //====================================================================
 {
-    padded_xt = pad(xt, conv1d_Kernel_Size, conv1d_stride);
+    padded_xt = pad(xt);
     unfold(conv1d_Kernel_Size, conv1d_stride); // unfolded xt (9, 12, 1) .  weight shape (12, 1, 16), (tensordot(unfolded_xt, weight) = (9,16))
 
     // Compute tensordot
@@ -187,7 +230,8 @@ void lstm::conv1d_layer2()
 //
 //====================================================================
 {
-    padded_xt2 = pad(conv1d_out, conv1d_1_Kernel_Size, conv1d_1_stride);
+    //pad_init2(conv1d_out);
+    padded_xt2 = pad2(conv1d_out);
     unfolded_xt2[0] = padded_xt2;
 
     // Compute tensordot
@@ -265,7 +309,8 @@ void lstm::check_buffer(int numSamples)  //TODO this is called every block, how 
         // Reset the input
         input = nc::zeros<float>(nc::Shape(input_size, 1));
         //Set initial conv1d layer 1 arrays
-        padded_xt = pad(input, conv1d_Kernel_Size, conv1d_stride); //TODO ability to set stride
+        pad_init(input);
+        padded_xt = pad(input); //TODO ability to set stride
         unfolded_xt.clear();
         for (int i = 0; i < padded_xt.shape().rows / conv1d_stride; i++)
         {
@@ -273,6 +318,7 @@ void lstm::check_buffer(int numSamples)  //TODO this is called every block, how 
         }
         conv1d_out = nc::zeros<float>(nc::Shape(unfolded_xt.size(), conv1d_kernel[0].shape().cols));
         // Set initial conv1d layer 2 array
+        pad_init2(conv1d_out);
         unfolded_xt2.clear();
         nc::NdArray<float> placeholder_temp;
         unfolded_xt2.push_back(placeholder_temp);
