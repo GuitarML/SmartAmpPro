@@ -39,7 +39,7 @@ it will be re-installed the next time you open the plugin.
    Note: This saves the two channels to a single stereo .wav file, with the input on the left (channel 1), and target on the right (channel 2)
 
 
-### Creating .json models from recorded .wav samples.
+### Training .json models from recorded .wav samples.
 
 In order to use the "Train Model" button, the following python libraries must be installed on your system (not a virtual environment)<br>
 -tensorflow (2.4 used in testing with python3.8) <br>
