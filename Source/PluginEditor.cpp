@@ -126,12 +126,12 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     addAndMakeVisible(ampGainKnob);
     ampGainKnob.setLookAndFeel(&ampSilverKnobLAF);
     ampGainKnob.addListener(this);
-    ampGainKnob.setRange(0.0, 20.0);
+    ampGainKnob.setRange(-10.0, 10.0);
     ampGainKnob.setValue(processor.ampGainKnobState);
     ampGainKnob.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
     ampGainKnob.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, false, 50, 20);
     ampGainKnob.setNumDecimalPlacesToDisplay(1);
-    ampGainKnob.setDoubleClickReturnValue(true, 10.0);
+    ampGainKnob.setDoubleClickReturnValue(true, 0.0);
 
     addAndMakeVisible(ampMasterKnob);
     ampMasterKnob.setLookAndFeel(&ampSilverKnobLAF);
