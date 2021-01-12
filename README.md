@@ -12,6 +12,8 @@ using A.I. is to produce the highest quality sound, any future development will 
 using WaveNet, or a different A.I. model than the one used here ([GuitarLSTM](https://github.com/GuitarML/GuitarLSTM)). 
 
 
+![app](https://github.com/keyth72/SmartAmpPro/blob/master/resources/plugin.png)
+
 ## Installing the plugin
 
 1. Download plugin (Windows 10 only) [here]
@@ -29,11 +31,11 @@ it will be re-installed the next time you open the plugin.
 ### Capturing .wav samples for model training:
 
 1. Click the "Start Capture" button to and enter a model name to save. 
-2. After saving, the plugin wil begin a 10 second coundown followed by a 3 minute recording session.
+2. After saving, the plugin will begin a 10 second coundown followed by a 3 minute recording session.
 3. The plugin will automatically record from Channels 1 and 2, with the input expected on channel 1, and the target
    expected on channel 2. This assumes the user has an Audio Interface connected with at least two channels.
    (all testing was done on a Focusrite Scarlett 2i2)
-4. Once the three minutes are done, recording will automatically end.
+4. Once the three minutes are over, recording will automatically stop and the .wav file will be saved.
 5. This saves the two channels to a single stereo .wav file, with the input on the left (channel 1), and target on the right (channel 2)
 
 
