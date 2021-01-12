@@ -81,7 +81,7 @@ def main(args):
         conv1d_strides = 12
         conv1d_1_strides = 12   
         conv1d_filters = 4
-        hidden_units = 24
+        hidden_units = 32
     elif train_mode == 1:       # Accuracy Training (~10x longer than Speed Training)
         learning_rate = 0.01 
         conv1d_strides = 4
@@ -109,10 +109,17 @@ def main(args):
     print(model.summary())
 
     # Load and Preprocess Data ###########################################
+    
     in_rate, stereo_data = wavfile.read(args.in_file)
-
-    in_data = stereo_data.T[0]
-    out_data = stereo_data.T[1]
+    
+    # If a second wav file is provided, assume each file is mono and load data
+    if args.out_file != "":
+        out_rate, out_data = wavfile.read(args.out_file)
+        in_data = stereo_data
+    # Else, use the stereo wav file channel 1 and channel 2 for training data
+    else:
+        in_data = stereo_data.T[0]
+        out_data = stereo_data.T[1]
 
     X_all = in_data.astype(np.float32).flatten()  
     X_all = normalize(X_all).reshape(len(X_all),1)   
@@ -195,30 +202,12 @@ def main(args):
     f.close()
 
 
-
-    # Create Analysis Plots ###########################################
-    if args.create_plots == 1:
-        print("Plotting results..")
-        import plot
-
-        plot.analyze_pred_vs_actual({   'output_wav':'models/'+name+'/y_test.wav',
-                                            'pred_wav':'models/'+name+'/y_pred.wav', 
-                                            'input_wav':'models/'+name+'/x_test.wav',
-                                            'model_name':name,
-                                            'show_plots':1,
-                                            'path':'models/'+name
-                                        })
-
-
     # Generate json model ################################
     filename = 'models/'+name+'/'+ args.name +'.h5'
-    json_filename = 'models/'+name+'/'+ args.name
+    #json_filename = 'models/'+name+'/'+ args.name
+    json_filename = args.name
     f = h5py.File(filename, 'r')
-    # List all groups
-    #print("Keys: %s" % f.keys())
-    # List all layers
-    #print("Layers: %s" % f[list(f.keys())[0]].keys())
-
+   
     # Load the model data
     data = {}
     for layer in f["model_weights"].keys():
@@ -252,15 +241,29 @@ def main(args):
         json.dump(data, outfile)
     print("SmartAmpPro model generated: ", json_filename + ".json")
 
+    # Create Analysis Plots ###########################################
+    if args.create_plots == 1:
+        print("Plotting results..")
+        import plot
+
+        plot.analyze_pred_vs_actual({   'output_wav':'models/'+name+'/y_test.wav',
+                                            'pred_wav':'models/'+name+'/y_pred.wav', 
+                                            'input_wav':'models/'+name+'/x_test.wav',
+                                            'model_name':name,
+                                            'show_plots':1,
+                                            'path':'models/'+name
+                                        })
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("in_file")
     parser.add_argument("name")
+    parser.add_argument("--out_file", type=str, default="")
     parser.add_argument("--training_mode", type=int, default=0)
     parser.add_argument("--batch_size", type=int, default=4096)
-    parser.add_argument("--max_epochs", type=int, default=1)
+    parser.add_argument("--max_epochs", type=int, default=3)
     parser.add_argument("--create_plots", type=int, default=1)
-    parser.add_argument("--input_size", type=int, default=100)
-    parser.add_argument("--split_data", type=int, default=1)
+    parser.add_argument("--input_size", type=int, default=180)
+    parser.add_argument("--split_data", type=int, default=6)
     args = parser.parse_args()
     main(args)

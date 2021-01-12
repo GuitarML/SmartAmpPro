@@ -8,12 +8,14 @@
       <FILE id="Uieb0X" name="led_blue_off.png" compile="0" resource="1"
             file="resources/led_blue_off.png"/>
       <FILE id="ceij5f" name="led_blue_on.png" compile="0" resource="1" file="resources/led_blue_on.png"/>
+      <FILE id="m7wsyw" name="plot.py" compile="0" resource="1" file="resources/plot.py"/>
       <FILE id="kSnGrA" name="Power_switch_off.png" compile="0" resource="1"
             file="resources/Power_switch_off.png"/>
       <FILE id="VU1K05" name="Power_switch_on.png" compile="0" resource="1"
             file="resources/Power_switch_on.png"/>
       <FILE id="sIplv3" name="smp_off.png" compile="0" resource="1" file="resources/smp_off.png"/>
       <FILE id="oyBNlZ" name="smp_on.png" compile="0" resource="1" file="resources/smp_on.png"/>
+      <FILE id="GmSw4X" name="train.py" compile="0" resource="1" file="resources/train.py"/>
       <FILE id="NSHRQf" name="Vintage_Knob.png" compile="0" resource="1"
             file="resources/Vintage_Knob.png"/>
       <FILE id="ydzcso" name="Vintage_Knob_alt.png" compile="0" resource="1"
