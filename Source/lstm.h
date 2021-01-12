@@ -72,7 +72,6 @@ class lstm
         int pad_right = 0;
         nc::NdArray<float> pad_left_zeros;
         nc::NdArray<float> pad_right_zeros;
-        //nc::NdArray<float> pad_out;
 
         int seq_len2 = 1;
         int local_channels2 = 1;
@@ -82,24 +81,17 @@ class lstm
         int pad_right2 = 0;
         nc::NdArray<float> pad_left_zeros2;
         nc::NdArray<float> pad_right_zeros2;
-        //nc::NdArray<float> pad_out2;
 
         // LSTM calc
         nc::NdArray<float> gates = nc::zeros<float>(1, HS * 4);
         nc::NdArray<float> h_t;
 
         // conv1d eigen calc
-
         int len_i = 0;
         int len_o = 0; 
         int len_j = 0;
         int len_k = 0;
         float total = 0.0;
-
-        int len_i2 = 0;
-        int len_o2 = 0;
-        int len_j2 = 0;
-        int len_k2 = 0;
 
         // Loaded Model Weights
         nc::NdArray<float> conv1d_bias;
@@ -122,9 +114,7 @@ class lstm
         nc::NdArray<float> padded_xt;
         std::vector<nc::NdArray<float>> unfolded_xt2;
         nc::NdArray<float> padded_xt2;
-
-
-        
+ 
     private:
 
 };

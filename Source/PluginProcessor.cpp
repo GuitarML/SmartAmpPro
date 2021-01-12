@@ -162,8 +162,6 @@ void SmartAmpProAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
         //    Master Volume 
         buffer.applyGain(ampMaster);
 
-        //    Apply levelAdjust from model param (for adjusting quiet models)
-
     }
     
     for (int ch = 1; ch < buffer.getNumChannels(); ++ch)

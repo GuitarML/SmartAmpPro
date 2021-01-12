@@ -120,9 +120,6 @@ void lstm::pad_init(nc::NdArray<float> xt) //TODO optimize these calculations, o
 
     pad_left_zeros = nc::zeros<float>(pad_left, local_channels);
     pad_right_zeros = nc::zeros<float>(pad_right, local_channels);
-    //pad_out = nc::vstack({ pad_left_zeros, xt, pad_right_zeros });
-
-    //return nc::vstack({ nc::zeros<float>(pad_left, local_channels), xt, nc::zeros<float>(pad_right, local_channels) });
 }
 
 
@@ -150,9 +147,6 @@ void lstm::pad_init2(nc::NdArray<float> xt) //TODO optimize these calculations, 
 
     pad_left_zeros2 = nc::zeros<float>(pad_left2, local_channels2);
     pad_right_zeros2 = nc::zeros<float>(pad_right2, local_channels2);
-    //pad_out2 = nc::vstack({ pad_left_zeros2, xt, pad_right_zeros2 });
-
-    //return nc::vstack({ nc::zeros<float>(pad_left, local_channels), xt, nc::zeros<float>(pad_right, local_channels) });
 }
 
 nc::NdArray<float> lstm::pad(nc::NdArray<float> xt) {
@@ -192,7 +186,7 @@ void lstm::conv1d_layer(nc::NdArray<float> xt)
 //====================================================================
 {
     padded_xt = pad(xt);
-    unfold(conv1d_Kernel_Size, conv1d_stride); // unfolded xt (9, 12, 1) .  weight shape (12, 1, 16), (tensordot(unfolded_xt, weight) = (9,16))
+    unfold(conv1d_Kernel_Size, conv1d_stride);
 
     // Compute tensordot
     len_i = unfolded_xt.size(); //9
@@ -267,7 +261,6 @@ void lstm::lstm_layer()
 //
 //====================================================================
 {
-
     gates = nc::dot(conv1d_1_out, W) + bias;
 
     // Check if using slicing notation is faster here         np: a[2:5, 5:8]	NC :   a(nc::Slice(2, 5), nc::Slice(5, 8))
@@ -288,7 +281,6 @@ void lstm::dense_layer()
 {
     dense_out = nc::dot(lstm_out, dense_kernel) + dense_bias;
 }
-
 
 
 void lstm::check_buffer(int numSamples)  //TODO this is called every block, how to call just at beginning and when buffer size changes?
@@ -338,8 +330,6 @@ void lstm::set_data(const float* chData, int numSamples)
 //====================================================================
 {
 
-    //const float* chData = inputData[0];
-
     // Move input_size-1 of last buffer to the beginning of new_buffer
     for (int k = 0; k < input_size - 1; k++)
     {
@@ -388,7 +378,5 @@ void lstm::process(const float* inData, float* outData, int numSamples)
         lstm_layer();
         dense_layer();
         outData[i] = dense_out[0];
-
     }
-
 }

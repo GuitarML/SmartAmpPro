@@ -428,7 +428,6 @@ void SmartAmpProAudioProcessorEditor::timerCallback()
         helpLabel.setText("Begin 3 minutes of guitar playing!", juce::NotificationType::sendNotification);
         minutes = "";
         seconds = "10";
-        //system("C:/Users/KBloemer/Desktop/Archive/SmartAmpPro/train.bat"); // call to training program
 
     } else if (t == 170) {
         helpLabel.setText("Play some chords", juce::NotificationType::sendNotification);
