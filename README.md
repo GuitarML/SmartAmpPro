@@ -41,7 +41,7 @@ it will be re-installed the next time you open the plugin.
 
 ### Creating .json models from recorded .wav samples.
 
-In order to use the "Train Model" button, the following python libraries must be installed on your system (not a virtual environment)
+In order to use the "Train Model" button, the following python libraries must be installed on your system (not a virtual environment)<br>
 -tensorflow (2.4 used in testing with python3.8) <br>
 -matplotlib<br>
 -scipy<br>
