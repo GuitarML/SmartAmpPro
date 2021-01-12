@@ -16,7 +16,7 @@ using WaveNet, or a different A.I. model than the one used here ([GuitarLSTM](ht
 
 ## Installing the plugin
 
-1. Download plugin (Windows 10 only) [here]
+1. Download plugin (Windows 10 only) [here](https://github.com/GuitarML/SmartAmpPro/releases/tag/v1.0)
 2. Copy to your DAW's VST directory
 
 ## Using the plugin
