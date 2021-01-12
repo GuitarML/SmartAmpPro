@@ -18,8 +18,14 @@ class lstm
         lstm();
 
         // Math and vector operations
-        double sigmoid(float x);
-        nc::NdArray<float> pad(nc::NdArray<float> xt, int kernel_size, int stride);
+        float tanh(float x);
+        float sigmoid(float x);
+        void pad_init(nc::NdArray<float> xt);
+        void pad_init2(nc::NdArray<float> xt);
+
+        nc::NdArray<float> pad(nc::NdArray<float> xt);
+        nc::NdArray<float> pad2(nc::NdArray<float> xt);
+
         void unfold(int kernel_size, int stride);
 
         // Layers
@@ -57,22 +63,34 @@ class lstm
         int conv1d_stride = 0;
         int conv1d_1_stride = 0;
 
+        // Pad calculations
         int seq_len = 1;
         int local_channels = 1;
         int seq_mod_stride = 0;
+        int pad_width = 0;
+        int pad_left = 0;
+        int pad_right = 0;
+        nc::NdArray<float> pad_left_zeros;
+        nc::NdArray<float> pad_right_zeros;
 
+        int seq_len2 = 1;
+        int local_channels2 = 1;
+        int seq_mod_stride2 = 0;
+        int pad_width2 = 0;
+        int pad_left2 = 0;
+        int pad_right2 = 0;
+        nc::NdArray<float> pad_left_zeros2;
+        nc::NdArray<float> pad_right_zeros2;
+
+        // LSTM calc
         nc::NdArray<float> gates = nc::zeros<float>(1, HS * 4);
         nc::NdArray<float> h_t;
 
         // conv1d eigen calc
-        int pad_width = 0;
-        int pad_left = 0;
-        int pad_right = 0;
-
-        int len_i = 0; //9
-        int len_o = 0; //16
-        int len_j = 0; //12
-        int len_k = 0; //1
+        int len_i = 0;
+        int len_o = 0; 
+        int len_j = 0;
+        int len_k = 0;
         float total = 0.0;
 
         // Loaded Model Weights
@@ -96,7 +114,7 @@ class lstm
         nc::NdArray<float> padded_xt;
         std::vector<nc::NdArray<float>> unfolded_xt2;
         nc::NdArray<float> padded_xt2;
-        
+ 
     private:
 
 };

@@ -162,8 +162,6 @@ void SmartAmpProAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
         //    Master Volume 
         buffer.applyGain(ampMaster);
 
-        //    Apply levelAdjust from model param (for adjusting quiet models)
-
     }
     
     for (int ch = 1; ch < buffer.getNumChannels(); ++ch)
@@ -255,7 +253,7 @@ void SmartAmpProAudioProcessor::setupDataDirectories()
 
 void SmartAmpProAudioProcessor::installPythonScripts()
 {
-    File train_script = userAppDataDirectory.getFullPathName() + "/train_smp.py";
+    File train_script = userAppDataDirectory.getFullPathName() + "/train.py";
     File plot_script = userAppDataDirectory.getFullPathName() + "/plot.py";
 
     bool b = train_script.existsAsFile();
@@ -267,7 +265,7 @@ void SmartAmpProAudioProcessor::installPythonScripts()
 
         std::ofstream myfile;
         myfile.open(char_train_script);
-        myfile << BinaryData::train_smp_py;
+        myfile << BinaryData::train_py;
 
         myfile.close();
     }

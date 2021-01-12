@@ -15,7 +15,7 @@
             file="resources/Power_switch_on.png"/>
       <FILE id="sIplv3" name="smp_off.png" compile="0" resource="1" file="resources/smp_off.png"/>
       <FILE id="oyBNlZ" name="smp_on.png" compile="0" resource="1" file="resources/smp_on.png"/>
-      <FILE id="MtjoRi" name="train_smp.py" compile="0" resource="1" file="resources/train_smp.py"/>
+      <FILE id="GmSw4X" name="train.py" compile="0" resource="1" file="resources/train.py"/>
       <FILE id="NSHRQf" name="Vintage_Knob.png" compile="0" resource="1"
             file="resources/Vintage_Knob.png"/>
       <FILE id="ydzcso" name="Vintage_Knob_alt.png" compile="0" resource="1"
