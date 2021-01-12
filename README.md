@@ -21,7 +21,7 @@ using WaveNet, or a different A.I. model than the one used here ([GuitarLSTM](ht
 
 ## Using the plugin
 
-On Windows 10, the SmartAmpPro creates a "C:/Users/<user>/AppData/Roaming/GuitarML/SmartAmpPro" directory. 
+On Windows 10, the SmartAmpPro creates a "C:/Users/user/AppData/Roaming/GuitarML/SmartAmpPro" directory. 
 All .json models, associated training files, and .wav samples created from the plugin will be saved here. 
 When using the "Add Tone" button, the chosen .json file will be copied here. There is no automatic data cleanup
 of this directory. If you modify the "train.py" file and want to revert to the original, remove the the .py file and 
@@ -51,7 +51,7 @@ To test these are installed correctly for SmartAmpPro, open a command prompt, ru
 The plugin simply makes a system call to python and runs the training script, so these need to be a system-wide installation on your computer.
 
 1. Click the "Train Model" button and select the .wav file to train from.
-    (These are in the "C:/Users/<user>/AppData/Roaming/GuitarML/SmartAmpPro" directory from the above step)
+    (These are in the "C:/Users/user/AppData/Roaming/GuitarML/SmartAmpPro" directory from the above step)
 2. If you have two separate .wav files (float32, mono, no extra data) then you can select both from the
    dialog box. Ensure that the input comes first alphabetically. For example:
 	"Input.wav", "Output.wav" works, but  "zInput.wav" and "Output.wav" would use the wrong file as input vs. output.
