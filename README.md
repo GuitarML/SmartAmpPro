@@ -71,7 +71,7 @@ Note: You can modify the train.py script to test different parameters, but it ma
 2. Download and install [JUCE](https://juce.com/) This project uses the "Projucer" application from the JUCE website. 
 3. Download and extract [NumCpp](https://github.com/dpilger26/NumCpp) This is a c++ implementation of the Python Numpy library.
 4. Download and extract [Boost](https://www.boost.org/)  (NumCpp requires Boost)
-5. Download and extract: [json] (https://github.com/nlohmann/json)
+5. Download and extract: [json](https://github.com/nlohmann/json)
 6. Open the SmartAmpPro.jucer file and in the appropriate Exporter Header Search Path field, enter the appropriate include paths.
    For example:
 
