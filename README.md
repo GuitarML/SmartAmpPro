@@ -30,13 +30,13 @@ it will be re-installed the next time you open the plugin.
 
 ### Capturing .wav samples for model training:
 
-1. Click the "Start Capture" button to and enter a model name to save. 
+1. Click the "Start Capture" button and enter a model name to save. 
 2. After saving, the plugin will begin a 10 second coundown followed by a 3 minute recording session.
 3. The plugin will automatically record from Channels 1 and 2, with the input expected on channel 1, and the target
    expected on channel 2. This assumes the user has an Audio Interface connected with at least two channels.
    (all testing was done on a Focusrite Scarlett 2i2)
 4. Once the three minutes are over, recording will automatically stop and the .wav file will be saved.
-5. This saves the two channels to a single stereo .wav file, with the input on the left (channel 1), and target on the right (channel 2)
+   Note: This saves the two channels to a single stereo .wav file, with the input on the left (channel 1), and target on the right (channel 2)
 
 
 ### Creating .json models from recorded .wav samples.
@@ -60,7 +60,9 @@ The plugin simply makes a system call to python and runs the training script, so
 3. A terminal window should pop up and execute the training script. If it appears and quickly disappears, check that your
 model name doesn't already exist in the SmartAmpPro/models directory, or check that the python libraries were installed correctly.
 To further troubleshoot, navigate to the SmartAmpPro directory, open a cmd prompt and manually run "python train.py <input.wav(s)> <name>"
-4. After training has completed (should take 5 minutes or less), you will now have a newly created model to select in the plugin drop down box.
+4. An analysis plot will show the training results (plots and samples are saved to the SmartAmpPro/models directory). Close the plot to resume using the plugin normally.
+5. After training has completed (should take 5 minutes or less), you will now have a newly created model to select in the plugin drop down box.
+	
 
 Note: You can modify the train.py script to test different parameters, but it may produce undesired results in the plugin.
 
