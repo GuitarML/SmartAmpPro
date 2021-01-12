@@ -21,7 +21,7 @@ using WaveNet, or a different A.I. model than the one used here ([GuitarLSTM](ht
 
 ## Using the plugin
 
-On Windows 10, the SmartAmpPro creates a "C:\Users\<user>\AppData\Roaming\GuitarML\SmartAmpPro" directory. 
+On Windows 10, the SmartAmpPro creates a "C:\Users\\<user>\AppData\Roaming\GuitarML\SmartAmpPro" directory. 
 All .json models, associated training files, and .wav samples created from the plugin will be saved here. 
 When using the "Add Tone" button, the chosen .json file will be copied here. There is no automatic data cleanup
 of this directory. If you modify the "train.py" file and want to revert to the original, remove the the .py file and 
