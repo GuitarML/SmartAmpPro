@@ -12,7 +12,7 @@ using A.I. is to produce the highest quality sound, any future development will 
 using WaveNet, or a different A.I. model than the one used here ([GuitarLSTM](https://github.com/GuitarML/GuitarLSTM)). 
 
 
-![app](https://github.com/keyth72/SmartAmpPro/blob/master/resources/plugin.png)
+![app](https://github.com/GuitarML/SmartAmpPro/blob/master/resources/plugin.png)
 
 ## Installing the plugin
 
