@@ -42,9 +42,9 @@ it will be re-installed the next time you open the plugin.
 ### Creating .json models from recorded .wav samples.
 
 In order to use the "Train Model" button, the following python libraries must be installed on your system (not a virtual environment)
--tensorflow (2.4 used in testing with python3.8) 
--matplotlib
--scipy
+-tensorflow (2.4 used in testing with python3.8) <br>
+-matplotlib<br>
+-scipy<br>
 Note: Earlier versions of python may not work with latest tensorflow
 
 To test these are installed correctly for SmartAmpPro, open a command prompt, run python and try to import tensorflow, matplotlib, and scipy.
