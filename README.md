@@ -36,7 +36,7 @@ entirely different machine learning model. Only use tone files trained from Smar
 
 ### Capturing .wav samples for model training:
 
-1. Click the "Start Capture" button and enter a model name to save. 
+1. Click the "Start Capture" button and enter a model name to save. Ensure this name contains no spaces. 
 2. After saving, the plugin will begin a 10 second coundown followed by a 3 minute recording session.
 3. The plugin will automatically record from Channels 1 and 2, with the input expected on channel 1, and the target
    expected on channel 2. This assumes the user has an Audio Interface connected with at least two channels.
