@@ -9,7 +9,7 @@ Developer Note: After performing listening tests between the original SmartAmp(W
 SmartAmpPro(LSTM model) it was determined that the WaveNet produces a much more natural
 sound (especially on clean tones), even though both models have a low error-to-signal ratio. 
 Since the main goal of using A.I. is to produce the highest quality sound, any future 
-development will continue using WaveNet, or a different A.I. model than the one used here ([GuitarLSTM](https://github.com/GuitarML/GuitarLSTM)).
+development will continue using WaveNet, or a different A.I. model from the one used here ([GuitarLSTM](https://github.com/GuitarML/GuitarLSTM)).
 
 ![app](https://github.com/GuitarML/SmartAmpPro/blob/master/resources/plugin.png)
 
