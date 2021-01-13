@@ -22,10 +22,17 @@ using WaveNet, or a different A.I. model than the one used here ([GuitarLSTM](ht
 
 On Windows 10, the SmartAmpPro creates a "C:/Users/user/AppData/Roaming/GuitarML/SmartAmpPro" directory. 
 All .json models, associated training files, and .wav samples created from the plugin will be saved here. 
-When using the "Add Tone" button, the chosen .json file will be copied here. There is no automatic data cleanup
-of this directory. If you modify the "train.py" file and want to revert to the original, remove the the .py file and 
-it will be re-installed the next time you open the plugin.
+There is no automatic data cleanup of this directory. If you modify the "train.py" file and want to revert 
+to the original, remove the the .py file and it will be re-installed the next time you open the plugin.
 
+## "Add Tone" button
+This button adds a tone file (with .json extension) to the plugin. Click the "Add Tone" button to open up 
+a file select dialog box. Select your .json tone file (or multiple files) to import them into the plugin. 
+This simply copies the tone file to your "SmartAmpPro" directory in "AppData". The tone is now an option
+in the drop down box in the plugin. 
+
+Note: The original SmartAmp/PedalNetRT .json files are not compatible with this plugin because it is an
+entirely different machine learning model. Only use tone files trained from SmartAmpPro.
 
 ### Capturing .wav samples for model training:
 
@@ -72,7 +79,7 @@ Note: You can modify the train.py script to test different parameters, but it ma
 2. Download and install [JUCE](https://juce.com/) This project uses the "Projucer" application from the JUCE website. 
 3. Download and extract [NumCpp](https://github.com/dpilger26/NumCpp) This is a c++ implementation of the Python Numpy library.
 4. Download and extract [Boost](https://www.boost.org/)  (NumCpp requires Boost)
-5. Download and extract: [json](https://github.com/nlohmann/json)
+5. Download and extract: [json](https://github.com/nlohmann/json) Json for c++
 6. Open the SmartAmpPro.jucer file and in the appropriate Exporter Header Search Path field, enter the appropriate include paths.
    For example:
 
@@ -81,6 +88,7 @@ Note: You can modify the train.py script to test different parameters, but it ma
 	<full-path-to>/NumCpp-master/include
 	<full-path-to>/boost_1_75_0/boost_1_75_0
 ```
+7. Build SmartAmpPro from the Juce Projucer application. 
 
 Dev Note: The above dependencies were chosen to facilitate rapid prototyping. It is possible to accomplish the same
 	thing using only Juce and the standard c++ library.
