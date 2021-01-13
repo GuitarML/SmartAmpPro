@@ -49,7 +49,6 @@
 #pragma once
 
 #include "DemoUtilities.h"
-#include "AudioLiveScrollingDisplay.h"
 
 //==============================================================================
 /** A simple class that acts as an AudioIODeviceCallback and writes the
@@ -234,7 +233,6 @@ public:
     AudioRecordingDemo()
     {
         setOpaque (true);
-        addAndMakeVisible (liveAudioScroller);
 
         addAndMakeVisible (explanationLabel);
         explanationLabel.setFont (Font (15.0f, Font::plain));
@@ -266,7 +264,6 @@ public:
                                      });
        #endif
 
-        audioDeviceManager.addAudioCallback (&liveAudioScroller);
         audioDeviceManager.addAudioCallback (&recorder);
 
         setSize (500, 500);
@@ -275,7 +272,6 @@ public:
     ~AudioRecordingDemo() override
     {
         audioDeviceManager.removeAudioCallback (&recorder);
-        audioDeviceManager.removeAudioCallback (&liveAudioScroller);
     }
 
     void paint (Graphics& g) override
@@ -287,7 +283,6 @@ public:
     {
         auto area = getLocalBounds();
 
-        liveAudioScroller .setBounds (area.removeFromTop (80).reduced (8));
         recordingThumbnail.setBounds (area.removeFromTop (80).reduced (8));
         recordButton      .setBounds (area.removeFromTop (36).removeFromLeft (140).reduced (8));
         explanationLabel  .setBounds (area.reduced (8));
@@ -301,7 +296,6 @@ public:
     AudioDeviceManager& audioDeviceManager { getSharedAudioDeviceManager (1, 0) };
    #endif
 
-    LiveScrollingAudioDisplay liveAudioScroller;
     RecordingThumbnail recordingThumbnail;
     AudioRecorder recorder  { recordingThumbnail.getAudioThumbnail() };
 

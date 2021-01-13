@@ -94,7 +94,3 @@ void ModelLoader::load_json(const char *filename)
     dense_bias_nc = vector_to_nc(dense_bias);
     dense_kernel_nc = matrix_to_nc(dense_kernel);
 }
-
-
-
-

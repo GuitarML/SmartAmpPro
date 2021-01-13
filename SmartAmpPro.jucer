@@ -24,8 +24,6 @@
             file="resources/Vintage_Knob_alt.png"/>
     </GROUP>
     <GROUP id="{0C30E6D7-5E80-A33B-74CB-A4BA09196080}" name="Source">
-      <FILE id="zIkWlp" name="AudioLiveScrollingDisplay.h" compile="0" resource="0"
-            file="Source/AudioLiveScrollingDisplay.h"/>
       <FILE id="sisDyq" name="AudioRecordingDemo.h" compile="0" resource="0"
             file="Source/AudioRecordingDemo.h"/>
       <FILE id="T12vBi" name="DemoUtilities.h" compile="0" resource="0" file="Source/DemoUtilities.h"/>

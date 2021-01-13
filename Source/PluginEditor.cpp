@@ -153,8 +153,6 @@ SmartAmpProAudioProcessorEditor::~SmartAmpProAudioProcessorEditor()
 //==============================================================================
 void SmartAmpProAudioProcessorEditor::paint (Graphics& g)
 {
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
-    //g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
     if ( current_background == 1 && processor.amp_state == 1) {
         background = ImageCache::getFromMemory(BinaryData::smp_on_png, BinaryData::smp_on_pngSize);
     } else if (current_background == 1 && processor.amp_state == 1) {
@@ -167,7 +165,6 @@ void SmartAmpProAudioProcessorEditor::paint (Graphics& g)
     g.setColour (Colours::white);
     g.setFont (15.0f);
 
-    // Should really override the ToggleButton class, but being lazy here
     // Set On/Off amp graphic
     if (processor.amp_state == 0) {
         ampOnButton.setImages(true, true, true,
@@ -334,7 +331,6 @@ void SmartAmpProAudioProcessorEditor::trainButtonClicked()
 
         bool b = train_script.existsAsFile();
         if (b == true) {
-            //std::string string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + fullpath.getFullPathName().toStdString() + "/train.bat " + file.getFileName().toStdString() + " " + file.getFileNameWithoutExtension().toStdString();
             File file = files[0]; // TODO: Fix to handle spaces in filename
             std::string string_command = "";
             if (files.size() > 1) {
