@@ -25,7 +25,7 @@ All .json models, associated training files, and .wav samples created from the p
 There is no automatic data cleanup of this directory. If you modify the "train.py" file and want to revert 
 to the original, remove the the .py file and it will be re-installed the next time you open the plugin.
 
-## "Add Tone" button
+### "Add Tone" button
 This button adds a tone file (with .json extension) to the plugin. Click the "Add Tone" button to open up 
 a file select dialog box. Select your .json tone file (or multiple files) to import them into the plugin. 
 This simply copies the tone file to your "SmartAmpPro" directory in "AppData". The tone is now an option
