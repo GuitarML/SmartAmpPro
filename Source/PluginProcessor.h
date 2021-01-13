@@ -87,13 +87,14 @@ public:
     juce::String loaded_tone_name;
     const char* char_filename = "";
     int model_loaded = 0;
+    int current_model_index = 0;
 
     // Amp knob states
     float ampPresenceKnobState = 0.0;
     float ampBassKnobState = 0.0;
     float ampMidKnobState = 0.0;
     float ampTrebleKnobState = 0.0;
-    float ampGainKnobState = 10.0;
+    float ampGainKnobState = 0.0;
     float ampMasterKnobState = -12.0;
 
     ModelLoader loader;

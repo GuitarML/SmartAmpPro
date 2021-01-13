@@ -60,7 +60,6 @@ private:
     Label timerLabel;
     Label helpLabel;
     TextButton loadButton;
-    Label modelLabel;
     juce::String fname;
     virtual void buttonClicked(Button* button) override;
     void modelSelectChanged();

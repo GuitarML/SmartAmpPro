@@ -5,6 +5,7 @@
               jucerFormatVersion="1" pluginCode="sa1" maxBinaryFileSize="20971520">
   <MAINGROUP id="ZrSGof" name="SmartAmpPro">
     <GROUP id="{0250E2E8-A733-0AA7-0A08-97085228CF87}" name="Resources">
+      <FILE id="hw0XCC" name="heavy.json" compile="0" resource="1" file="models/heavy.json"/>
       <FILE id="Uieb0X" name="led_blue_off.png" compile="0" resource="1"
             file="resources/led_blue_off.png"/>
       <FILE id="ceij5f" name="led_blue_on.png" compile="0" resource="1" file="resources/led_blue_on.png"/>
@@ -16,6 +17,7 @@
       <FILE id="sIplv3" name="smp_off.png" compile="0" resource="1" file="resources/smp_off.png"/>
       <FILE id="oyBNlZ" name="smp_on.png" compile="0" resource="1" file="resources/smp_on.png"/>
       <FILE id="GmSw4X" name="train.py" compile="0" resource="1" file="resources/train.py"/>
+      <FILE id="ACIBhm" name="ts9.json" compile="0" resource="1" file="models/ts9.json"/>
       <FILE id="NSHRQf" name="Vintage_Knob.png" compile="0" resource="1"
             file="resources/Vintage_Knob.png"/>
       <FILE id="ydzcso" name="Vintage_Knob_alt.png" compile="0" resource="1"

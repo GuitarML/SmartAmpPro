@@ -28,10 +28,11 @@ SmartAmpProAudioProcessor::SmartAmpProAudioProcessor()
 #endif
 {
     setupDataDirectories();
-    if (jsonFiles.size() > 0) {
-        loadConfig(jsonFiles[0]);
-    }
     installPythonScripts();
+    resetDirectory(userAppDataDirectory);
+    if (jsonFiles.size() > 0) {
+        loadConfig(jsonFiles[current_model_index]);
+    }
 }
 
 SmartAmpProAudioProcessor::~SmartAmpProAudioProcessor()
@@ -252,14 +253,24 @@ void SmartAmpProAudioProcessor::setupDataDirectories()
 }
 
 void SmartAmpProAudioProcessor::installPythonScripts()
+//====================================================================
+// Description: Checks that the python scripts and default tones
+//  are installed to the SmartAmpPro directory, and if not, 
+//  copy them from the binary data in the plugin to that directory.
+//
+//====================================================================
 {
     File train_script = userAppDataDirectory.getFullPathName() + "/train.py";
     File plot_script = userAppDataDirectory.getFullPathName() + "/plot.py";
+    File ts9_tone = userAppDataDirectory.getFullPathName() + "/ts9.json";
+    File heavy_tone = userAppDataDirectory.getFullPathName() + "/heavy.json";
 
     bool b = train_script.existsAsFile();
     bool p = plot_script.existsAsFile();
-    if (b == false) {
+    bool ts9 = ts9_tone.existsAsFile();
+    bool h = heavy_tone.existsAsFile();
 
+    if (b == false) {
         std::string string_command = train_script.getFullPathName().toStdString();
         const char* char_train_script = &string_command[0];
 
@@ -270,13 +281,32 @@ void SmartAmpProAudioProcessor::installPythonScripts()
         myfile.close();
     }
     if (p == false) {
-
         std::string string_command = plot_script.getFullPathName().toStdString();
         const char* char_plot_script = &string_command[0];
 
         std::ofstream myfile;
         myfile.open(char_plot_script);
         myfile << BinaryData::plot_py;
+
+        myfile.close();
+    }
+    if (ts9 == false) {
+        std::string string_command = ts9_tone.getFullPathName().toStdString();
+        const char* char_ts9_tone = &string_command[0];
+
+        std::ofstream myfile;
+        myfile.open(char_ts9_tone);
+        myfile << BinaryData::ts9_json;
+
+        myfile.close();
+    }
+    if (h == false) {
+        std::string string_command = heavy_tone.getFullPathName().toStdString();
+        const char* char_heavy_tone = &string_command[0];
+
+        std::ofstream myfile;
+        myfile.open(char_heavy_tone);
+        myfile << BinaryData::heavy_json;
 
         myfile.close();
     }

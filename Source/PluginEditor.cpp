@@ -28,7 +28,7 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
         c += 1;
     }
     modelSelect.onChange = [this] {modelSelectChanged(); };
-    modelSelect.setSelectedItemIndex(0, juce::NotificationType::sendNotification);
+    modelSelect.setSelectedItemIndex(processor.current_model_index, juce::NotificationType::sendNotification);
     modelSelect.setScrollWheelEnabled(true);
 
     // Set Widget Graphics
@@ -53,11 +53,6 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     addAndMakeVisible(trainButton);
     trainButton.setButtonText("Train Model");
     trainButton.addListener(this);
-
-    //addAndMakeVisible(modelLabel);
-    modelLabel.setText(processor.loaded_tone_name, juce::NotificationType::dontSendNotification);
-    modelLabel.setJustificationType(juce::Justification::left);
-    modelLabel.setColour(juce::Label::textColourId, juce::Colours::black);
     
     addAndMakeVisible(timerLabel);
     timerLabel.setText(minutes + ":" + seconds, juce::NotificationType::dontSendNotification);
@@ -211,7 +206,6 @@ void SmartAmpProAudioProcessorEditor::resized()
     timerLabel.setBounds(300, 10, 70, 25);
     helpLabel.setBounds(190, 36, 300, 65);
     loadButton.setBounds(15, 42, 100, 25);
-    modelLabel.setBounds(20, 45, 400, 25);
     // Amp Widgets
     ampPresenceKnob.setBounds(445, 242, 55, 75);
     ampBassKnob.setBounds(203, 242, 55, 75);
@@ -229,6 +223,7 @@ void SmartAmpProAudioProcessorEditor::modelSelectChanged()
     const int selectedFileIndex = modelSelect.getSelectedItemIndex();
     if (selectedFileIndex >= 0 && selectedFileIndex < processor.jsonFiles.size()) {
         processor.loadConfig(processor.jsonFiles[selectedFileIndex]);
+        processor.current_model_index = modelSelect.getSelectedItemIndex();
     }
 }
 
@@ -247,7 +242,6 @@ void SmartAmpProAudioProcessorEditor::loadButtonClicked()
 
                 processor.loadConfig(file);
                 fname = file.getFileName();
-                modelLabel.setText(fname, juce::NotificationType::dontSendNotification);
                 processor.loaded_tone = file;
                 processor.loaded_tone_name = fname;
                 processor.custom_tone = 1;
@@ -289,9 +283,10 @@ void SmartAmpProAudioProcessorEditor::ampOnButtonClicked() {
 }
 
 void SmartAmpProAudioProcessorEditor::recordButtonClicked() {
+    File userAppDataDirectory2 = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile(JucePlugin_Manufacturer).getChildFile(JucePlugin_Name);
     if (processor.recording == 0) {
         FileChooser chooser("Enter a descriptive tone name",
-            processor.userAppDataDirectory,
+            userAppDataDirectory2,
             "*.wav");
         if (chooser.browseForFileToSave(false))  // TODO Overwriting existing file seems to lock up the plugin - fix
         {
@@ -326,8 +321,9 @@ void SmartAmpProAudioProcessorEditor::recordButtonClicked() {
 
 void SmartAmpProAudioProcessorEditor::trainButtonClicked() 
 {
+    File userAppDataDirectory2 = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile(JucePlugin_Manufacturer).getChildFile(JucePlugin_Name);
     FileChooser chooser("Select recorded .wav sample for tone capture",
-        processor.userAppDataDirectory,
+        userAppDataDirectory2,
         "*.wav");
     if (chooser.browseForMultipleFilesToOpen())
     {
