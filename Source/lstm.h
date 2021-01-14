@@ -53,7 +53,7 @@ class lstm
         std::vector<std::vector<float>> data;
 
         // Network Parameters
-        int input_size = 120; // TODO read from file
+        int input_size = 120;
 
         int HS = 1;
         int conv1d_Kernel_Size = 0;
