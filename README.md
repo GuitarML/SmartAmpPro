@@ -5,12 +5,6 @@ This plugin uses a LSTM model to recreate the sound of real amps and pedals. You
 samples and train models from the plugin. Tone models are saved in .json format. Model training
 is accomplished using Tensorflow/Keras.
 
-Developer Note: After performing listening tests between the original SmartAmp(WaveNet model), and
-SmartAmpPro(LSTM model) it was determined that the WaveNet produces a much more natural
-sound (especially on clean tones), even though both models have a low error-to-signal ratio. 
-Since the main goal of using A.I. is to produce the highest quality sound, any future 
-development will continue using WaveNet, or a different A.I. model from the one used here ([GuitarLSTM](https://github.com/GuitarML/GuitarLSTM)).
-
 ![app](https://github.com/GuitarML/SmartAmpPro/blob/main/resources/plugin.jpg)
 
 ## Installing the plugin
