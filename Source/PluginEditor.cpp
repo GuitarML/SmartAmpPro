@@ -282,7 +282,7 @@ void SmartAmpProAudioProcessorEditor::ampOnButtonClicked() {
 void SmartAmpProAudioProcessorEditor::recordButtonClicked() {
     File userAppDataDirectory2 = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile(JucePlugin_Manufacturer).getChildFile(JucePlugin_Name);
     if (processor.recording == 0) {
-        FileChooser chooser("Enter a descriptive tone name",
+        FileChooser chooser("Enter a descriptive tone name (NO SPACES IN NAME)",
             userAppDataDirectory2,
             "*.wav");
         if (chooser.browseForFileToSave(false))  // TODO Overwriting existing file seems to lock up the plugin - fix

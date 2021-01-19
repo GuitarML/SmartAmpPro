@@ -146,7 +146,6 @@ void SmartAmpProAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
     // Setup Audio Data
     const int numSamples = buffer.getNumSamples();
     const int numInputChannels = getTotalNumInputChannels();
-    float* channelData = buffer.getWritePointer(0);
 
     // Amp =============================================================================
     if (amp_state == 1) {

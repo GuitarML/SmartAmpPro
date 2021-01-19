@@ -14,10 +14,18 @@ is accomplished using Tensorflow/Keras.
 
 ## Using the plugin
 
-On Windows 10, the SmartAmpPro creates a "C:/Users/user/AppData/Roaming/GuitarML/SmartAmpPro" directory. 
-All .json models, associated training files, and .wav samples created from the plugin will be saved here. 
-There is no automatic data cleanup of this directory. If you modify the "train.py" file and want to revert 
-to the original, remove the the .py file and it will be re-installed the next time you open the plugin.
+All .json models, python training files, and .wav samples created from the plugin will be saved to the
+"userApplicationDataDirectory" defined by Juce for the OS. There is no automatic data cleanup of this 
+directory. If you modify the "train.py" file and want to revert to the original, remove the the .py file 
+and it will be re-installed the next time you open the plugin.
+
+userApplicationDataDirectoy Locations (default location for models, python scripts, and .wav samples for training)
+```
+Windows 10: "C:/Users/<username>/AppData/Roaming/GuitarML/SmartAmpPro"
+OSX (default): /Users/<username>/Library/GuitarML/SmartAmpPro
+OSX (for Garageband, substitute appropriate version): 
+    /Users/<username>/Library/Containers/com.apple.garageband10/Data/Library/GuitarML/SmartAmpPro
+```
 
 ### "Add Tone" button
 This button adds a tone file (with .json extension) to the plugin. Click the "Add Tone" button to open up 
@@ -51,7 +59,7 @@ To test these are installed correctly for SmartAmpPro, open a command prompt, ru
 The plugin simply makes a system call to python and runs the training script, so these need to be a system-wide installation on your computer.
 
 1. Click the "Train Model" button and select the .wav file to train from.
-    (These are in the "C:/Users/user/AppData/Roaming/GuitarML/SmartAmpPro" directory from the above step)
+    (These are in the "userApplicationDataDirectoy" directory from the above step)
 2. If you have two separate .wav files (float32, mono, no extra data) then you can select both from the
    dialog box. Ensure that the input comes first alphabetically. For example:
 	"Input.wav", "Output.wav" works, but  "zInput.wav" and "Output.wav" would use the wrong file as input vs. output.

@@ -45,6 +45,7 @@ class lstm
             nc::NdArray<float> dense_bias_nc, nc::NdArray<float> dense_kernel_nc, int input_size_loader,
             int conv1d_stride_loader, int conv1d_1_stride_loader);
 
+        int input_size = 120;
 
         // Data processing
         nc::NdArray<float> input = nc::zeros<float>(nc::Shape(input_size, 1));
@@ -53,7 +54,6 @@ class lstm
         std::vector<std::vector<float>> data;
 
         // Network Parameters
-        int input_size = 120;
 
         int HS = 1;
         int conv1d_Kernel_Size = 0;
