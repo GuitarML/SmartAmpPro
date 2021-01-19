@@ -61,11 +61,26 @@ def main(args):
     '''
 
     name = args.name
+    name_taken = True
+    
     if not os.path.exists('models/'+name):
         os.makedirs('models/'+name)
     else:
         print("A model folder with the same name already exists. Please choose a new name.")
         return
+        #while name_taken == True:
+        #    if os.path.exists('models/'+name):
+        #        if "_v" in name:
+        #            version = name.split("_v")[-1]
+        #            version_num = int(version) + 1
+        #            version = str(version_num)
+        #            name = name.split("_v")[0] + "_v" + version
+        #        else:
+        #            name = name + "_v1"
+        #   else:
+        #        os.makedirs('models/'+name)
+        #        name_taken = False
+                
 
     train_mode = args.training_mode     # 0 = speed training, 
                                         # 1 = accuracy training 
@@ -203,9 +218,9 @@ def main(args):
 
 
     # Generate json model ################################
-    filename = 'models/'+name+'/'+ args.name +'.h5'
+    filename = 'models/'+name+'/'+ name +'.h5'
     #json_filename = 'models/'+name+'/'+ args.name
-    json_filename = args.name
+    json_filename = name
     f = h5py.File(filename, 'r')
    
     # Load the model data

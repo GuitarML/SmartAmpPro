@@ -62,12 +62,12 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     timerLabel.setVisible(0);
 
     addAndMakeVisible(helpLabel);
-    helpLabel.setText("Get Ready for Tone Capture..", juce::NotificationType::dontSendNotification);
+    helpLabel.setText("", juce::NotificationType::dontSendNotification);
     //helpLabel.setJustificationType(juce::Justification::horizontallyCentred);
     helpLabel.setJustificationType(juce::Justification::centredTop);
     helpLabel.setColour(juce::Label::textColourId, juce::Colours::black);
     helpLabel.setFont(juce::Font(20.0f, juce::Font::bold));
-    helpLabel.setVisible(0);
+    helpLabel.setVisible(1);
 
 
     ampLED.setImages(true, true, true,
@@ -81,7 +81,7 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     ampPresenceKnob.setLookAndFeel(&ampSilverKnobLAF);
     ampPresenceKnob.addListener(this);
     //ampPresenceKnob.setSkewFactorFromMidPoint(1000.0); // Not working because of custom lookAndFeel class
-    ampPresenceKnob.setRange(-10.0, 10.0);
+    ampPresenceKnob.setRange(-12.0, 12.0);
     ampPresenceKnob.setValue(processor.ampPresenceKnobState);
     ampPresenceKnob.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
     ampPresenceKnob.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, false, 75, 20);
@@ -91,7 +91,7 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     addAndMakeVisible(ampBassKnob);
     ampBassKnob.setLookAndFeel(&ampSilverKnobLAF);
     ampBassKnob.addListener(this);
-    ampBassKnob.setRange(-8.0, 8.0);
+    ampBassKnob.setRange(-10.0, 10.0);
     ampBassKnob.setValue(processor.ampBassKnobState);
     ampBassKnob.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
     ampBassKnob.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, false, 50, 20);
@@ -101,7 +101,7 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     addAndMakeVisible(ampMidKnob);
     ampMidKnob.setLookAndFeel(&ampSilverKnobLAF);
     ampMidKnob.addListener(this);
-    ampMidKnob.setRange(-8.0, 8.0);
+    ampMidKnob.setRange(-10.0, 10.0);
     ampMidKnob.setValue(processor.ampMidKnobState);
     ampMidKnob.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
     ampMidKnob.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, false, 50, 20);
@@ -111,7 +111,7 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     addAndMakeVisible(ampTrebleKnob);
     ampTrebleKnob.setLookAndFeel(&ampSilverKnobLAF);
     ampTrebleKnob.addListener(this);
-    ampTrebleKnob.setRange(-8.0, 8.0);
+    ampTrebleKnob.setRange(-10.0, 10.0);
     ampTrebleKnob.setValue(processor.ampTrebleKnobState);
     ampTrebleKnob.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
     ampTrebleKnob.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, false, 50, 20);
@@ -121,7 +121,7 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     addAndMakeVisible(ampGainKnob);
     ampGainKnob.setLookAndFeel(&ampSilverKnobLAF);
     ampGainKnob.addListener(this);
-    ampGainKnob.setRange(-10.0, 10.0);
+    ampGainKnob.setRange(-15.0, 15.0);
     ampGainKnob.setValue(processor.ampGainKnobState);
     ampGainKnob.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
     ampGainKnob.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, false, 50, 20);
@@ -131,7 +131,7 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     addAndMakeVisible(ampMasterKnob);
     ampMasterKnob.setLookAndFeel(&ampSilverKnobLAF);
     ampMasterKnob.addListener(this);
-    ampMasterKnob.setRange(-24.0, 0.0);
+    ampMasterKnob.setRange(-36.0, 12.0);
     ampMasterKnob.setValue(processor.ampMasterKnobState);
     ampMasterKnob.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
     ampMasterKnob.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, false, 50, 20 );
@@ -140,10 +140,6 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
 
     // Size of plugin GUI
     setSize(694, 376);
-    // Load the preset model from the project resources
-
-    //processor.loadConfig(processor.loaded_tone);
-
 }
 
 SmartAmpProAudioProcessorEditor::~SmartAmpProAudioProcessorEditor()
@@ -259,6 +255,7 @@ void SmartAmpProAudioProcessorEditor::buttonClicked(juce::Button* button)
 {
     if (button == &ampOnButton) {
         ampOnButtonClicked();
+        helpLabel.setText("", juce::NotificationType::dontSendNotification);
     } else if (button == &loadButton) {
         loadButtonClicked();
     } else if (button == &recordButton) {
@@ -297,7 +294,6 @@ void SmartAmpProAudioProcessorEditor::recordButtonClicked() {
             timerLabel.setVisible(1);
             timer_start();
             helpLabel.setText("Get Ready for Tone Capture..\nEnsure input is on Channel 1 and target is on Channel 2", juce::NotificationType::sendNotification);
-            helpLabel.setVisible(1);
         }
 
     }
@@ -309,9 +305,9 @@ void SmartAmpProAudioProcessorEditor::recordButtonClicked() {
         timerLabel.setText(minutes + ":" + seconds, juce::NotificationType::sendNotification);
         timer_stop();
         timerLabel.setVisible(0);
-        helpLabel.setVisible(0);
         minutes = "";
         seconds = "10";
+        helpLabel.setText("Capture ended.", juce::NotificationType::dontSendNotification);
     }
 
 }
@@ -332,25 +328,45 @@ void SmartAmpProAudioProcessorEditor::trainButtonClicked()
         bool b = train_script.existsAsFile();
         if (b == true) {
             File file = files[0]; // TODO: Fix to handle spaces in filename
+            File file2 = "";
+            File test_file = "";
             std::string string_command = "";
             if (files.size() > 1) {
-                File file2 = files[1];
+                file2 = files[1];
                 // TODO: Currently the two selected files will be in alphabetical order, so the first will be input, second is output. Better way to handle?
+                test_file = processor.userAppDataDirectory.getFullPathName().toStdString() + "/" + file2.getFileNameWithoutExtension().toStdString() + ".json";
                 string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "python train.py " + file.getFullPathName().toStdString() + " " + file2.getFileNameWithoutExtension().toStdString() + " --out_file=" + file2.getFullPathName().toStdString();
             } else {
+                test_file = processor.userAppDataDirectory.getFullPathName().toStdString() + "/" + file.getFileNameWithoutExtension().toStdString() + ".json";
                 string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "python train.py " + file.getFullPathName().toStdString() + " " + file.getFileNameWithoutExtension().toStdString();
             }
-            const char* char_command = &string_command[0];
-            system(char_command); // call to training program
-            processor.resetDirectory(processor.userAppDataDirectory);
-            modelSelect.clear();
-            int c = 1;
-            for (const auto& jsonFile : processor.jsonFiles) {
-                modelSelect.addItem(jsonFile.getFileName(), c);
-                c += 1;
+            if (test_file.existsAsFile() == true) {
+                helpLabel.setText("Model exists. Choose new name,\n or rename captured .wav file.", juce::NotificationType::dontSendNotification);
             }
-            modelSelect.setSelectedItemIndex(0, juce::NotificationType::sendNotification);
-        }     
+            else {
+                // Attempt running train.py
+                const char* char_command = &string_command[0];
+                system(char_command); // call to training program
+                processor.resetDirectory(processor.userAppDataDirectory);
+                modelSelect.clear();
+                int c = 1;
+                for (const auto& jsonFile : processor.jsonFiles) {
+                    modelSelect.addItem(jsonFile.getFileName(), c);
+                    c += 1;
+                }
+                modelSelect.setSelectedItemIndex(0, juce::NotificationType::sendNotification);
+
+                // Check that a .json tone was generated, and if not, notify user through helpLabel
+                if (test_file.existsAsFile() == false) {
+                    helpLabel.setText("Failed to create new tone.", juce::NotificationType::dontSendNotification);
+                }
+                else { 
+                    helpLabel.setText("New Tone Created:\n" + test_file.getFileNameWithoutExtension().toStdString(), juce::NotificationType::dontSendNotification);
+                }
+            }
+        } else {
+            helpLabel.setText("Error: Could not locate training script.", juce::NotificationType::dontSendNotification);
+        }
     }
 }
 
@@ -416,8 +432,7 @@ void SmartAmpProAudioProcessorEditor::timerCallback()
         timerLabel.setText(":10", juce::NotificationType::sendNotification);
         t = 190;
         timerLabel.setVisible(0);
-        helpLabel.setVisible(0);
-        helpLabel.setText("Begin 3 minutes of guitar playing!", juce::NotificationType::sendNotification);
+        helpLabel.setText("Tone Capture Complete.\nClick \"Train Model\"", juce::NotificationType::sendNotification);
         minutes = "";
         seconds = "10";
 

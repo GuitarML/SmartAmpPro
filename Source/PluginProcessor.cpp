@@ -327,8 +327,12 @@ void SmartAmpProAudioProcessor::set_ampDrive(float db_ampDrive)
 
 void SmartAmpProAudioProcessor::set_ampMaster(float db_ampMaster)
 {
-    ampMaster = decibelToLinear(db_ampMaster);
     ampMasterKnobState = db_ampMaster;
+    if (db_ampMaster == -36.0) {
+        ampMaster = decibelToLinear(-100.0);
+    } else {
+        ampMaster = decibelToLinear(db_ampMaster);
+    }
 }
 
 void SmartAmpProAudioProcessor::set_ampEQ(float bass_slider, float mid_slider, float treble_slider, float presence_slider)
