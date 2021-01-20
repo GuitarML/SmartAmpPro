@@ -11,6 +11,8 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include <stdio.h>
+#include <fstream>
+#include <iostream>
 
 
 //==============================================================================
@@ -66,7 +68,7 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     //helpLabel.setJustificationType(juce::Justification::horizontallyCentred);
     helpLabel.setJustificationType(juce::Justification::centredTop);
     helpLabel.setColour(juce::Label::textColourId, juce::Colours::black);
-    helpLabel.setFont(juce::Font(20.0f, juce::Font::bold));
+    helpLabel.setFont(juce::Font(18.0f, juce::Font::bold));
     helpLabel.setVisible(1);
 
 
@@ -269,14 +271,26 @@ void SmartAmpProAudioProcessorEditor::buttonClicked(juce::Button* button)
 void SmartAmpProAudioProcessorEditor::ampOnButtonClicked() {
     if (processor.amp_state == 0) {
         processor.amp_state = 1;
+        // Reset the directory in case user is manually adding or removing models from the SmartAmpPro directory
+        processor.resetDirectory(processor.userAppDataDirectory);
     }
     else {
         processor.amp_state = 0;
+        // Also acts as failsafe to stop training timer (TODO change how this is handled)
+        if (training == 1) {
+            timer_stop();
+            training = 0;
+            helpLabel.setText("Training halted.", juce::NotificationType::dontSendNotification);
+        }
     }
     repaint();
 }
 
 void SmartAmpProAudioProcessorEditor::recordButtonClicked() {
+    if (training == 1) {
+        helpLabel.setText("Can't record while training.", juce::NotificationType::dontSendNotification);
+        return;
+    }
     File userAppDataDirectory2 = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile(JucePlugin_Manufacturer).getChildFile(JucePlugin_Name);
     if (processor.recording == 0) {
         FileChooser chooser("Enter a descriptive tone name (NO SPACES IN NAME)",
@@ -314,8 +328,16 @@ void SmartAmpProAudioProcessorEditor::recordButtonClicked() {
 
 void SmartAmpProAudioProcessorEditor::trainButtonClicked() 
 {
+    if (processor.recording == 1) {
+        helpLabel.setText("Can't train while recording.", juce::NotificationType::dontSendNotification);
+        return;
+    } else if (training == 1) {
+        helpLabel.setText("Training already in progress.", juce::NotificationType::dontSendNotification);
+        return;
+    }
+
     File userAppDataDirectory2 = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile(JucePlugin_Manufacturer).getChildFile(JucePlugin_Name);
-    FileChooser chooser("Select recorded .wav sample for tone capture",
+    FileChooser chooser("Select recorded .wav sample for model training",
         userAppDataDirectory2,
         "*.wav");
     if (chooser.browseForMultipleFilesToOpen())
@@ -328,41 +350,68 @@ void SmartAmpProAudioProcessorEditor::trainButtonClicked()
         bool b = train_script.existsAsFile();
         if (b == true) {
             File file = files[0]; // TODO: Fix to handle spaces in filename
-            File file2 = "";
-            File test_file = "";
+            File file2;
+            
             std::string string_command = "";
+
+            // Generate run script based on platform
+            #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+            //Windows (32-bit and 64-bit)
             if (files.size() > 1) {
                 file2 = files[1];
                 // TODO: Currently the two selected files will be in alphabetical order, so the first will be input, second is output. Better way to handle?
+                model_folder = processor.userAppDataDirectory.getFullPathName().toStdString() + "/models/" + file2.getFileNameWithoutExtension().toStdString();
                 test_file = processor.userAppDataDirectory.getFullPathName().toStdString() + "/" + file2.getFileNameWithoutExtension().toStdString() + ".json";
-                string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "python train.py " + file.getFullPathName().toStdString() + " " + file2.getFileNameWithoutExtension().toStdString() + " --out_file=" + file2.getFullPathName().toStdString();
-            } else {
-                test_file = processor.userAppDataDirectory.getFullPathName().toStdString() + "/" + file.getFileNameWithoutExtension().toStdString() + ".json";
-                string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "python train.py " + file.getFullPathName().toStdString() + " " + file.getFileNameWithoutExtension().toStdString();
-            }
-            if (test_file.existsAsFile() == true) {
-                helpLabel.setText("Model exists. Choose new name,\n or rename captured .wav file.", juce::NotificationType::dontSendNotification);
+                string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "echo python train.py " + file.getFullPathName().toStdString() + " " + file2.getFileNameWithoutExtension().toStdString() + " --out_file=" + file2.getFullPathName().toStdString() + " > run.bat && start /min run.bat && exit";
             }
             else {
-                // Attempt running train.py
+                model_folder = processor.userAppDataDirectory.getFullPathName().toStdString() + "/models/" + file.getFileNameWithoutExtension().toStdString();
+                test_file = processor.userAppDataDirectory.getFullPathName().toStdString() + "/" + file.getFileNameWithoutExtension().toStdString() + ".json";
+                string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "echo python train.py " + file.getFullPathName().toStdString() + " " + file.getFileNameWithoutExtension().toStdString() + " > run.bat && start /min run.bat && exit";
+            }
+
+            #elif __APPLE__
+            if (files.size() > 1) {
+                file2 = files[1];
+                // TODO: Currently the two selected files will be in alphabetical order, so the first will be input, second is output. Better way to handle?
+                model_folder = processor.userAppDataDirectory.getFullPathName().toStdString() + "/models/" + file2.getFileNameWithoutExtension().toStdString();
+                test_file = processor.userAppDataDirectory.getFullPathName().toStdString() + "/" + file2.getFileNameWithoutExtension().toStdString() + ".json";
+                string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "echo python train.py " + file.getFullPathName().toStdString() + " " + file2.getFileNameWithoutExtension().toStdString() + " --out_file=" + file2.getFullPathName().toStdString() + " > run.sh && chmod 775 *  && ./run.sh&";
+            }
+            else {
+                model_folder = processor.userAppDataDirectory.getFullPathName().toStdString() + "/models/" + file.getFileNameWithoutExtension().toStdString();
+                test_file = processor.userAppDataDirectory.getFullPathName().toStdString() + "/" + file.getFileNameWithoutExtension().toStdString() + ".json";
+                string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "echo python train.py " + file.getFullPathName().toStdString() + " " + file.getFileNameWithoutExtension().toStdString() + " > run.sh && chmod 775 * && ./run.sh&";
+            }
+            #elif __linux__
+            if (files.size() > 1) {
+                file2 = files[1];
+                // TODO: Currently the two selected files will be in alphabetical order, so the first will be input, second is output. Better way to handle?
+                model_folder = processor.userAppDataDirectory.getFullPathName().toStdString() + "/models/" + file2.getFileNameWithoutExtension().toStdString();
+                test_file = processor.userAppDataDirectory.getFullPathName().toStdString() + "/" + file2.getFileNameWithoutExtension().toStdString() + ".json";
+                string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "echo python train.py " + file.getFullPathName().toStdString() + " " + file2.getFileNameWithoutExtension().toStdString() + " --out_file=" + file2.getFullPathName().toStdString() + " > run.sh && chmod 775 *  && ./run.sh&";
+            }
+            else {
+                model_folder = processor.userAppDataDirectory.getFullPathName().toStdString() + "/models/" + file.getFileNameWithoutExtension().toStdString();
+                test_file = processor.userAppDataDirectory.getFullPathName().toStdString() + "/" + file.getFileNameWithoutExtension().toStdString() + ".json";
+                string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "echo python train.py " + file.getFullPathName().toStdString() + " " + file.getFileNameWithoutExtension().toStdString() + " > run.sh && chmod 775 * && ./run.sh&";
+            }
+            #else
+            #   error "Unknown compiler"
+            #endif
+
+
+            if (test_file.existsAsFile()) {
+                helpLabel.setText(test_file.getFileNameWithoutExtension().toStdString() + " tone already exists.", juce::NotificationType::dontSendNotification);
+            } else if (model_folder.exists()) {
+                helpLabel.setText("\""+ test_file.getFileNameWithoutExtension().toStdString() + "\" model folder already exists. Remove folder or choose a new name.", juce::NotificationType::dontSendNotification);
+            } else {
+                // Attempt to run train.py
+                setTrainingStatus(0);
                 const char* char_command = &string_command[0];
                 system(char_command); // call to training program
-                processor.resetDirectory(processor.userAppDataDirectory);
-                modelSelect.clear();
-                int c = 1;
-                for (const auto& jsonFile : processor.jsonFiles) {
-                    modelSelect.addItem(jsonFile.getFileName(), c);
-                    c += 1;
-                }
-                modelSelect.setSelectedItemIndex(0, juce::NotificationType::sendNotification);
-
-                // Check that a .json tone was generated, and if not, notify user through helpLabel
-                if (test_file.existsAsFile() == false) {
-                    helpLabel.setText("Failed to create new tone.", juce::NotificationType::dontSendNotification);
-                }
-                else { 
-                    helpLabel.setText("New Tone Created:\n" + test_file.getFileNameWithoutExtension().toStdString(), juce::NotificationType::dontSendNotification);
-                }
+                training = 1;
+                timer_start();
             }
         } else {
             helpLabel.setText("Error: Could not locate training script.", juce::NotificationType::dontSendNotification);
@@ -401,58 +450,125 @@ void SmartAmpProAudioProcessorEditor::timer_stop()
     t = 190;
 }
 
+void SmartAmpProAudioProcessorEditor::setTrainingStatus(int status) {
+    std::ifstream infile(processor.userAppDataDirectory.getFullPathName().toStdString() + "/status.txt");
+    int a = 0;
+    int b = 0;
+    int accuracy = 0.0;
+    while (infile >> a >> b)
+    {
+        accuracy = b;
+    }
+    std::ofstream outfile;
+    outfile.open(processor.userAppDataDirectory.getFullPathName().toStdString() + "/status.txt", std::ofstream::trunc);
+    outfile << std::to_string(status) + " " + std::to_string(accuracy);
+    outfile.close();
+}
+
 void SmartAmpProAudioProcessorEditor::timerCallback()
 {
-    //std::cout << "time tick" << std::endl;
-    t -= 1;
-    seconds = std::to_string(t % 60);
-    minutes = std::to_string(t / 60);
-    //t_label = std::to_string(t);
-    if (t > 180) {
-        minutes = "";
-        seconds = std::to_string(std::abs(t - 180));
-    } else if (t == 180) {
-        processor.audio_recorder.setRecordName(record_file);
-        processor.audio_recorder.startRecording();
-        helpLabel.setText("Begin 3 minutes of guitar playing!", juce::NotificationType::sendNotification);
-    }
+    // Check if timer is for training or for recording
+    if (training == 1) {
+        std::ifstream infile(processor.userAppDataDirectory.getFullPathName().toStdString() + "/status.txt");
+        int a;
+        int b;
+        while (infile >> a >> b)
+        {
+            helpLabel.setText(std::to_string(a) + " status", juce::NotificationType::dontSendNotification);
+            if (a < 100) {
+                helpLabel.setText("Training: " + std::to_string(a) + "% complete\n" + test_file.getFileNameWithoutExtension().toStdString(), juce::NotificationType::dontSendNotification);
+                return;
+            }
+            else {
+                timer_stop();
+                training = 0;
+                // Run this after model has been generated
+                processor.resetDirectory(processor.userAppDataDirectory);
+                modelSelect.clear();
+                int c = 1;
+                for (const auto& jsonFile : processor.jsonFiles) {
+                    modelSelect.addItem(jsonFile.getFileName(), c);
+                    c += 1;
+                }
+                modelSelect.setSelectedItemIndex(0, juce::NotificationType::sendNotification);
 
-    if (t % 60 < 10) {
+                // Check that a .json tone was generated, and if not, notify user through helpLabel
+                if (test_file.existsAsFile() == false) {
+                    helpLabel.setText("Failed to create new tone.", juce::NotificationType::dontSendNotification);
+                }
+                else {
+                    helpLabel.setText("New Tone Created:\n" + test_file.getFileNameWithoutExtension().toStdString() + "\nAccuracy: " + std::to_string(b) + "%", juce::NotificationType::dontSendNotification);
+                }
+            }
+        }
+        if (training == 0) {
+            setTrainingStatus(0);
+        }
+
+    } else {
+
+
+        //std::cout << "time tick" << std::endl;
+        t -= 1;
+        seconds = std::to_string(t % 60);
+        minutes = std::to_string(t / 60);
+        //t_label = std::to_string(t);
+        if (t > 180) {
+            minutes = "";
+            seconds = std::to_string(std::abs(t - 180));
+        }
+        else if (t == 180) {
+            processor.audio_recorder.setRecordName(record_file);
+            processor.audio_recorder.startRecording();
+            helpLabel.setText("Begin 3 minutes of guitar playing!", juce::NotificationType::sendNotification);
+        }
+
+        if (t % 60 < 10) {
             seconds = "0" + seconds;
-    }
+        }
 
-    timerLabel.setText(minutes + ":" + seconds, juce::NotificationType::sendNotification);
-    if (t < 1) {
-        timer_stop();
-        processor.audio_recorder.stopRecording();
-        processor.recording = 0;
-        recordButton.setColour(TextButton::buttonColourId, Colours::black);
-        recordButton.setButtonText("Start Capture");
-        timer_stop();
-        timerLabel.setText(":10", juce::NotificationType::sendNotification);
-        t = 190;
-        timerLabel.setVisible(0);
-        helpLabel.setText("Tone Capture Complete.\nClick \"Train Model\"", juce::NotificationType::sendNotification);
-        minutes = "";
-        seconds = "10";
+        timerLabel.setText(minutes + ":" + seconds, juce::NotificationType::sendNotification);
+        if (t < 1) {
+            timer_stop();
+            processor.audio_recorder.stopRecording();
+            processor.recording = 0;
+            recordButton.setColour(TextButton::buttonColourId, Colours::black);
+            recordButton.setButtonText("Start Capture");
+            timer_stop();
+            timerLabel.setText(":10", juce::NotificationType::sendNotification);
+            t = 190;
+            timerLabel.setVisible(0);
+            helpLabel.setText("Tone Capture Complete.\nClick \"Train Model\"", juce::NotificationType::sendNotification);
+            minutes = "";
+            seconds = "10";
 
-    } else if (t == 170) {
-        helpLabel.setText("Play some chords", juce::NotificationType::sendNotification);
-    } else if (t == 150) {
-        helpLabel.setText("Play some notes", juce::NotificationType::sendNotification);
-    } else if (t == 130) {
-        helpLabel.setText("Play your favorite song", juce::NotificationType::sendNotification);
-    } else if (t == 100) {
-        helpLabel.setText("Play quiet", juce::NotificationType::sendNotification);
-    } else if (t == 80) {
-        helpLabel.setText("Play loud!", juce::NotificationType::sendNotification);
-    } else if (t == 60) {
-        helpLabel.setText("Make some mistakes", juce::NotificationType::sendNotification);
-    } else if (t == 50) {
-        helpLabel.setText("Play some high notes", juce::NotificationType::sendNotification);
-    } else if (t == 30) {
-        helpLabel.setText("Play some low notes", juce::NotificationType::sendNotification);
-    } else if (t == 10) {
-        helpLabel.setText("Almost done.. Let it ring out!", juce::NotificationType::sendNotification);
+        }
+        else if (t == 170) {
+            helpLabel.setText("Play some chords", juce::NotificationType::sendNotification);
+        }
+        else if (t == 150) {
+            helpLabel.setText("Play some notes", juce::NotificationType::sendNotification);
+        }
+        else if (t == 130) {
+            helpLabel.setText("Play your favorite song", juce::NotificationType::sendNotification);
+        }
+        else if (t == 100) {
+            helpLabel.setText("Play quiet", juce::NotificationType::sendNotification);
+        }
+        else if (t == 80) {
+            helpLabel.setText("Play loud!", juce::NotificationType::sendNotification);
+        }
+        else if (t == 60) {
+            helpLabel.setText("Make some mistakes", juce::NotificationType::sendNotification);
+        }
+        else if (t == 50) {
+            helpLabel.setText("Play some high notes", juce::NotificationType::sendNotification);
+        }
+        else if (t == 30) {
+            helpLabel.setText("Play some low notes", juce::NotificationType::sendNotification);
+        }
+        else if (t == 10) {
+            helpLabel.setText("Almost done.. Let it ring out!", juce::NotificationType::sendNotification);
+        }
     }
 }

@@ -34,9 +34,9 @@ class lstm
         void lstm_layer();
         void dense_layer();
 
-        void lstm::check_buffer(int numSamples);
-        void lstm::set_data(const float* inData, int numSamples);
-        void lstm::process(const float* inData, float* outData, int numSamples);
+        void check_buffer(int numSamples);
+        void set_data(const float* inData, int numSamples);
+        void process(const float* inData, float* outData, int numSamples);
 
         void setParams(int hidden_size, int conv1d_num_kernels, int conv1d_1_num_kernels, int conv1d_stride, int conv1d_1_stride,
             nc::NdArray<float> conv1d_bias_nc, nc::NdArray<float> conv1d_1_bias_nc,
