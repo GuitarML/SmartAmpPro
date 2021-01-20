@@ -25,6 +25,7 @@ Windows 10: "C:/Users/<username>/AppData/Roaming/GuitarML/SmartAmpPro"
 OSX (default): /Users/<username>/Library/GuitarML/SmartAmpPro
 OSX (for Garageband, substitute appropriate version): 
     /Users/<username>/Library/Containers/com.apple.garageband10/Data/Library/GuitarML/SmartAmpPro
+Linux: /home/usr/.config/GuitarML/SmartAmpPro
 ```
 
 ### "Add Tone" button
