@@ -277,7 +277,7 @@ def main(args):
                                             'pred_wav':'models/'+name+'/y_pred.wav', 
                                             'input_wav':'models/'+name+'/x_test.wav',
                                             'model_name':name,
-                                            'show_plots':1,
+                                            'show_plots':0,
                                             'path':'models/'+name
                                         })
 

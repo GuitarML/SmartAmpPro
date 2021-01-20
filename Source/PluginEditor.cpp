@@ -68,7 +68,7 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     //helpLabel.setJustificationType(juce::Justification::horizontallyCentred);
     helpLabel.setJustificationType(juce::Justification::centredTop);
     helpLabel.setColour(juce::Label::textColourId, juce::Colours::black);
-    helpLabel.setFont(juce::Font(20.0f, juce::Font::bold));
+    helpLabel.setFont(juce::Font(18.0f, juce::Font::bold));
     helpLabel.setVisible(1);
 
 
@@ -331,10 +331,13 @@ void SmartAmpProAudioProcessorEditor::trainButtonClicked()
     if (processor.recording == 1) {
         helpLabel.setText("Can't train while recording.", juce::NotificationType::dontSendNotification);
         return;
+    } else if (training == 1) {
+        helpLabel.setText("Training already in progress.", juce::NotificationType::dontSendNotification);
+        return;
     }
 
     File userAppDataDirectory2 = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile(JucePlugin_Manufacturer).getChildFile(JucePlugin_Name);
-    FileChooser chooser("Select recorded .wav sample for tone capture",
+    FileChooser chooser("Select recorded .wav sample for model training",
         userAppDataDirectory2,
         "*.wav");
     if (chooser.browseForMultipleFilesToOpen())
@@ -357,10 +360,12 @@ void SmartAmpProAudioProcessorEditor::trainButtonClicked()
             if (files.size() > 1) {
                 file2 = files[1];
                 // TODO: Currently the two selected files will be in alphabetical order, so the first will be input, second is output. Better way to handle?
+                model_folder = processor.userAppDataDirectory.getFullPathName().toStdString() + "/models/" + file2.getFileNameWithoutExtension().toStdString();
                 test_file = processor.userAppDataDirectory.getFullPathName().toStdString() + "/" + file2.getFileNameWithoutExtension().toStdString() + ".json";
                 string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "echo python train.py " + file.getFullPathName().toStdString() + " " + file2.getFileNameWithoutExtension().toStdString() + " --out_file=" + file2.getFullPathName().toStdString() + " > run.bat && start /min run.bat && exit";
             }
             else {
+                model_folder = processor.userAppDataDirectory.getFullPathName().toStdString() + "/models/" + file.getFileNameWithoutExtension().toStdString();
                 test_file = processor.userAppDataDirectory.getFullPathName().toStdString() + "/" + file.getFileNameWithoutExtension().toStdString() + ".json";
                 string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "echo python train.py " + file.getFullPathName().toStdString() + " " + file.getFileNameWithoutExtension().toStdString() + " > run.bat && start /min run.bat && exit";
             }
@@ -374,11 +379,12 @@ void SmartAmpProAudioProcessorEditor::trainButtonClicked()
             #endif
 
 
-            if (test_file.existsAsFile() == true) {
-                helpLabel.setText(test_file.getFileNameWithoutExtension().toStdString() + " already exists.", juce::NotificationType::dontSendNotification);
-            }
-            else {
-                // Attempt running train.py
+            if (test_file.existsAsFile()) {
+                helpLabel.setText(test_file.getFileNameWithoutExtension().toStdString() + " tone already exists.", juce::NotificationType::dontSendNotification);
+            } else if (model_folder.exists()) {
+                helpLabel.setText("\""+ test_file.getFileNameWithoutExtension().toStdString() + "\" model folder already exists. Remove folder or choose a new name.", juce::NotificationType::dontSendNotification);
+            } else {
+                // Attempt to run train.py
                 setTrainingStatus(0);
                 const char* char_command = &string_command[0];
                 system(char_command); // call to training program
@@ -448,7 +454,7 @@ void SmartAmpProAudioProcessorEditor::timerCallback()
         {
             helpLabel.setText(std::to_string(a) + " status", juce::NotificationType::dontSendNotification);
             if (a < 100) {
-                helpLabel.setText("Training: " + std::to_string(a) + "% complete", juce::NotificationType::dontSendNotification);
+                helpLabel.setText("Training: " + std::to_string(a) + "% complete\n" + test_file.getFileNameWithoutExtension().toStdString(), juce::NotificationType::dontSendNotification);
                 return;
             }
             else {
