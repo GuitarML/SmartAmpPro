@@ -7,6 +7,10 @@ from scipy import signal
 import argparse
 import struct
 
+def write_accuracy(loss):
+    file1 = open('status.txt', 'w')
+    file1.write("100 " + str(round((1 - round(loss,2))*100)))
+    file1.close()
 
 def error_to_signal(y, y_pred, use_filter=1):
     """
@@ -90,6 +94,8 @@ def analyze_pred_vs_actual(args):
     # Calculate error to signal ratio with pre-emphasis filter as
     #    used to train the model
     e2s = error_to_signal(signal1, signal2)
+    write_accuracy(e2s)
+    
     e2s_no_filter = error_to_signal(signal1, signal2, use_filter=0)
     print("Error to signal (with pre-emphasis filter): ", e2s)
     print("Error to signal (no pre-emphasis filter): ", e2s_no_filter)

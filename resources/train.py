@@ -19,6 +19,12 @@ import argparse
 
 import json
    
+   
+def write_status(progress):
+    file1 = open('status.txt', 'w')
+    file1.write(str(progress) + " 0")
+    file1.close()
+   
 def pre_emphasis_filter(x, coeff=0.95):
     return tf.concat([x, x - coeff * x], 1)
     
@@ -59,6 +65,8 @@ def main(args):
         --training_mode=1   Accuracy training
         --training_mode=2   Extended training (set max_epochs as desired, for example 50+)
     '''
+
+    write_status(0)
 
     name = args.name
     name_taken = True
@@ -122,7 +130,7 @@ def main(args):
     model.add(Dense(1, activation=None))
     model.compile(optimizer=Adam(learning_rate=learning_rate), loss=error_to_signal, metrics=[error_to_signal])
     print(model.summary())
-
+    write_status(5)
     # Load and Preprocess Data ###########################################
     
     in_rate, stereo_data = wavfile.read(args.in_file)
@@ -141,6 +149,7 @@ def main(args):
     y_all = out_data.astype(np.float32).flatten() 
     y_all = normalize(y_all).reshape(len(y_all),1)   
 
+    write_status(10)
     # If splitting the data for training, do this part
     if args.split_data > 1:
         num_split = len(X_all) // args.split_data
@@ -167,6 +176,7 @@ def main(args):
             # Train Model ###################################################
             model.fit(X_random,y_random, epochs=epochs, batch_size=batch_size, validation_split=0.2)  
 
+            write_status((i+1)*15)
 
         model.save('models/'+name+'/'+name+'.h5')
 
@@ -187,22 +197,6 @@ def main(args):
 
         model.save('models/'+name+'/'+name+'.h5', include_optimizer=False)
 
-    # Run Prediction #################################################
-    print("Running prediction..")
-
-    # Get the last 20% of the wav data to run prediction and plot results
-    y_the_rest, y_last_part = np.split(y_all, [int(len(y_all)*.8)])
-    x_the_rest, x_last_part = np.split(X_all, [int(len(X_all)*.8)])
-    y_test = y_last_part[input_size-1:] 
-    indices = np.arange(input_size) + np.arange(len(x_last_part)-input_size+1)[:,np.newaxis] 
-    X_test = tf.gather(x_last_part,indices) 
-
-    prediction = model.predict(X_test, batch_size=batch_size)
-
-    save_wav('models/'+name+'/y_pred.wav', prediction)
-    save_wav('models/'+name+'/x_test.wav', x_last_part)
-    save_wav('models/'+name+'/y_test.wav', y_test)
-
     # Add additional data to the saved model (like input_size, strides)
     filename = 'models/'+name+'/'+name+'.h5'
     f = h5py.File(filename, 'a')
@@ -215,8 +209,7 @@ def main(args):
     dset3[0] = conv1d_1_strides
 
     f.close()
-
-
+    
     # Generate json model ################################
     filename = 'models/'+name+'/'+ name +'.h5'
     #json_filename = 'models/'+name+'/'+ args.name
@@ -255,6 +248,25 @@ def main(args):
     with open(json_filename + ".json", 'w') as outfile:
         json.dump(data, outfile)
     print("SmartAmpPro model generated: ", json_filename + ".json")
+    write_status(95)
+
+
+    # Run Prediction #################################################
+    print("Running prediction..")
+
+    # Get the last 20% of the wav data to run prediction and plot results
+    y_the_rest, y_last_part = np.split(y_all, [int(len(y_all)*.8)])
+    x_the_rest, x_last_part = np.split(X_all, [int(len(X_all)*.8)])
+    y_test = y_last_part[input_size-1:] 
+    indices = np.arange(input_size) + np.arange(len(x_last_part)-input_size+1)[:,np.newaxis] 
+    X_test = tf.gather(x_last_part,indices) 
+
+    prediction = model.predict(X_test, batch_size=batch_size)
+
+    save_wav('models/'+name+'/y_pred.wav', prediction)
+    save_wav('models/'+name+'/x_test.wav', x_last_part)
+    save_wav('models/'+name+'/y_test.wav', y_test)
+
 
     # Create Analysis Plots ###########################################
     if args.create_plots == 1:
@@ -268,6 +280,8 @@ def main(args):
                                             'show_plots':1,
                                             'path':'models/'+name
                                         })
+
+    
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

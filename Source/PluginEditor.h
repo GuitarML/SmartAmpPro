@@ -55,6 +55,9 @@ private:
     Image background;
     int current_background = 1;
 
+    int training = 0;
+    File test_file = "";
+
     TextButton recordButton;
     TextButton trainButton;
     Label timerLabel;
@@ -68,6 +71,8 @@ private:
     virtual void sliderValueChanged(Slider* slider) override;
     void ampOnButtonClicked();
     void recordButtonClicked();
+
+    void setTrainingStatus(int status);
 
     // Recording Timer
     String record_file = "";
