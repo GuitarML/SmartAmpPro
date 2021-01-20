@@ -95,6 +95,7 @@ def main(args):
                                         # 2 = extended training
     batch_size = args.batch_size 
     test_size = 0.2
+    #test_size = 0.05 # Workaround for Ubuntu low RAM
     epochs = args.max_epochs
     input_size = args.input_size
 
@@ -294,5 +295,6 @@ if __name__ == "__main__":
     parser.add_argument("--create_plots", type=int, default=1)
     parser.add_argument("--input_size", type=int, default=120)
     parser.add_argument("--split_data", type=int, default=6)
+    #parser.add_argument("--split_data", type=int, default=10) # Workaround for Ubuntu low RAM
     args = parser.parse_args()
     main(args)

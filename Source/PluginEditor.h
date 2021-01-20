@@ -56,8 +56,8 @@ private:
     int current_background = 1;
 
     int training = 0;
-    File test_file = "";
-    File model_folder = "";
+    File test_file;
+    File model_folder;
 
     TextButton recordButton;
     TextButton trainButton;
