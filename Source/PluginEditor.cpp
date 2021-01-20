@@ -356,7 +356,7 @@ void SmartAmpProAudioProcessorEditor::trainButtonClicked()
 
             // Generate run script based on platform
             #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-                        //define something for Windows (32-bit and 64-bit, this part is common)
+            //Windows (32-bit and 64-bit)
             if (files.size() > 1) {
                 file2 = files[1];
                 // TODO: Currently the two selected files will be in alphabetical order, so the first will be input, second is output. Better way to handle?
@@ -371,9 +371,31 @@ void SmartAmpProAudioProcessorEditor::trainButtonClicked()
             }
 
             #elif __APPLE__
-            //#include <TargetConditionals.h>
+            if (files.size() > 1) {
+                file2 = files[1];
+                // TODO: Currently the two selected files will be in alphabetical order, so the first will be input, second is output. Better way to handle?
+                model_folder = processor.userAppDataDirectory.getFullPathName().toStdString() + "/models/" + file2.getFileNameWithoutExtension().toStdString();
+                test_file = processor.userAppDataDirectory.getFullPathName().toStdString() + "/" + file2.getFileNameWithoutExtension().toStdString() + ".json";
+                string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "echo python train.py " + file.getFullPathName().toStdString() + " " + file2.getFileNameWithoutExtension().toStdString() + " --out_file=" + file2.getFullPathName().toStdString() + " > run.sh && chmod 775 *  && ./run.sh";
+            }
+            else {
+                model_folder = processor.userAppDataDirectory.getFullPathName().toStdString() + "/models/" + file.getFileNameWithoutExtension().toStdString();
+                test_file = processor.userAppDataDirectory.getFullPathName().toStdString() + "/" + file.getFileNameWithoutExtension().toStdString() + ".json";
+                string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "echo python train.py " + file.getFullPathName().toStdString() + " " + file.getFileNameWithoutExtension().toStdString() + " > run.sh && chmod 775 * && ./run.sh";
+            }
             #elif __linux__
-            
+            if (files.size() > 1) {
+                file2 = files[1];
+                // TODO: Currently the two selected files will be in alphabetical order, so the first will be input, second is output. Better way to handle?
+                model_folder = processor.userAppDataDirectory.getFullPathName().toStdString() + "/models/" + file2.getFileNameWithoutExtension().toStdString();
+                test_file = processor.userAppDataDirectory.getFullPathName().toStdString() + "/" + file2.getFileNameWithoutExtension().toStdString() + ".json";
+                string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "echo python train.py " + file.getFullPathName().toStdString() + " " + file2.getFileNameWithoutExtension().toStdString() + " --out_file=" + file2.getFullPathName().toStdString() + " > run.sh && chmod 775 *  && ./run.sh";
+            }
+            else {
+                model_folder = processor.userAppDataDirectory.getFullPathName().toStdString() + "/models/" + file.getFileNameWithoutExtension().toStdString();
+                test_file = processor.userAppDataDirectory.getFullPathName().toStdString() + "/" + file.getFileNameWithoutExtension().toStdString() + ".json";
+                string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "echo python train.py " + file.getFullPathName().toStdString() + " " + file.getFileNameWithoutExtension().toStdString() + " > run.sh && chmod 775 * && ./run.sh";
+            }
             #else
             #   error "Unknown compiler"
             #endif
