@@ -45,12 +45,14 @@ private:
     Slider ampTrebleKnob;
     Slider ampGainKnob;
     Slider ampMasterKnob;
+    Slider progressCircle;
     ImageButton ampOnButton;
     ImageButton ampLED;
     ComboBox modelSelect;
     
     // LookandFeels 
     myLookAndFeel ampSilverKnobLAF;
+    myLookAndFeel statusKnob;
 
     Image background;
     int current_background = 1;
@@ -61,6 +63,7 @@ private:
 
     TextButton recordButton;
     TextButton trainButton;
+    TextButton exportButton;
     Label timerLabel;
     Label helpLabel;
     TextButton loadButton;
@@ -69,6 +72,7 @@ private:
     void modelSelectChanged();
     void loadButtonClicked();
     void trainButtonClicked();
+    void exportButtonClicked();
     virtual void sliderValueChanged(Slider* slider) override;
     void ampOnButtonClicked();
     void recordButtonClicked();
@@ -83,6 +87,7 @@ private:
     int t = 190;
     String seconds = "10";
     String minutes = "";
+    float progressValue = 0.0;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SmartAmpProAudioProcessorEditor)
 };
