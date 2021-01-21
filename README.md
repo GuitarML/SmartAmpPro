@@ -19,9 +19,11 @@ recommended to use the "pip" package manager to install these dependencies. Pip 
 Python3.4 and up.
 
 ```
-In the command terminal:
+#In the command terminal:
 
 pip install -r requirements.txt
+
+# OR run the included "install_requirements" script (.bat for Windows, .sh for Mac/Linux)
 ```
 
 Note: You can still use the plugin without installing the python dependencies, but the 
