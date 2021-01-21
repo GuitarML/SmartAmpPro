@@ -30,7 +30,7 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
         c += 1;
     }
     modelSelect.onChange = [this] {modelSelectChanged(); };
-    modelSelect.setSelectedItemIndex(processor.current_model_index, juce::NotificationType::sendNotification);
+    modelSelect.setSelectedItemIndex(processor.current_model_index, juce::NotificationType::dontSendNotification);
     modelSelect.setScrollWheelEnabled(true);
 
     // Set Widget Graphics
@@ -47,18 +47,22 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
 
     addAndMakeVisible(loadButton);
     loadButton.setButtonText("Import Tone");
+    loadButton.setColour(juce::Label::textColourId, juce::Colours::black);
     loadButton.addListener(this);
 
     addAndMakeVisible(exportButton);
     exportButton.setButtonText("Export Tone");
+    exportButton.setColour(juce::Label::textColourId, juce::Colours::black);
     exportButton.addListener(this);
 
     addAndMakeVisible(recordButton);
     recordButton.setButtonText("Start Capture");
+    recordButton.setColour(juce::Label::textColourId, juce::Colours::black);
     recordButton.addListener(this);
 
     addAndMakeVisible(trainButton);
     trainButton.setButtonText("Train Tone");
+    trainButton.setColour(juce::Label::textColourId, juce::Colours::black);
     trainButton.addListener(this);
     
     addAndMakeVisible(timerLabel);
@@ -76,13 +80,13 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     helpLabel.setFont(juce::Font(18.0f, juce::Font::bold));
     helpLabel.setVisible(1);
 
-
+    addAndMakeVisible(ampLED);
     ampLED.setImages(true, true, true,
         ImageCache::getFromMemory(BinaryData::led_blue_on_png, BinaryData::led_blue_on_pngSize), 1.0, Colours::transparentWhite,
         Image(), 1.0, Colours::transparentWhite,
         ImageCache::getFromMemory(BinaryData::led_blue_on_png, BinaryData::led_blue_on_pngSize), 1.0, Colours::transparentWhite,
         0.0);
-    addAndMakeVisible(ampLED);
+    ampLED.addListener(this);
 
     addAndMakeVisible(progressCircle);
     progressCircle.setEnabled(false);
@@ -168,12 +172,26 @@ SmartAmpProAudioProcessorEditor::~SmartAmpProAudioProcessorEditor()
 //==============================================================================
 void SmartAmpProAudioProcessorEditor::paint (Graphics& g)
 {
-    if ( current_background == 1 && processor.amp_state == 1) {
-        background = ImageCache::getFromMemory(BinaryData::smp_on_png, BinaryData::smp_on_pngSize);
-    } else if (current_background == 1 && processor.amp_state == 1) {
-        background = ImageCache::getFromMemory(BinaryData::smp_on_png, BinaryData::smp_on_pngSize);
-    } else {
-        background = ImageCache::getFromMemory(BinaryData::smp_off_png, BinaryData::smp_off_pngSize);
+    if (skin == 0) {
+        if (current_background == 1 && processor.amp_state == 1) {
+            background = ImageCache::getFromMemory(BinaryData::smp_on_png, BinaryData::smp_on_pngSize);
+        }
+        else if (current_background == 1 && processor.amp_state == 1) {
+            background = ImageCache::getFromMemory(BinaryData::smp_on_png, BinaryData::smp_on_pngSize);
+        }
+        else {
+            background = ImageCache::getFromMemory(BinaryData::smp_off_png, BinaryData::smp_off_pngSize);
+        }
+    } else if (skin == 1) {
+        if (current_background == 1 && processor.amp_state == 1) {
+            background = ImageCache::getFromMemory(BinaryData::original_on_png, BinaryData::original_on_pngSize);
+        }
+        else if (current_background == 1 && processor.amp_state == 1) {
+            background = ImageCache::getFromMemory(BinaryData::original_on_png, BinaryData::original_on_pngSize);
+        }
+        else {
+            background = ImageCache::getFromMemory(BinaryData::original_off_png, BinaryData::original_off_pngSize);
+        }
     }
     g.drawImageAt(background, 0, 0);
 
@@ -181,29 +199,56 @@ void SmartAmpProAudioProcessorEditor::paint (Graphics& g)
     g.setFont (15.0f);
 
     // Set On/Off amp graphic
-    if (processor.amp_state == 0) {
-        ampOnButton.setImages(true, true, true,
-            ImageCache::getFromMemory(BinaryData::Power_switch_off_png, BinaryData::Power_switch_off_pngSize), 1.0, Colours::transparentWhite,
-            Image(), 1.0, Colours::transparentWhite,
-            ImageCache::getFromMemory(BinaryData::Power_switch_off_png, BinaryData::Power_switch_off_pngSize), 1.0, Colours::transparentWhite,
-            0.0);
-        ampLED.setImages(true, true, true,
-            ImageCache::getFromMemory(BinaryData::led_blue_off_png, BinaryData::led_blue_off_pngSize), 1.0, Colours::transparentWhite,
-            Image(), 1.0, Colours::transparentWhite,
-            ImageCache::getFromMemory(BinaryData::led_blue_off_png, BinaryData::led_blue_off_pngSize), 1.0, Colours::transparentWhite,
-            0.0);
-    }
-    else {
-        ampOnButton.setImages(true, true, true,
-            ImageCache::getFromMemory(BinaryData::Power_switch_on_png, BinaryData::Power_switch_on_pngSize), 1.0, Colours::transparentWhite,
-            Image(), 1.0, Colours::transparentWhite,
-            ImageCache::getFromMemory(BinaryData::Power_switch_on_png, BinaryData::Power_switch_on_pngSize), 1.0, Colours::transparentWhite,
-            0.0);
-        ampLED.setImages(true, true, true,
-            ImageCache::getFromMemory(BinaryData::led_blue_on_png, BinaryData::led_blue_on_pngSize), 1.0, Colours::transparentWhite,
-            Image(), 1.0, Colours::transparentWhite,
-            ImageCache::getFromMemory(BinaryData::led_blue_on_png, BinaryData::led_blue_on_pngSize), 1.0, Colours::transparentWhite,
-            0.0);
+    if (skin == 0) {
+        if (processor.amp_state == 0) {
+            ampOnButton.setImages(true, true, true,
+                ImageCache::getFromMemory(BinaryData::Power_switch_off_png, BinaryData::Power_switch_off_pngSize), 1.0, Colours::transparentWhite,
+                Image(), 1.0, Colours::transparentWhite,
+                ImageCache::getFromMemory(BinaryData::Power_switch_off_png, BinaryData::Power_switch_off_pngSize), 1.0, Colours::transparentWhite,
+                0.0);
+            ampLED.setImages(true, true, true,
+                ImageCache::getFromMemory(BinaryData::led_blue_off_png, BinaryData::led_blue_off_pngSize), 1.0, Colours::transparentWhite,
+                Image(), 1.0, Colours::transparentWhite,
+                ImageCache::getFromMemory(BinaryData::led_blue_off_png, BinaryData::led_blue_off_pngSize), 1.0, Colours::transparentWhite,
+                0.0);
+        }
+        else {
+            ampOnButton.setImages(true, true, true,
+                ImageCache::getFromMemory(BinaryData::Power_switch_on_png, BinaryData::Power_switch_on_pngSize), 1.0, Colours::transparentWhite,
+                Image(), 1.0, Colours::transparentWhite,
+                ImageCache::getFromMemory(BinaryData::Power_switch_on_png, BinaryData::Power_switch_on_pngSize), 1.0, Colours::transparentWhite,
+                0.0);
+            ampLED.setImages(true, true, true,
+                ImageCache::getFromMemory(BinaryData::led_blue_on_png, BinaryData::led_blue_on_pngSize), 1.0, Colours::transparentWhite,
+                Image(), 1.0, Colours::transparentWhite,
+                ImageCache::getFromMemory(BinaryData::led_blue_on_png, BinaryData::led_blue_on_pngSize), 1.0, Colours::transparentWhite,
+                0.0);
+        }
+    } else if (skin == 1) {
+        if (processor.amp_state == 0) {
+            ampOnButton.setImages(true, true, true,
+                ImageCache::getFromMemory(BinaryData::power_switch_up_png, BinaryData::power_switch_up_pngSize), 1.0, Colours::transparentWhite,
+                Image(), 1.0, Colours::transparentWhite,
+                ImageCache::getFromMemory(BinaryData::power_switch_down_png, BinaryData::power_switch_down_pngSize), 1.0, Colours::transparentWhite,
+                0.0);
+            ampLED.setImages(true, true, true,
+                ImageCache::getFromMemory(BinaryData::led_blue_off_png, BinaryData::led_blue_off_pngSize), 1.0, Colours::transparentWhite,
+                Image(), 1.0, Colours::transparentWhite,
+                ImageCache::getFromMemory(BinaryData::led_blue_off_png, BinaryData::led_blue_off_pngSize), 1.0, Colours::transparentWhite,
+                0.0);
+        }
+        else {
+            ampOnButton.setImages(true, true, true,
+                ImageCache::getFromMemory(BinaryData::power_switch_down_png, BinaryData::Power_switch_on_pngSize), 1.0, Colours::transparentWhite,
+                Image(), 1.0, Colours::transparentWhite,
+                ImageCache::getFromMemory(BinaryData::power_switch_down_png, BinaryData::power_switch_down_pngSize), 1.0, Colours::transparentWhite,
+                0.0);
+            ampLED.setImages(true, true, true,
+                ImageCache::getFromMemory(BinaryData::led_blue_on_png, BinaryData::led_blue_on_pngSize), 1.0, Colours::transparentWhite,
+                Image(), 1.0, Colours::transparentWhite,
+                ImageCache::getFromMemory(BinaryData::led_blue_on_png, BinaryData::led_blue_on_pngSize), 1.0, Colours::transparentWhite,
+                0.0);
+        }
     }
 
 }
@@ -231,7 +276,7 @@ void SmartAmpProAudioProcessorEditor::resized()
     ampMasterKnob.setBounds(542, 225, 75, 95);
 
     ampOnButton.setBounds(54, 259, 15, 25);
-    ampLED.setBounds(636, 240, 15, 25);
+    ampLED.setBounds(636, 240, 15, 15);
 }
 
 void SmartAmpProAudioProcessorEditor::modelSelectChanged()
@@ -267,7 +312,7 @@ void SmartAmpProAudioProcessorEditor::loadButtonClicked()
                 bool a = file.copyFileTo(fullpath);
                 if (a == true) {
                     modelSelect.addItem(file.getFileNameWithoutExtension(), processor.jsonFiles.size() + 1);
-                    modelSelect.setSelectedItemIndex(processor.jsonFiles.size(), juce::NotificationType::sendNotification);
+                    modelSelect.setSelectedItemIndex(processor.jsonFiles.size(), juce::NotificationType::dontSendNotification);
                     processor.jsonFiles.push_back(file);
                     if (files.size() == 1) {
                         helpLabel.setText("Tone file imported:\n" + file.getFileNameWithoutExtension(), juce::NotificationType::dontSendNotification);
@@ -336,9 +381,42 @@ void SmartAmpProAudioProcessorEditor::buttonClicked(juce::Button* button)
         trainButtonClicked();
     } else if (button == &exportButton) {
         exportButtonClicked();
+    } else if (button == &ampLED) {
+        ledButtonClicked();
     }
 }
 
+void SmartAmpProAudioProcessorEditor::ledButtonClicked() {
+    if (skin == 0) {
+        skin = 1;
+        ampSilverKnobLAF.setLookAndFeel(ImageCache::getFromMemory(BinaryData::knob_silver_png, BinaryData::knob_silver_pngSize));
+        // Amp Widgets
+        ampPresenceKnob.setBounds(461, 264, 65, 85);
+        ampBassKnob.setBounds(179, 264, 65, 85);
+        ampMidKnob.setBounds(276, 264, 65, 85);
+        ampTrebleKnob.setBounds(368, 264, 65, 85);
+        ampGainKnob.setBounds(86, 264, 65, 85);
+        ampMasterKnob.setBounds(567, 264, 65, 85);
+
+        ampOnButton.setBounds(25, 277, 15, 25);
+        ampLED.setBounds(653, 87, 15, 15);
+        repaint();
+    } else if (skin == 1) {
+        skin = 0;
+        ampSilverKnobLAF.setLookAndFeel(ImageCache::getFromMemory(BinaryData::Vintage_Knob_png, BinaryData::Vintage_Knob_pngSize));
+        // Amp Widgets
+        ampPresenceKnob.setBounds(445, 242, 55, 75);
+        ampBassKnob.setBounds(203, 242, 55, 75);
+        ampMidKnob.setBounds(283, 242, 55, 75);
+        ampTrebleKnob.setBounds(368, 242, 55, 75);
+        ampGainKnob.setBounds(100, 225, 75, 95);
+        ampMasterKnob.setBounds(542, 225, 75, 95);
+
+        ampOnButton.setBounds(54, 259, 15, 25);
+        ampLED.setBounds(636, 240, 15, 15);
+        repaint();
+    }
+}
 
 void SmartAmpProAudioProcessorEditor::ampOnButtonClicked() {
     if (processor.amp_state == 0) {
@@ -370,10 +448,10 @@ void SmartAmpProAudioProcessorEditor::recordButtonClicked() {
             processor.recording = 1;
             recordButton.setColour(TextButton::buttonColourId, Colours::red);
             recordButton.setButtonText("Stop Capture");
-            timerLabel.setText(minutes + ":0" + seconds, juce::NotificationType::sendNotification);
+            timerLabel.setText(minutes + ":0" + seconds, juce::NotificationType::dontSendNotification);
             timerLabel.setVisible(1);
             timer_start();
-            helpLabel.setText("Ensure input is on Channel 1 and target is on Channel 2", juce::NotificationType::sendNotification);
+            helpLabel.setText("Ensure input is on Channel 1 and target is on Channel 2", juce::NotificationType::dontSendNotification);
             progressValue = 100.0;
             progressCircle.setValue(progressValue, juce::NotificationType::dontSendNotification);
         }
@@ -384,9 +462,10 @@ void SmartAmpProAudioProcessorEditor::recordButtonClicked() {
         processor.recording = 0;
         recordButton.setColour(TextButton::buttonColourId, Colours::black);
         recordButton.setButtonText("Start Capture");
-        timerLabel.setText(minutes + ":" + seconds, juce::NotificationType::sendNotification);
+        timerLabel.setText(minutes + ":" + seconds, juce::NotificationType::dontSendNotification);
         timer_stop();
-        timerLabel.setVisible(0);
+        //timerLabel.setVisible(0);
+        timerLabel.setText("", juce::NotificationType::dontSendNotification);
         minutes = "";
         seconds = "10";
         helpLabel.setText("Capture ended.", juce::NotificationType::dontSendNotification);
@@ -542,8 +621,9 @@ void SmartAmpProAudioProcessorEditor::setTrainingStatus(int status) {
     outfile.open(processor.userAppDataDirectory.getFullPathName().toStdString() + "/status.txt", std::ofstream::trunc);
     outfile << std::to_string(status) + " " + std::to_string(accuracy);
     outfile.close();
-    progressValue = a;
+    progressValue = 0.0;
     progressCircle.setValue(progressValue, juce::NotificationType::dontSendNotification);
+    timerLabel.setText("", juce::NotificationType::dontSendNotification);
 }
 
 void SmartAmpProAudioProcessorEditor::timerCallback()
@@ -578,7 +658,7 @@ void SmartAmpProAudioProcessorEditor::timerCallback()
                     modelSelect.addItem(jsonFile.getFileName(), c);
                     c += 1;
                 }
-                modelSelect.setSelectedItemIndex(0, juce::NotificationType::sendNotification);
+                modelSelect.setSelectedItemIndex(0, juce::NotificationType::dontSendNotification);
 
                 // Check that a .json tone was generated, and if not, notify user through helpLabel
                 if (test_file.existsAsFile() == false) {
@@ -608,14 +688,14 @@ void SmartAmpProAudioProcessorEditor::timerCallback()
         else if (t == 180) {
             processor.audio_recorder.setRecordName(record_file);
             processor.audio_recorder.startRecording();
-            helpLabel.setText("Begin 3 minutes of \nguitar playing!", juce::NotificationType::sendNotification);
+            helpLabel.setText("Begin 3 minutes of \nguitar playing!", juce::NotificationType::dontSendNotification);
         }
 
         if (t % 60 < 10) {
             seconds = "0" + seconds;
         }
 
-        timerLabel.setText(minutes + ":" + seconds, juce::NotificationType::sendNotification);
+        timerLabel.setText(minutes + ":" + seconds, juce::NotificationType::dontSendNotification);
         if (t < 1) {
             timer_stop();
             processor.audio_recorder.stopRecording();
@@ -623,10 +703,10 @@ void SmartAmpProAudioProcessorEditor::timerCallback()
             recordButton.setColour(TextButton::buttonColourId, Colours::black);
             recordButton.setButtonText("Start Capture");
             timer_stop();
-            timerLabel.setText(":10", juce::NotificationType::sendNotification);
+            timerLabel.setText(":10", juce::NotificationType::dontSendNotification);
             t = 190;
-            timerLabel.setVisible(0);
-            helpLabel.setText("Tone Capture Complete.\nClick \"Train Tone\"", juce::NotificationType::sendNotification);
+            //timerLabel.setVisible(0);
+            helpLabel.setText("Tone Capture Complete.\nClick \"Train Tone\"", juce::NotificationType::dontSendNotification);
             minutes = "";
             seconds = "10";
             progressValue = 0.0;
@@ -634,33 +714,33 @@ void SmartAmpProAudioProcessorEditor::timerCallback()
             timerLabel.setText("", juce::NotificationType::dontSendNotification);
         }
         else if (t == 170) {
-            helpLabel.setText("Play some chords", juce::NotificationType::sendNotification);
+            helpLabel.setText("Play some chords", juce::NotificationType::dontSendNotification);
         }
         else if (t == 150) {
-            helpLabel.setText("Play some notes", juce::NotificationType::sendNotification);
+            helpLabel.setText("Play some notes", juce::NotificationType::dontSendNotification);
         }
         else if (t == 130) {
-            helpLabel.setText("Play your favorite song", juce::NotificationType::sendNotification);
+            helpLabel.setText("Play your favorite song", juce::NotificationType::dontSendNotification);
         }
         else if (t == 100) {
-            helpLabel.setText("Play quiet", juce::NotificationType::sendNotification);
+            helpLabel.setText("Play quiet", juce::NotificationType::dontSendNotification);
         }
         else if (t == 80) {
-            helpLabel.setText("Play loud!", juce::NotificationType::sendNotification);
+            helpLabel.setText("Play loud!", juce::NotificationType::dontSendNotification);
         }
         else if (t == 60) {
-            helpLabel.setText("Make some mistakes", juce::NotificationType::sendNotification);
+            helpLabel.setText("Make some mistakes", juce::NotificationType::dontSendNotification);
         }
         else if (t == 50) {
-            helpLabel.setText("Play some high notes", juce::NotificationType::sendNotification);
+            helpLabel.setText("Play some high notes", juce::NotificationType::dontSendNotification);
         }
         else if (t == 30) {
-            helpLabel.setText("Play some low notes", juce::NotificationType::sendNotification);
+            helpLabel.setText("Play some low notes", juce::NotificationType::dontSendNotification);
         }
         else if (t == 10) {
-            helpLabel.setText("Almost done..\nLet it ring out!", juce::NotificationType::sendNotification);
+            helpLabel.setText("Almost done..\nLet it ring out!", juce::NotificationType::dontSendNotification);
         }
-        if (t < 181) {
+        if (t < 181 && t > 0) {
             progressValue = t * 100 / 180;
             progressCircle.setValue(progressValue, juce::NotificationType::dontSendNotification);
         }

@@ -76,6 +76,8 @@ private:
     virtual void sliderValueChanged(Slider* slider) override;
     void ampOnButtonClicked();
     void recordButtonClicked();
+    void ledButtonClicked();
+    int skin = 0;
 
     void setTrainingStatus(int status);
 

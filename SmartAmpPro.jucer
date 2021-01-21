@@ -6,14 +6,24 @@
   <MAINGROUP id="ZrSGof" name="SmartAmpPro">
     <GROUP id="{0250E2E8-A733-0AA7-0A08-97085228CF87}" name="Resources">
       <FILE id="hw0XCC" name="heavy.json" compile="0" resource="1" file="models/heavy.json"/>
+      <FILE id="oL2AXS" name="knob_silver.png" compile="0" resource="1" file="resources/knob_silver.png"/>
       <FILE id="Uieb0X" name="led_blue_off.png" compile="0" resource="1"
             file="resources/led_blue_off.png"/>
       <FILE id="ceij5f" name="led_blue_on.png" compile="0" resource="1" file="resources/led_blue_on.png"/>
+      <FILE id="geQBcU" name="led_red_off.png" compile="0" resource="1" file="resources/led_red_off.png"/>
+      <FILE id="UpeQo5" name="led_red_on.png" compile="0" resource="1" file="resources/led_red_on.png"/>
+      <FILE id="O83NVt" name="original_off.png" compile="0" resource="1"
+            file="resources/original_off.png"/>
+      <FILE id="CMoOJy" name="original_on.png" compile="0" resource="1" file="resources/original_on.png"/>
       <FILE id="m7wsyw" name="plot.py" compile="0" resource="1" file="resources/plot.py"/>
+      <FILE id="GfT9kD" name="power_switch_down.png" compile="0" resource="1"
+            file="resources/power_switch_down.png"/>
       <FILE id="kSnGrA" name="Power_switch_off.png" compile="0" resource="1"
             file="resources/Power_switch_off.png"/>
       <FILE id="VU1K05" name="Power_switch_on.png" compile="0" resource="1"
             file="resources/Power_switch_on.png"/>
+      <FILE id="EPTRVK" name="power_switch_up.png" compile="0" resource="1"
+            file="resources/power_switch_up.png"/>
       <FILE id="sIplv3" name="smp_off.png" compile="0" resource="1" file="resources/smp_off.png"/>
       <FILE id="oyBNlZ" name="smp_on.png" compile="0" resource="1" file="resources/smp_on.png"/>
       <FILE id="szu9lS" name="status_knob.png" compile="0" resource="1" file="resources/status_knob.png"/>

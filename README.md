@@ -12,6 +12,21 @@ is accomplished using Tensorflow/Keras.
 1. Download plugin (Windows 10 only) [here](https://github.com/GuitarML/SmartAmpPro/releases/tag/v1.0)
 2. Copy to your DAW's VST directory
 
+## Installing python dependencies
+
+The python dependencies for training tones are listed in the ```requirements.txt`` file. It's 
+recommended to use the "pip" package manager to install these dependencies. Pip is included in 
+Python3.4 and up.
+
+```
+In the command terminal:
+
+pip install -r requirements.txt
+```
+
+Note: You can still use the plugin without installing the python dependencies, but the 
+      "Train Tone" button will not work.
+
 ## Using the plugin
 
 All .json models, python training files, and .wav samples created from the plugin will be saved to the
