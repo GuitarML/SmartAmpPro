@@ -14,7 +14,7 @@ is accomplished using Tensorflow/Keras.
 
 ## Installing python dependencies
 
-The python dependencies for training tones are listed in the ```requirements.txt`` file. It's 
+The python dependencies for training tones are listed in the ```requirements.txt``` file. It's 
 recommended to use the "pip" package manager to install these dependencies. Pip is included in 
 Python3.4 and up.
 
