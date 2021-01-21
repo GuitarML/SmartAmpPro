@@ -36,7 +36,7 @@ All .json models, python training files, and .wav samples created from the plugi
 directory. If you modify the "train.py" file and want to revert to the original, remove the the .py file 
 and it will be re-installed the next time you open the plugin.
 
-userApplicationDataDirectoy Locations (default location for models, python scripts, and .wav samples for training)
+userApplicationDataDirectoy Locations (default location for models, python scripts, and .wav samples for training):
 ```
 Windows 10: "C:/Users/<username>/AppData/Roaming/GuitarML/SmartAmpPro"
 OSX (default): /Users/<username>/Library/GuitarML/SmartAmpPro
@@ -45,14 +45,15 @@ OSX (for Garageband, substitute appropriate version):
 Linux: /home/<username>/.config/GuitarML/SmartAmpPro
 ```
 
-### "Add Tone" button
-This button adds a tone file (with .json extension) to the plugin. Click the "Add Tone" button to open up 
+### "Import Tone" and "Export Tone" buttons
+Export or import tone files (with .json extension) to and from the plugin. Click the "Add Tone" button to open up 
 a file select dialog box. Select your .json tone file (or multiple files) to import them into the plugin. 
-This simply copies the tone file to your "SmartAmpPro" directory in "AppData". The tone is now an option
-in the drop down box in the plugin. 
+This simply copies the tone file to your SmartAmpPro directory defined above. The tone is now an option
+in the drop down box in the plugin. The "Export Tone" button copies the tone files from the SmartAmpPro
+directory to the chosen location.
 
-Note: The original SmartAmp/PedalNetRT .json files are not compatible with this plugin because it is an
-entirely different machine learning model. Only use tone files trained from SmartAmpPro.
+Note: The original SmartAmp/PedalNetRT .json files are not compatible with this plugin because it is a
+different machine learning model. Only use tone files trained from SmartAmpPro.
 
 ### Capturing .wav samples for model training:
 
@@ -63,34 +64,28 @@ entirely different machine learning model. Only use tone files trained from Smar
    (all testing was done on a Focusrite Scarlett 2i2)
 4. Once the three minutes are over, recording will automatically stop and the .wav file will be saved.
    Note: This saves the two channels to a single stereo .wav file, with the input on the left (channel 1), and target on the right (channel 2)
-
+   Note: The playing prompts such as "Play loud!" that appear while training are suggestions, and don't need to be
+          followed exactly to successfully train a model.
 
 ### Training .json models from recorded .wav samples.
 
-In order to use the "Train Model" button, the following python libraries must be installed on your system (not a virtual environment)<br>
--tensorflow (2.4 used in testing with python3.8) <br>
--matplotlib<br>
--scipy<br>
-Note: Earlier versions of python may not work with latest tensorflow
-
-To test these are installed correctly for SmartAmpPro, open a command prompt, run python and try to import tensorflow, matplotlib, and scipy.
-The plugin simply makes a system call to python and runs the training script, so these need to be a system-wide installation on your computer.
+The Python dependencies from the ```requirements.txt``` file must be installed on your system (not a virtual env)
+for the tone training to work.
 
 1. Click the "Train Model" button and select the .wav file to train from.
-    (These are in the "userApplicationDataDirectoy" directory from the above step)
+    (These are in the "userApplicationDataDirectoy" mentioned above)
 2. If you have two separate .wav files (float32, mono, no extra data) then you can select both from the
    dialog box. Ensure that the input comes first alphabetically. For example:
 	"Input.wav", "Output.wav" works, but  "zInput.wav" and "Output.wav" would use the wrong file as input vs. output.
-   Ensure that no model exists in the "models" directory with the same name as the target .wav file. The target .wav file
-   name (or the stereo .wav filename from the above step) is used for the output .json model name.
-3. A terminal window should pop up and execute the training script. If it appears and quickly disappears, check that your
-model name doesn't already exist in the SmartAmpPro/models directory, or check that the python libraries were installed correctly.
-To further troubleshoot, navigate to the SmartAmpPro directory, open a cmd prompt and manually run "python train.py <input.wav(s)> <name>"
-4. An analysis plot will show the training results (plots and samples are saved to the SmartAmpPro/models directory). Close the plot to resume using the plugin normally.
+3. On Windows, a terminal window should pop up and execute the training script. Mac suppresses the terminal and runs in the background.
+   The percent complete status should update in the plugin. If it remains at 0, or seems to get stuck, stop the training by clicking
+   the button. 
+   Note: To troubleshoot, navigate to the SmartAmpPro directory, open a cmd prompt and manually run "python train.py <input.wav(s)> <name>"
+4. Analysis plots are saved to the SmartAmpPro directory, along with sample .wav files and the Keras .h5 model file.
 5. After training has completed (should take 5 minutes or less), you will now have a newly created model to select in the plugin drop down box.
 	
-
-Note: You can modify the train.py script to test different parameters, but it may produce undesired results in the plugin.
+Note: You can modify the train.py script to test different parameters, but it may produce undesired results in the plugin. Recommended to only
+      modify the number of epochs, or the number of hidden units of the LSTM layer. 
 
 
 ## Build Instructions
