@@ -16,7 +16,8 @@ is accomplished using Tensorflow/Keras.
 
 The python dependencies for training tones are listed in the ```requirements.txt``` file. It's 
 recommended to use the "pip" package manager to install these dependencies. Pip is included in 
-Python3.4 and up.
+Python3.4 and up. Python3.6 and Python3.8 were used during development and either version is
+recommended for SmartAmpPro.  Tensorflow2.4 does not support Python3.9 as of 1/22/20.
 
 ```
 #In the command terminal:
@@ -120,4 +121,3 @@ Note: Make sure to build in Release mode unless actually debugging. Debug mode w
 
 
 ## Special Thanks
-
