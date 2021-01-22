@@ -163,6 +163,10 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
 
     // Size of plugin GUI
     setSize(694, 376);
+
+    // Set current plugin skin
+    setSkin();
+
 }
 
 SmartAmpProAudioProcessorEditor::~SmartAmpProAudioProcessorEditor()
@@ -172,7 +176,7 @@ SmartAmpProAudioProcessorEditor::~SmartAmpProAudioProcessorEditor()
 //==============================================================================
 void SmartAmpProAudioProcessorEditor::paint (Graphics& g)
 {
-    if (skin == 0) {
+    if (processor.skin == 0) {
         if (current_background == 1 && processor.amp_state == 1) {
             background = ImageCache::getFromMemory(BinaryData::smp_on_png, BinaryData::smp_on_pngSize);
         }
@@ -182,7 +186,7 @@ void SmartAmpProAudioProcessorEditor::paint (Graphics& g)
         else {
             background = ImageCache::getFromMemory(BinaryData::smp_off_png, BinaryData::smp_off_pngSize);
         }
-    } else if (skin == 1) {
+    } else if (processor.skin == 1) {
         if (current_background == 1 && processor.amp_state == 1) {
             background = ImageCache::getFromMemory(BinaryData::original_on_png, BinaryData::original_on_pngSize);
         }
@@ -199,7 +203,7 @@ void SmartAmpProAudioProcessorEditor::paint (Graphics& g)
     g.setFont (15.0f);
 
     // Set On/Off amp graphic
-    if (skin == 0) {
+    if (processor.skin == 0) {
         if (processor.amp_state == 0) {
             ampOnButton.setImages(true, true, true,
                 ImageCache::getFromMemory(BinaryData::Power_switch_off_png, BinaryData::Power_switch_off_pngSize), 1.0, Colours::transparentWhite,
@@ -224,7 +228,7 @@ void SmartAmpProAudioProcessorEditor::paint (Graphics& g)
                 ImageCache::getFromMemory(BinaryData::led_blue_on_png, BinaryData::led_blue_on_pngSize), 1.0, Colours::transparentWhite,
                 0.0);
         }
-    } else if (skin == 1) {
+    } else if (processor.skin == 1) {
         if (processor.amp_state == 0) {
             ampOnButton.setImages(true, true, true,
                 ImageCache::getFromMemory(BinaryData::power_switch_up_png, BinaryData::power_switch_up_pngSize), 1.0, Colours::transparentWhite,
@@ -386,9 +390,8 @@ void SmartAmpProAudioProcessorEditor::buttonClicked(juce::Button* button)
     }
 }
 
-void SmartAmpProAudioProcessorEditor::ledButtonClicked() {
-    if (skin == 0) {
-        skin = 1;
+void SmartAmpProAudioProcessorEditor::setSkin() {
+    if (processor.skin == 1) {
         ampSilverKnobLAF.setLookAndFeel(ImageCache::getFromMemory(BinaryData::knob_silver_png, BinaryData::knob_silver_pngSize));
         // Amp Widgets
         ampPresenceKnob.setBounds(461, 264, 65, 85);
@@ -401,8 +404,8 @@ void SmartAmpProAudioProcessorEditor::ledButtonClicked() {
         ampOnButton.setBounds(25, 277, 15, 25);
         ampLED.setBounds(653, 87, 15, 15);
         repaint();
-    } else if (skin == 1) {
-        skin = 0;
+    }
+    else if (processor.skin == 0) {
         ampSilverKnobLAF.setLookAndFeel(ImageCache::getFromMemory(BinaryData::Vintage_Knob_png, BinaryData::Vintage_Knob_pngSize));
         // Amp Widgets
         ampPresenceKnob.setBounds(445, 242, 55, 75);
@@ -415,6 +418,16 @@ void SmartAmpProAudioProcessorEditor::ledButtonClicked() {
         ampOnButton.setBounds(54, 259, 15, 25);
         ampLED.setBounds(636, 240, 15, 15);
         repaint();
+    }
+}
+
+void SmartAmpProAudioProcessorEditor::ledButtonClicked() {
+    if (processor.skin == 0) {
+        processor.skin = 1;
+        setSkin();
+    } else if (processor.skin == 1) {
+        processor.skin = 0;
+        setSkin();
     }
 }
 

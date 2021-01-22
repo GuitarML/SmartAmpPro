@@ -77,7 +77,7 @@ private:
     void ampOnButtonClicked();
     void recordButtonClicked();
     void ledButtonClicked();
-    int skin = 0;
+    void setSkin();
 
     void setTrainingStatus(int status);
 

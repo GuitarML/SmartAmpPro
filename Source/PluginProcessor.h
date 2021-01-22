@@ -101,6 +101,7 @@ public:
     lstm LSTM;
     AudioRecordingDemo audio_recorder;
     int recording = 0;
+    int skin = 0;
 
 private:
     Eq4Band eq4band; // Amp EQ
