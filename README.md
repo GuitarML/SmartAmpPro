@@ -90,11 +90,11 @@ for the tone training to work.
    The percent complete status should update in the plugin. If it remains at 0, or seems to get stuck, stop the training by clicking
    the button. 
    Note: To troubleshoot, navigate to the SmartAmpPro directory, open a cmd prompt and manually run "python train.py <input.wav(s)> <name>"
-4. Analysis plots are saved to the SmartAmpPro directory, along with sample .wav files and the Keras .h5 model file.
+4. Analysis plots are saved to the SmartAmpPro/models/<model_name> directory, along with sample .wav files and the Keras .h5 model file.
 5. After training has completed (should take 5 minutes or less), you will now have a newly created model to select in the plugin drop down box.
 	
 Note: You can modify the train.py script to test different parameters, but it may produce undesired results in the plugin. Recommended to only
-      modify the number of epochs, or the number of hidden units of the LSTM layer. 
+      modify the number of epochs, learning rate, or the number of hidden units of the LSTM layer. 
 
 
 ## Build Instructions
