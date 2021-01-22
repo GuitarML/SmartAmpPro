@@ -5,7 +5,17 @@
               jucerFormatVersion="1" pluginCode="sa1" maxBinaryFileSize="20971520">
   <MAINGROUP id="ZrSGof" name="SmartAmpPro">
     <GROUP id="{0250E2E8-A733-0AA7-0A08-97085228CF87}" name="Resources">
+      <FILE id="M33NU6" name="BluesJrClean.json" compile="0" resource="1"
+            file="models/BluesJrClean.json"/>
+      <FILE id="hYrIdf" name="BluesJrDirty.json" compile="0" resource="1"
+            file="models/BluesJrDirty.json"/>
+      <FILE id="JwDXH0" name="ClearBlueSky.json" compile="0" resource="1"
+            file="models/ClearBlueSky.json"/>
       <FILE id="hw0XCC" name="heavy.json" compile="0" resource="1" file="models/heavy.json"/>
+      <FILE id="b0JVS6" name="install_requirements.bat" compile="0" resource="1"
+            file="install_requirements.bat"/>
+      <FILE id="R3Orjm" name="install_requirements.sh" compile="0" resource="1"
+            file="install_requirements.sh"/>
       <FILE id="oL2AXS" name="knob_silver.png" compile="0" resource="1" file="resources/knob_silver.png"/>
       <FILE id="Uieb0X" name="led_blue_off.png" compile="0" resource="1"
             file="resources/led_blue_off.png"/>
@@ -24,11 +34,13 @@
             file="resources/Power_switch_on.png"/>
       <FILE id="EPTRVK" name="power_switch_up.png" compile="0" resource="1"
             file="resources/power_switch_up.png"/>
+      <FILE id="h8E9nX" name="requirements.txt" compile="0" resource="1"
+            file="requirements.txt"/>
       <FILE id="sIplv3" name="smp_off.png" compile="0" resource="1" file="resources/smp_off.png"/>
       <FILE id="oyBNlZ" name="smp_on.png" compile="0" resource="1" file="resources/smp_on.png"/>
       <FILE id="szu9lS" name="status_knob.png" compile="0" resource="1" file="resources/status_knob.png"/>
       <FILE id="GmSw4X" name="train.py" compile="0" resource="1" file="resources/train.py"/>
-      <FILE id="ACIBhm" name="ts9.json" compile="0" resource="1" file="models/ts9.json"/>
+      <FILE id="vCyH7n" name="TS9.json" compile="0" resource="1" file="models/TS9.json"/>
       <FILE id="NSHRQf" name="Vintage_Knob.png" compile="0" resource="1"
             file="resources/Vintage_Knob.png"/>
       <FILE id="ydzcso" name="Vintage_Knob_alt.png" compile="0" resource="1"

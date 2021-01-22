@@ -71,8 +71,8 @@ def main(args):
     name = args.name
     name_taken = True
     
-    if not os.path.exists('models/'+name):
-        os.makedirs('models/'+name)
+    if not os.path.exists('../models/'+name):
+        os.makedirs('../models/'+name)
     else:
         print("A model folder with the same name already exists. Please choose a new name.")
         return
@@ -179,7 +179,7 @@ def main(args):
 
             write_status((i+1)*15)
 
-        model.save('models/'+name+'/'+name+'.h5')
+        model.save('../models/'+name+'/'+name+'.h5')
 
 
     # If training on the full set of input data in one run, do this part
@@ -196,10 +196,10 @@ def main(args):
         # Train Model ###################################################
         model.fit(X_random,y_random, epochs=epochs, batch_size=batch_size, validation_split=test_size)    
 
-        model.save('models/'+name+'/'+name+'.h5', include_optimizer=False)
+        model.save('../models/'+name+'/'+name+'.h5', include_optimizer=False)
 
     # Add additional data to the saved model (like input_size, strides)
-    filename = 'models/'+name+'/'+name+'.h5'
+    filename = '../models/'+name+'/'+name+'.h5'
     f = h5py.File(filename, 'a')
     grp = f.create_group("info")
     dset = grp.create_dataset("input_size", (1,), dtype='int16')
@@ -212,9 +212,8 @@ def main(args):
     f.close()
     
     # Generate json model ################################
-    filename = 'models/'+name+'/'+ name +'.h5'
-    #json_filename = 'models/'+name+'/'+ args.name
-    json_filename = name
+    filename = '../models/'+name+'/'+ name +'.h5'
+    json_filename = "../tones/" + name
     f = h5py.File(filename, 'r')
    
     # Load the model data
@@ -264,9 +263,9 @@ def main(args):
 
     prediction = model.predict(X_test, batch_size=batch_size)
 
-    save_wav('models/'+name+'/y_pred.wav', prediction)
-    save_wav('models/'+name+'/x_test.wav', x_last_part)
-    save_wav('models/'+name+'/y_test.wav', y_test)
+    save_wav('../models/'+name+'/y_pred.wav', prediction)
+    save_wav('../models/'+name+'/x_test.wav', x_last_part)
+    save_wav('../models/'+name+'/y_test.wav', y_test)
 
 
     # Create Analysis Plots ###########################################
@@ -274,12 +273,12 @@ def main(args):
         print("Plotting results..")
         import plot
 
-        plot.analyze_pred_vs_actual({   'output_wav':'models/'+name+'/y_test.wav',
-                                            'pred_wav':'models/'+name+'/y_pred.wav', 
-                                            'input_wav':'models/'+name+'/x_test.wav',
+        plot.analyze_pred_vs_actual({   'output_wav':'../models/'+name+'/y_test.wav',
+                                            'pred_wav':'../models/'+name+'/y_pred.wav', 
+                                            'input_wav':'../models/'+name+'/x_test.wav',
                                             'model_name':name,
                                             'show_plots':0,
-                                            'path':'models/'+name
+                                            'path':'../models/'+name
                                         })
 
     

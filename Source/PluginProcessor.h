@@ -80,6 +80,10 @@ public:
     std::vector<File> jsonFiles;
     File currentDirectory = File::getCurrentWorkingDirectory().getFullPathName();
     File userAppDataDirectory = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile(JucePlugin_Manufacturer).getChildFile(JucePlugin_Name);
+    File userAppDataDirectory_captures = userAppDataDirectory.getFullPathName() + "/captures";
+    File userAppDataDirectory_install = userAppDataDirectory.getFullPathName() + "/install";
+    File userAppDataDirectory_tones = userAppDataDirectory.getFullPathName() + "/tones";
+    File userAppDataDirectory_training = userAppDataDirectory.getFullPathName() + "/training";
     // Pedal/amp states
     int amp_state = 1; // 0 = off, 1 = on
     int custom_tone = 0; // 0 = custom tone loaded, 1 = default channel tone

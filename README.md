@@ -44,6 +44,14 @@ OSX (for Garageband, substitute appropriate version):
     /Users/<username>/Library/Containers/com.apple.garageband10/Data/Library/GuitarML/SmartAmpPro
 Linux: /home/<username>/.config/GuitarML/SmartAmpPro
 ```
+```
+#The following directories are created in the SmartAmpPro folder:
+/captures		# Where all recorded .wav files are saved
+/install		# Where Python dependency installation scripts are stored
+/models			# The model output of the training scripts (Keras .h5 model, generated .wav samples, generated plots)
+/tones			# Where all .json tone files are saved
+/training		# Where python training scripts are stored
+```
 
 ### "Import Tone" and "Export Tone" buttons
 Export or import tone files (with .json extension) to and from the plugin. Click the "Add Tone" button to open up 
@@ -109,3 +117,7 @@ Dev Note: The above dependencies were chosen to facilitate rapid prototyping. It
 	thing using only Juce and the standard c++ library.
 
 Note: Make sure to build in Release mode unless actually debugging. Debug mode will not keep up with real time playing.
+
+
+## Special Thanks
+

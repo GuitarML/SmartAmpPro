@@ -29,7 +29,7 @@ SmartAmpProAudioProcessor::SmartAmpProAudioProcessor()
 {
     setupDataDirectories();
     installPythonScripts();
-    resetDirectory(userAppDataDirectory);
+    resetDirectory(userAppDataDirectory_tones);
     if (jsonFiles.size() > 0) {
         loadConfig(jsonFiles[current_model_index]);
     }
@@ -238,6 +238,11 @@ void SmartAmpProAudioProcessor::setupDataDirectories()
     // User app data directory
     File userAppDataTempFile = userAppDataDirectory.getChildFile("tmp.pdl");
 
+    File userAppDataTempFile_captures = userAppDataDirectory_captures.getChildFile("tmp.pdl");
+    File userAppDataTempFile_install = userAppDataDirectory_install.getChildFile("tmp.pdl");
+    File userAppDataTempFile_tones = userAppDataDirectory_tones.getChildFile("tmp.pdl");
+    File userAppDataTempFile_training = userAppDataDirectory_training.getChildFile("tmp.pdl");
+
     // Create (and delete) temp file if necessary, so that user doesn't have
     // to manually create directories
     if (!userAppDataDirectory.exists()) {
@@ -247,8 +252,36 @@ void SmartAmpProAudioProcessor::setupDataDirectories()
         userAppDataTempFile.deleteFile();
     }
 
-    // Add the directory
-    addDirectory(userAppDataDirectory);
+    if (!userAppDataDirectory_captures.exists()) {
+        userAppDataTempFile_captures.create();
+    }
+    if (userAppDataTempFile_captures.existsAsFile()) {
+        userAppDataTempFile_captures.deleteFile();
+    }
+
+    if (!userAppDataDirectory_install.exists()) {
+        userAppDataTempFile_install.create();
+    }
+    if (userAppDataTempFile_install.existsAsFile()) {
+        userAppDataTempFile_install.deleteFile();
+    }
+
+    if (!userAppDataDirectory_tones.exists()) {
+        userAppDataTempFile_tones.create();
+    }
+    if (userAppDataTempFile_tones.existsAsFile()) {
+        userAppDataTempFile_tones.deleteFile();
+    }
+
+    if (!userAppDataDirectory_training.exists()) {
+        userAppDataTempFile_training.create();
+    }
+    if (userAppDataTempFile_training.existsAsFile()) {
+        userAppDataTempFile_training.deleteFile();
+    }
+
+    // Add the tones directory and update tone list
+    addDirectory(userAppDataDirectory_tones);
 }
 
 void SmartAmpProAudioProcessor::installPythonScripts()
@@ -259,17 +292,24 @@ void SmartAmpProAudioProcessor::installPythonScripts()
 //
 //====================================================================
 {
-    File train_script = userAppDataDirectory.getFullPathName() + "/train.py";
-    File plot_script = userAppDataDirectory.getFullPathName() + "/plot.py";
-    File ts9_tone = userAppDataDirectory.getFullPathName() + "/ts9.json";
-    File heavy_tone = userAppDataDirectory.getFullPathName() + "/heavy.json";
+    // Python model training scripts
+    File train_script = userAppDataDirectory_training.getFullPathName() + "/train.py";
+    File plot_script = userAppDataDirectory_training.getFullPathName() + "/plot.py";
 
-    bool b = train_script.existsAsFile();
-    bool p = plot_script.existsAsFile();
-    bool ts9 = ts9_tone.existsAsFile();
-    bool h = heavy_tone.existsAsFile();
+    // Default tones
+    File ts9_tone = userAppDataDirectory_tones.getFullPathName() + "/TS9.json";
+    File heavy_tone = userAppDataDirectory_tones.getFullPathName() + "/heavy.json";
+    File bjclean_tone = userAppDataDirectory_tones.getFullPathName() + "/BluesJrClean.json";
+    File bjdirty_tone = userAppDataDirectory_tones.getFullPathName() + "/BluesJrDirty.json";
+    File cbs_tone = userAppDataDirectory_tones.getFullPathName() + "/ClearBlueSky.json";
 
-    if (b == false) {
+    // Python dependency installation scripts
+    File install_req_windows = userAppDataDirectory_install.getFullPathName() + "/install_requirements.bat";
+    File install_req_mac = userAppDataDirectory_install.getFullPathName() + "/install_requirements.sh";
+    File req = userAppDataDirectory_install.getFullPathName() + "/requirements.txt";
+
+
+    if (train_script.existsAsFile() == false) {
         std::string string_command = train_script.getFullPathName().toStdString();
         const char* char_train_script = &string_command[0];
 
@@ -279,7 +319,7 @@ void SmartAmpProAudioProcessor::installPythonScripts()
 
         myfile.close();
     }
-    if (p == false) {
+    if (plot_script.existsAsFile() == false) {
         std::string string_command = plot_script.getFullPathName().toStdString();
         const char* char_plot_script = &string_command[0];
 
@@ -289,23 +329,83 @@ void SmartAmpProAudioProcessor::installPythonScripts()
 
         myfile.close();
     }
-    if (ts9 == false) {
+    if (ts9_tone.existsAsFile() == false) {
         std::string string_command = ts9_tone.getFullPathName().toStdString();
         const char* char_ts9_tone = &string_command[0];
 
         std::ofstream myfile;
         myfile.open(char_ts9_tone);
-        myfile << BinaryData::ts9_json;
+        myfile << BinaryData::TS9_json;
 
         myfile.close();
     }
-    if (h == false) {
+    if (heavy_tone.existsAsFile() == false) {
         std::string string_command = heavy_tone.getFullPathName().toStdString();
         const char* char_heavy_tone = &string_command[0];
 
         std::ofstream myfile;
         myfile.open(char_heavy_tone);
         myfile << BinaryData::heavy_json;
+
+        myfile.close();
+    }
+    if (bjclean_tone.existsAsFile() == false) {
+        std::string string_command = bjclean_tone.getFullPathName().toStdString();
+        const char* char_bjclean = &string_command[0];
+
+        std::ofstream myfile;
+        myfile.open(char_bjclean);
+        myfile << BinaryData::BluesJrClean_json;
+
+        myfile.close();
+    }
+    if (bjdirty_tone.existsAsFile() == false) {
+        std::string string_command = bjdirty_tone.getFullPathName().toStdString();
+        const char* char_bjdirty = &string_command[0];
+
+        std::ofstream myfile;
+        myfile.open(char_bjdirty);
+        myfile << BinaryData::BluesJrDirty_json;
+
+        myfile.close();
+    }
+    if (cbs_tone.existsAsFile() == false) {
+        std::string string_command = cbs_tone.getFullPathName().toStdString();
+        const char* char_cbs = &string_command[0];
+
+        std::ofstream myfile;
+        myfile.open(char_cbs);
+        myfile << BinaryData::ClearBlueSky_json;
+
+        myfile.close();
+    }
+    if (install_req_windows.existsAsFile() == false) {
+        std::string string_command = install_req_windows.getFullPathName().toStdString();
+        const char* char_windows = &string_command[0];
+
+        std::ofstream myfile;
+        myfile.open(char_windows);
+        myfile << BinaryData::install_requirements_bat;
+
+        myfile.close();
+    }
+    if (install_req_mac.existsAsFile() == false) {
+        std::string string_command = install_req_mac.getFullPathName().toStdString();
+        const char* char_mac = &string_command[0];
+
+        std::ofstream myfile;
+        myfile.open(char_mac);
+        myfile << BinaryData::install_requirements_sh;
+
+        myfile.close();
+    }
+    if (req.existsAsFile() == false) {
+        std::string string_command = req.getFullPathName().toStdString();
+        const char* char_req = &string_command[0];
+
+        std::ofstream myfile;
+        myfile.open(char_req);
+        myfile << BinaryData::requirements_txt;
 
         myfile.close();
     }

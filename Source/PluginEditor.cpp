@@ -103,8 +103,7 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     addAndMakeVisible(ampPresenceKnob);
     ampPresenceKnob.setLookAndFeel(&ampSilverKnobLAF);
     ampPresenceKnob.addListener(this);
-    //ampPresenceKnob.setSkewFactorFromMidPoint(1000.0); // Not working because of custom lookAndFeel class
-    ampPresenceKnob.setRange(-12.0, 12.0);
+    ampPresenceKnob.setRange(-10.0, 10.0);
     ampPresenceKnob.setValue(processor.ampPresenceKnobState);
     ampPresenceKnob.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
     ampPresenceKnob.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, false, 75, 20);
@@ -114,7 +113,7 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     addAndMakeVisible(ampBassKnob);
     ampBassKnob.setLookAndFeel(&ampSilverKnobLAF);
     ampBassKnob.addListener(this);
-    ampBassKnob.setRange(-10.0, 10.0);
+    ampBassKnob.setRange(-8.0, 8.0);
     ampBassKnob.setValue(processor.ampBassKnobState);
     ampBassKnob.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
     ampBassKnob.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, false, 50, 20);
@@ -124,7 +123,7 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     addAndMakeVisible(ampMidKnob);
     ampMidKnob.setLookAndFeel(&ampSilverKnobLAF);
     ampMidKnob.addListener(this);
-    ampMidKnob.setRange(-10.0, 10.0);
+    ampMidKnob.setRange(-8.0, 8.0);
     ampMidKnob.setValue(processor.ampMidKnobState);
     ampMidKnob.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
     ampMidKnob.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, false, 50, 20);
@@ -134,7 +133,7 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     addAndMakeVisible(ampTrebleKnob);
     ampTrebleKnob.setLookAndFeel(&ampSilverKnobLAF);
     ampTrebleKnob.addListener(this);
-    ampTrebleKnob.setRange(-10.0, 10.0);
+    ampTrebleKnob.setRange(-8.0, 8.0);
     ampTrebleKnob.setValue(processor.ampTrebleKnobState);
     ampTrebleKnob.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
     ampTrebleKnob.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, false, 50, 20);
@@ -144,7 +143,7 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     addAndMakeVisible(ampGainKnob);
     ampGainKnob.setLookAndFeel(&ampSilverKnobLAF);
     ampGainKnob.addListener(this);
-    ampGainKnob.setRange(-15.0, 15.0);
+    ampGainKnob.setRange(-12.0, 12.0);
     ampGainKnob.setValue(processor.ampGainKnobState);
     ampGainKnob.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
     ampGainKnob.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, false, 50, 20);
@@ -302,7 +301,7 @@ void SmartAmpProAudioProcessorEditor::loadButtonClicked()
         int import_fail = 1;
         Array<File> files = chooser.getResults();
         for (auto file : files) {
-            File fullpath = processor.userAppDataDirectory.getFullPathName() + "/" + file.getFileName();
+            File fullpath = processor.userAppDataDirectory_tones.getFullPathName() + "/" + file.getFileName();
             bool b = fullpath.existsAsFile();
             if (b == false) {
 
@@ -330,6 +329,8 @@ void SmartAmpProAudioProcessorEditor::loadButtonClicked()
             }
             if (import_fail == 0 && files.size() > 1) {
                 helpLabel.setText("At least one file could\nnot be imported.", juce::NotificationType::dontSendNotification);
+            } else if (import_fail == 1 && files.size() > 1) {
+                helpLabel.setText("Tones successfully imported.", juce::NotificationType::dontSendNotification);
             }
         }
     }
@@ -339,7 +340,7 @@ void SmartAmpProAudioProcessorEditor::exportButtonClicked()
 {
     int export_fail = 1;
     FileChooser chooser("Select one or more .json tone files to export",
-        processor.userAppDataDirectory,
+        processor.userAppDataDirectory_tones,
         "*.json");
     FileChooser chooser2("Select directory to export tone files to",
         File::getSpecialLocation(File::userDesktopDirectory),
@@ -367,6 +368,9 @@ void SmartAmpProAudioProcessorEditor::exportButtonClicked()
             }
             if (export_fail == 0 && files.size() > 1) {
                 helpLabel.setText("At least one file could\nnot be exported.", juce::NotificationType::dontSendNotification);
+            }
+            else if (export_fail == 1 && files.size() > 1) {
+                helpLabel.setText("Tones successfully exported.", juce::NotificationType::dontSendNotification);
             }
         }
     }
@@ -435,7 +439,7 @@ void SmartAmpProAudioProcessorEditor::ampOnButtonClicked() {
     if (processor.amp_state == 0) {
         processor.amp_state = 1;
         // Reset the directory in case user is manually adding or removing models from the SmartAmpPro directory
-        processor.resetDirectory(processor.userAppDataDirectory);
+        processor.resetDirectory(processor.userAppDataDirectory_tones); // TODO maybe just use addDirectory() here
     }
     else {
         processor.amp_state = 0;
@@ -448,10 +452,10 @@ void SmartAmpProAudioProcessorEditor::recordButtonClicked() {
         helpLabel.setText("Can't record while training.", juce::NotificationType::dontSendNotification);
         return;
     }
-    File userAppDataDirectory2 = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile(JucePlugin_Manufacturer).getChildFile(JucePlugin_Name);
+    //File userAppDataDirectory2 = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile(JucePlugin_Manufacturer).getChildFile(JucePlugin_Name);
     if (processor.recording == 0) {
         FileChooser chooser("Enter a descriptive tone name (NO SPACES IN NAME)",
-            userAppDataDirectory2,
+            processor.userAppDataDirectory_captures,
             "*.wav");
         if (chooser.browseForFileToSave(false))  // TODO Overwriting existing file seems to lock up the plugin - fix
         {
@@ -505,16 +509,16 @@ void SmartAmpProAudioProcessorEditor::trainButtonClicked()
         return;
     }
 
-    File userAppDataDirectory2 = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile(JucePlugin_Manufacturer).getChildFile(JucePlugin_Name);
+    //File userAppDataDirectory2 = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile(JucePlugin_Manufacturer).getChildFile(JucePlugin_Name);
     FileChooser chooser("Select recorded .wav sample for tone training",
-        userAppDataDirectory2,
+        processor.userAppDataDirectory_captures,
         "*.wav");
     if (chooser.browseForMultipleFilesToOpen())
     {
         Array<File> files = chooser.getResults();
    
-        File fullpath = processor.userAppDataDirectory.getFullPathName();
-        File train_script = processor.userAppDataDirectory.getFullPathName() + "/train.py";
+        File fullpath = processor.userAppDataDirectory_training.getFullPathName();
+        File train_script = processor.userAppDataDirectory_training.getFullPathName() + "/train.py";
 
         bool b = train_script.existsAsFile();
         if (b == true) {
@@ -530,12 +534,12 @@ void SmartAmpProAudioProcessorEditor::trainButtonClicked()
                 file2 = files[1];
                 // TODO: Currently the two selected files will be in alphabetical order, so the first will be input, second is output. Better way to handle?
                 model_folder = processor.userAppDataDirectory.getFullPathName().toStdString() + "/models/" + file2.getFileNameWithoutExtension().toStdString();
-                test_file = processor.userAppDataDirectory.getFullPathName().toStdString() + "/" + file2.getFileNameWithoutExtension().toStdString() + ".json";
+                test_file = processor.userAppDataDirectory_tones.getFullPathName().toStdString() + "/" + file2.getFileNameWithoutExtension().toStdString() + ".json";
                 string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "echo python train.py " + file.getFullPathName().toStdString() + " " + file2.getFileNameWithoutExtension().toStdString() + " --out_file=" + file2.getFullPathName().toStdString() + " > run.bat && start /min run.bat && exit";
             }
             else {
                 model_folder = processor.userAppDataDirectory.getFullPathName().toStdString() + "/models/" + file.getFileNameWithoutExtension().toStdString();
-                test_file = processor.userAppDataDirectory.getFullPathName().toStdString() + "/" + file.getFileNameWithoutExtension().toStdString() + ".json";
+                test_file = processor.userAppDataDirectory_tones.getFullPathName().toStdString() + "/" + file.getFileNameWithoutExtension().toStdString() + ".json";
                 string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "echo python train.py " + file.getFullPathName().toStdString() + " " + file.getFileNameWithoutExtension().toStdString() + " > run.bat && start /min run.bat && exit";
             }
 
@@ -544,12 +548,12 @@ void SmartAmpProAudioProcessorEditor::trainButtonClicked()
                 file2 = files[1];
                 // TODO: Currently the two selected files will be in alphabetical order, so the first will be input, second is output. Better way to handle?
                 model_folder = processor.userAppDataDirectory.getFullPathName().toStdString() + "/models/" + file2.getFileNameWithoutExtension().toStdString();
-                test_file = processor.userAppDataDirectory.getFullPathName().toStdString() + "/" + file2.getFileNameWithoutExtension().toStdString() + ".json";
+                test_file = processor.userAppDataDirectory_tones.getFullPathName().toStdString() + "/" + file2.getFileNameWithoutExtension().toStdString() + ".json";
                 string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "echo python train.py " + file.getFullPathName().toStdString() + " " + file2.getFileNameWithoutExtension().toStdString() + " --out_file=" + file2.getFullPathName().toStdString() + " > run.sh && chmod 775 *  && ./run.sh&";
             }
             else {
                 model_folder = processor.userAppDataDirectory.getFullPathName().toStdString() + "/models/" + file.getFileNameWithoutExtension().toStdString();
-                test_file = processor.userAppDataDirectory.getFullPathName().toStdString() + "/" + file.getFileNameWithoutExtension().toStdString() + ".json";
+                test_file = processor.userAppDataDirectory_tones.getFullPathName().toStdString() + "/" + file.getFileNameWithoutExtension().toStdString() + ".json";
                 string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "echo python train.py " + file.getFullPathName().toStdString() + " " + file.getFileNameWithoutExtension().toStdString() + " > run.sh && chmod 775 * && ./run.sh&";
             }
             #elif __linux__
@@ -557,12 +561,12 @@ void SmartAmpProAudioProcessorEditor::trainButtonClicked()
                 file2 = files[1];
                 // TODO: Currently the two selected files will be in alphabetical order, so the first will be input, second is output. Better way to handle?
                 model_folder = processor.userAppDataDirectory.getFullPathName().toStdString() + "/models/" + file2.getFileNameWithoutExtension().toStdString();
-                test_file = processor.userAppDataDirectory.getFullPathName().toStdString() + "/" + file2.getFileNameWithoutExtension().toStdString() + ".json";
+                test_file = processor.userAppDataDirectory_tones.getFullPathName().toStdString() + "/" + file2.getFileNameWithoutExtension().toStdString() + ".json";
                 string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "echo python train.py " + file.getFullPathName().toStdString() + " " + file2.getFileNameWithoutExtension().toStdString() + " --out_file=" + file2.getFullPathName().toStdString() + " > run.sh && chmod 775 *  && ./run.sh&";
             }
             else {
                 model_folder = processor.userAppDataDirectory.getFullPathName().toStdString() + "/models/" + file.getFileNameWithoutExtension().toStdString();
-                test_file = processor.userAppDataDirectory.getFullPathName().toStdString() + "/" + file.getFileNameWithoutExtension().toStdString() + ".json";
+                test_file = processor.userAppDataDirectory_tones.getFullPathName().toStdString() + "/" + file.getFileNameWithoutExtension().toStdString() + ".json";
                 string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "echo python train.py " + file.getFullPathName().toStdString() + " " + file.getFileNameWithoutExtension().toStdString() + " > run.sh && chmod 775 * && ./run.sh&";
             }
             #else
@@ -622,7 +626,7 @@ void SmartAmpProAudioProcessorEditor::timer_stop()
 }
 
 void SmartAmpProAudioProcessorEditor::setTrainingStatus(int status) {
-    std::ifstream infile(processor.userAppDataDirectory.getFullPathName().toStdString() + "/status.txt");
+    std::ifstream infile(processor.userAppDataDirectory_training.getFullPathName().toStdString() + "/status.txt");
     int a = 0;
     int b = 0;
     int accuracy = 0.0;
@@ -631,7 +635,7 @@ void SmartAmpProAudioProcessorEditor::setTrainingStatus(int status) {
         accuracy = b;
     }
     std::ofstream outfile;
-    outfile.open(processor.userAppDataDirectory.getFullPathName().toStdString() + "/status.txt", std::ofstream::trunc);
+    outfile.open(processor.userAppDataDirectory_training.getFullPathName().toStdString() + "/status.txt", std::ofstream::trunc);
     outfile << std::to_string(status) + " " + std::to_string(accuracy);
     outfile.close();
     progressValue = 0.0;
@@ -645,7 +649,7 @@ void SmartAmpProAudioProcessorEditor::timerCallback()
     if (training == 1) {
         timerLabel.setVisible(1);
         timerLabel.setText("0%", juce::NotificationType::dontSendNotification);
-        std::ifstream infile(processor.userAppDataDirectory.getFullPathName().toStdString() + "/status.txt");
+        std::ifstream infile(processor.userAppDataDirectory_training.getFullPathName().toStdString() + "/status.txt");
         int a;
         int b;
         while (infile >> a >> b)
@@ -664,7 +668,7 @@ void SmartAmpProAudioProcessorEditor::timerCallback()
                 trainButton.setColour(TextButton::buttonColourId, Colours::black);
                 trainButton.setButtonText("Train Tone");
                 // Run this after model has been generated
-                processor.resetDirectory(processor.userAppDataDirectory);
+                processor.resetDirectory(processor.userAppDataDirectory_tones);
                 modelSelect.clear();
                 int c = 1;
                 for (const auto& jsonFile : processor.jsonFiles) {
