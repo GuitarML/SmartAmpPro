@@ -121,3 +121,9 @@ Note: Make sure to build in Release mode unless actually debugging. Debug mode w
 
 
 ## Special Thanks
+
+Thanks to @teddykoker, @mishushakov, @usdivad for help and contributions that were used in developing SmartAmpPro!
+
+Extra special thanks to my wife Rachel, and my kids Joseph, Caroline, and Lena, without whose love and support
+this project would not be possible. 
+
