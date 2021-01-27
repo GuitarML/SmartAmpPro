@@ -368,7 +368,6 @@ void lstm::process(const float* inData, float* outData, int numSamples)
 
     for (int i = 0; i < numSamples; i++)
     {
-
         // Set the current sample input to LSTM
         for (int j = 0; j < input_size; j++) {
             input[j] = data[i][j];

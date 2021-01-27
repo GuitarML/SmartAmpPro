@@ -74,7 +74,6 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
 
     addAndMakeVisible(helpLabel);
     helpLabel.setText("", juce::NotificationType::dontSendNotification);
-    //helpLabel.setJustificationType(juce::Justification::horizontallyCentred);
     helpLabel.setJustificationType(juce::Justification::topLeft);
     helpLabel.setColour(juce::Label::textColourId, juce::Colours::black);
     helpLabel.setFont(juce::Font(18.0f, juce::Font::bold));
@@ -253,7 +252,6 @@ void SmartAmpProAudioProcessorEditor::paint (Graphics& g)
                 0.0);
         }
     }
-
 }
 
 void SmartAmpProAudioProcessorEditor::resized()
@@ -267,7 +265,6 @@ void SmartAmpProAudioProcessorEditor::resized()
     helpLabel.setBounds(236, 10, 255, 65);
     loadButton.setBounds(15, 42, 100, 25);
     exportButton.setBounds(125, 42, 100, 25);
-
     progressCircle.setBounds(480, 8, 90, 70);
 
     // Amp Widgets
@@ -489,7 +486,6 @@ void SmartAmpProAudioProcessorEditor::recordButtonClicked() {
         progressValue = 0.0;
         progressCircle.setValue(progressValue, juce::NotificationType::dontSendNotification);
     }
-
 }
 
 void SmartAmpProAudioProcessorEditor::trainButtonClicked() 
@@ -509,7 +505,6 @@ void SmartAmpProAudioProcessorEditor::trainButtonClicked()
         return;
     }
 
-    //File userAppDataDirectory2 = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile(JucePlugin_Manufacturer).getChildFile(JucePlugin_Name);
     FileChooser chooser("Select recorded .wav sample for tone training",
         processor.userAppDataDirectory_captures,
         "*.wav");
@@ -691,13 +686,9 @@ void SmartAmpProAudioProcessorEditor::timerCallback()
         }
     // else run timer for Recording
     } else {
-
-
-        //std::cout << "time tick" << std::endl;
         t -= 1;
         seconds = std::to_string(t % 60);
         minutes = std::to_string(t / 60);
-        //t_label = std::to_string(t);
         if (t > 180) {
             minutes = "";
             seconds = std::to_string(std::abs(t - 180));
@@ -722,7 +713,6 @@ void SmartAmpProAudioProcessorEditor::timerCallback()
             timer_stop();
             timerLabel.setText(":10", juce::NotificationType::dontSendNotification);
             t = 190;
-            //timerLabel.setVisible(0);
             helpLabel.setText("Tone Capture Complete.\nClick \"Train Tone\"", juce::NotificationType::dontSendNotification);
             minutes = "";
             seconds = "10";
@@ -761,6 +751,5 @@ void SmartAmpProAudioProcessorEditor::timerCallback()
             progressValue = t * 100 / 180;
             progressCircle.setValue(progressValue, juce::NotificationType::dontSendNotification);
         }
-
     }
 }

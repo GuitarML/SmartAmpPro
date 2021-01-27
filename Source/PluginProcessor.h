@@ -110,7 +110,6 @@ public:
 private:
     Eq4Band eq4band; // Amp EQ
 
-
     // Amp
     float ampDrive = 1.0;
     float ampMaster = 1.0;

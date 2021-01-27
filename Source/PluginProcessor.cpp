@@ -234,7 +234,6 @@ void SmartAmpProAudioProcessor::addDirectory(const File& file)
 
 void SmartAmpProAudioProcessor::setupDataDirectories()
 {
-
     // User app data directory
     File userAppDataTempFile = userAppDataDirectory.getChildFile("tmp.pdl");
 
