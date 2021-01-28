@@ -133,9 +133,9 @@ of different knob settings and train a single model that can interpolate between
 with an adjustable gain parameter, to more accurately simulate the behavior of the system. This will also be a focus
 of future work.
 
-Other possibilities: 
-    - Online model sharing and integration with plugin
-    - Hardware integration as an actual guitar pedal (RaspberryPi, Arduino, Beaglebone)
+Other possibilities: <br>
+    - Online model sharing and integration with plugin <br>
+    - Hardware integration as an actual guitar pedal (RaspberryPi, Arduino, Beaglebone)<br>
 
 ## Special Thanks
 
