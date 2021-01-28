@@ -5,13 +5,11 @@
               jucerFormatVersion="1" pluginCode="sa1" maxBinaryFileSize="20971520">
   <MAINGROUP id="ZrSGof" name="SmartAmpPro">
     <GROUP id="{0250E2E8-A733-0AA7-0A08-97085228CF87}" name="Resources">
-      <FILE id="M33NU6" name="BluesJrClean.json" compile="0" resource="1"
-            file="models/BluesJrClean.json"/>
-      <FILE id="hYrIdf" name="BluesJrDirty.json" compile="0" resource="1"
-            file="models/BluesJrDirty.json"/>
       <FILE id="JwDXH0" name="ClearBlueSky.json" compile="0" resource="1"
             file="models/ClearBlueSky.json"/>
-      <FILE id="hw0XCC" name="heavy.json" compile="0" resource="1" file="models/heavy.json"/>
+      <FILE id="FRsECr" name="CompressedOverdrive.json" compile="0" resource="1"
+            file="models/CompressedOverdrive.json"/>
+      <FILE id="FE5TRB" name="Heavy.json" compile="0" resource="1" file="models/Heavy.json"/>
       <FILE id="b0JVS6" name="install_requirements.bat" compile="0" resource="1"
             file="install_requirements.bat"/>
       <FILE id="R3Orjm" name="install_requirements.sh" compile="0" resource="1"
@@ -40,7 +38,8 @@
       <FILE id="oyBNlZ" name="smp_on.png" compile="0" resource="1" file="resources/smp_on.png"/>
       <FILE id="szu9lS" name="status_knob.png" compile="0" resource="1" file="resources/status_knob.png"/>
       <FILE id="GmSw4X" name="train.py" compile="0" resource="1" file="resources/train.py"/>
-      <FILE id="vCyH7n" name="TS9.json" compile="0" resource="1" file="models/TS9.json"/>
+      <FILE id="x8bPNS" name="TubeClean.json" compile="0" resource="1" file="models/TubeClean.json"/>
+      <FILE id="dagdoc" name="TubeDirty.json" compile="0" resource="1" file="models/TubeDirty.json"/>
       <FILE id="NSHRQf" name="Vintage_Knob.png" compile="0" resource="1"
             file="resources/Vintage_Knob.png"/>
       <FILE id="ydzcso" name="Vintage_Knob_alt.png" compile="0" resource="1"
@@ -96,7 +95,7 @@
     <VS2019 targetFolder="Builds/VisualStudio2019">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" targetName="SmartAmpPro" headerPath="C:\Users\KBloemer\Desktop\Archive\json-develop\json-develop\include&#10;C:\Users\KBloemer\Desktop\Archive\NumCpp-master\include&#10;C:\Users\KBloemer\Desktop\Archive\boost_1_75_0\boost_1_75_0&#10;&#10;&#10;"/>
-        <CONFIGURATION isDebug="0" name="Release" targetName="SmartAmpPro" headerPath="C:\Users\KBloemer\Desktop\Archive\json-develop\json-develop\include&#10;C:\Users\KBloemer\Desktop\Archive\NumCpp-master\include&#10;C:\Users\KBloemer\Desktop\Archive\boost_1_75_0\boost_1_75_0&#10;&#10;&#10;"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="SmartAmpPro" headerPath="C:\Users\rache\Desktop\dev\json-develop\include&#10;C:\Users\rache\Desktop\dev\boost_1_75_0&#10;C:\Users\rache\Desktop\dev\NumCpp-master\include"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_video"/>

@@ -296,10 +296,10 @@ void SmartAmpProAudioProcessor::installPythonScripts()
     File plot_script = userAppDataDirectory_training.getFullPathName() + "/plot.py";
 
     // Default tones
-    File ts9_tone = userAppDataDirectory_tones.getFullPathName() + "/TS9.json";
-    File heavy_tone = userAppDataDirectory_tones.getFullPathName() + "/heavy.json";
-    File bjclean_tone = userAppDataDirectory_tones.getFullPathName() + "/BluesJrClean.json";
-    File bjdirty_tone = userAppDataDirectory_tones.getFullPathName() + "/BluesJrDirty.json";
+    File ts9_tone = userAppDataDirectory_tones.getFullPathName() + "/CompressedOverdrive.json";
+    File heavy_tone = userAppDataDirectory_tones.getFullPathName() + "/Heavy.json";
+    File bjclean_tone = userAppDataDirectory_tones.getFullPathName() + "/TubeClean.json";
+    File bjdirty_tone = userAppDataDirectory_tones.getFullPathName() + "/TubeDirty.json";
     File cbs_tone = userAppDataDirectory_tones.getFullPathName() + "/ClearBlueSky.json";
 
     // Python dependency installation scripts
