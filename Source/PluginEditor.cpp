@@ -652,12 +652,20 @@ void SmartAmpProAudioProcessorEditor::timerCallback()
             helpLabel.setText(std::to_string(a) + " status", juce::NotificationType::dontSendNotification);
             if (a < 100) {
                 helpLabel.setText("Training Tone: " + test_file.getFileNameWithoutExtension().toStdString(), juce::NotificationType::dontSendNotification);
-                timerLabel.setText(std::to_string(a) + "%", juce::NotificationType::dontSendNotification);
-                progressValue = a;
-                progressCircle.setValue(progressValue, juce::NotificationType::dontSendNotification);
+                // A simple way to keep the progress bar moving
+                int currentValue = progressCircle.getValue();
+                if (currentValue < a - 15 ) {
+                    currentValue = a;
+                } else if (currentValue < a + 15 && currentValue < 100) {
+                    currentValue += 1;
+                }
+                progressCircle.setValue(currentValue, juce::NotificationType::dontSendNotification);
+                timerLabel.setText(std::to_string(currentValue) + "%", juce::NotificationType::dontSendNotification);
                 return;
             }
             else {
+                progressCircle.setValue(100, juce::NotificationType::dontSendNotification);
+                timerLabel.setText(std::to_string(100) + "%", juce::NotificationType::dontSendNotification);
                 timer_stop();
                 training = 0;
                 trainButton.setColour(TextButton::buttonColourId, Colours::black);
