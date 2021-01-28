@@ -334,7 +334,7 @@ void SmartAmpProAudioProcessor::installPythonScripts()
 
         std::ofstream myfile;
         myfile.open(char_ts9_tone);
-        myfile << BinaryData::TS9_json;
+        myfile << BinaryData::CompressedOverdrive_json;
 
         myfile.close();
     }
@@ -344,7 +344,7 @@ void SmartAmpProAudioProcessor::installPythonScripts()
 
         std::ofstream myfile;
         myfile.open(char_heavy_tone);
-        myfile << BinaryData::heavy_json;
+        myfile << BinaryData::Heavy_json;
 
         myfile.close();
     }
@@ -354,7 +354,7 @@ void SmartAmpProAudioProcessor::installPythonScripts()
 
         std::ofstream myfile;
         myfile.open(char_bjclean);
-        myfile << BinaryData::BluesJrClean_json;
+        myfile << BinaryData::TubeClean_json;
 
         myfile.close();
     }
@@ -364,7 +364,7 @@ void SmartAmpProAudioProcessor::installPythonScripts()
 
         std::ofstream myfile;
         myfile.open(char_bjdirty);
-        myfile << BinaryData::BluesJrDirty_json;
+        myfile << BinaryData::TubeDirty_json;
 
         myfile.close();
     }
