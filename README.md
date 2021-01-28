@@ -121,6 +121,17 @@ Dev Note: The above dependencies were chosen to facilitate rapid prototyping. It
 
 Note: Make sure to build in Release mode unless actually debugging. Debug mode will not keep up with real time playing.
 
+## Future Work
+
+This plugin is designed to showcase the speed at which the guitar models can be trained.  Using models with larger
+parameters can improve accuracy at the cost of longer training time. The c++ inference can also be rewritten to be 
+more efficient and handle larger models at real time speeds. Future work will focus on improving the c++ inference 
+code to handle larger models, and optimizing the LSTM model to handle more complex signals (high gain/distortion).
+
+The current model training takes a "snapshot" of a particular amp/pedal/rig. It is possible to use multiple recordings
+of different knob settings and train a single model that can interpolate between the settings. For example, a model
+with an adjustable gain parameter, to more accurately simulate the behavior of the system. This will also be a focus
+of future work.
 
 ## Special Thanks
 
