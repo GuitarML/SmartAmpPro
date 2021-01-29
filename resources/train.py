@@ -61,9 +61,6 @@ def main(args):
           specified amount and train the model on each set. Doing this will allow for a higher
           input_size setting (more accurate results).
         
-        --training_mode=0   Speed training (default)
-        --training_mode=1   Accuracy training
-        --training_mode=2   Extended training (set max_epochs as desired, for example 50+)
     '''
 
     write_status(0)
@@ -89,35 +86,19 @@ def main(args):
         #        os.makedirs('models/'+name)
         #        name_taken = False
                 
-
-    train_mode = args.training_mode     # 0 = speed training, 
-                                        # 1 = accuracy training 
-                                        # 2 = extended training
     batch_size = args.batch_size 
     test_size = 0.2
     #test_size = 0.05 # Workaround for Ubuntu low RAM
     epochs = args.max_epochs
     input_size = args.input_size
 
-    # TRAINING MODE
-    if train_mode == 0:         # Speed Training
-        learning_rate = 0.01
-        conv1d_strides = 12
-        conv1d_1_strides = 12   
-        conv1d_filters = 4
-        hidden_units = 24
-    elif train_mode == 1:       # Accuracy Training (~10x longer than Speed Training)
-        learning_rate = 0.01 
-        conv1d_strides = 4
-        conv1d_1_strides = 4  
-        conv1d_filters = 36
-        hidden_units= 64
-    else:                       # Extended Training (~60x longer than Accuracy Training)
-        learning_rate = 0.0005 
-        conv1d_strides = 3
-        conv1d_1_strides = 3
-        conv1d_filters = 36
-        hidden_units= 96
+    # TRAINING PARAMS
+    learning_rate = 0.01
+    conv1d_strides = 12
+    conv1d_1_strides = 12   
+    conv1d_filters = 4
+    hidden_units = 24
+
 
     conv1d_KS = conv1d_strides 
     conv1d_1_KS = conv1d_1_strides
@@ -288,7 +269,6 @@ if __name__ == "__main__":
     parser.add_argument("in_file")
     parser.add_argument("name")
     parser.add_argument("--out_file", type=str, default="")
-    parser.add_argument("--training_mode", type=int, default=0)
     parser.add_argument("--batch_size", type=int, default=4096)
     parser.add_argument("--max_epochs", type=int, default=3)
     parser.add_argument("--create_plots", type=int, default=1)
