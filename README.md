@@ -66,7 +66,7 @@ directory to the chosen location.
 Note: The original SmartAmp/PedalNetRT .json files are not compatible with this plugin because it is a
 different machine learning model. Only use tone files trained from SmartAmpPro.
 
-### Capturing .wav samples for model training:
+### "Start Capture" button:
 
 1. Click the "Start Capture" button and enter a model name to save. Ensure this name contains no spaces. 
 2. After saving, the plugin will begin a 10 second coundown followed by a 3 minute recording session.
@@ -78,7 +78,7 @@ different machine learning model. Only use tone files trained from SmartAmpPro.
    Note: The playing prompts such as "Play loud!" that appear while training are suggestions, and don't need to be
           followed exactly to successfully train a model.
 
-### Training .json models from recorded .wav samples.
+### "Train Tone" button:
 
 The Python dependencies from the ```requirements.txt``` file must be installed on your system (not a virtual env)
 for the tone training to work.
