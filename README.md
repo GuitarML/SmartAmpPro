@@ -101,6 +101,10 @@ Note: You can modify the train.py script to test different parameters, but it ma
 See the GuitarLSTM repo for more information on how training works, and tips for creating sample recordings:
 https://github.com/GuitarML/GuitarLSTM<br>
 
+**Colab Notebook**:
+Use Google Colab notebook (train_colab.ipynb) for training 
+SmartAmpPro models in the cloud. See notebook comments for instructions.
+
 
 ## Build Instructions
 
@@ -124,10 +128,6 @@ Dev Note: The above dependencies were chosen to facilitate rapid prototyping. It
 
 Note: Make sure to build in Release mode unless actually debugging. Debug mode will not keep up with real time playing.
 
-
-**Colab Notebook**:
-Use Google Colab notebook (train_colab.ipynb) for training 
-SmartAmpPro models in the cloud. See notebook comments for instructions.
 
 ## Future Work
 
