@@ -3,9 +3,9 @@
 Guitar plugin made with JUCE that uses neural network models to emulate real world hardware.
 This plugin uses a LSTM model to recreate the sound of real amps and pedals. You can record
 samples and train models from the plugin. Tone models are saved in .json format. Model training
-is accomplished using Tensorflow/Keras. The main improvement from the original SmartAmp is
-training takes less than five minutes on CPU (vs. GPU) for comparable sound quality. Training has
-also been integrated into the plugin.
+is accomplished using Tensorflow/Keras. The main improvement from the original SmartAmp is that
+training takes less than five minutes on CPU (vs. 8 hours on GPU) for comparable sound quality.
+Training has also been integrated into the plugin.
 
 ![app](https://github.com/GuitarML/SmartAmpPro/blob/main/resources/plugin.jpg)
 
@@ -98,6 +98,9 @@ for the tone training to work.
 Note: You can modify the train.py script to test different parameters, but it may produce undesired results in the plugin. Recommended to only
       modify the number of epochs, learning rate, or the number of hidden units of the LSTM layer. 
 
+See the GuitarLSTM repo for more information on how training works, and tips for creating sample recordings:
+https://github.com/GuitarML/GuitarLSTM<br>
+
 
 ## Build Instructions
 
@@ -120,6 +123,11 @@ Dev Note: The above dependencies were chosen to facilitate rapid prototyping. It
 	thing using only Juce and the standard c++ library.
 
 Note: Make sure to build in Release mode unless actually debugging. Debug mode will not keep up with real time playing.
+
+
+**Colab Notebook**:
+Use Google Colab notebook (train_colab.ipynb) for training 
+SmartAmpPro models in the cloud. See notebook comments for instructions.
 
 ## Future Work
 
