@@ -10,7 +10,6 @@ ModelLoader::ModelLoader()
 
 nc::NdArray<float> ModelLoader::vector_to_nc(std::vector<float> in_vec)
 {
-
     nc::NdArray<float> out_vec = nc::random::rand<float>(nc::Shape(1, in_vec.size()));;
 
     for (int i = 0; i < in_vec.size(); i++)
@@ -35,11 +34,11 @@ nc::NdArray<float> ModelLoader::matrix_to_nc(std::vector<std::vector<float>> in_
 }
 
 
-std::vector<nc::NdArray<float>> ModelLoader::matrix3d_to_nc(nlohmann::json in_mat) //TODO FIX THIS FOR 3D ARRAYS, 
+std::vector<nc::NdArray<float>> ModelLoader::matrix3d_to_nc(nlohmann::json in_mat)
 {
     std::vector<nc::NdArray<float>> out_mat;
     nc::NdArray<float> nc_2D_matrix = nc::random::rand<float>(nc::Shape(in_mat[0].size(), in_mat[0][0].size()));
-    for (int i = 0; i < in_mat.size(); i++)  //Fix to work for any name
+    for (int i = 0; i < in_mat.size(); i++)
     {
         for (int j = 0; j < in_mat[0].size(); j++)
         {
@@ -59,7 +58,6 @@ std::vector<nc::NdArray<float>> ModelLoader::matrix3d_to_nc(nlohmann::json in_ma
 void ModelLoader::load_json(const char *filename)
 {
     // read a JSON file
-    
     std::ifstream i2(filename);
     nlohmann::json weights_json;
     i2 >> weights_json;
@@ -71,7 +69,7 @@ void ModelLoader::load_json(const char *filename)
     conv1d_kernel_nc = matrix3d_to_nc(weights_json["/conv1d/kernel:0"_json_pointer]);
     conv1d_stride_loader = weights_json["/conv1d_stride"_json_pointer];
 
-    conv1d_kernel_size = conv1d_kernel_nc.size();  //num channels, not kernel_size
+    conv1d_kernel_size = conv1d_kernel_nc.size();
     conv1d_num_channels = conv1d_bias_nc.size();
     
     std::vector<float> conv1d_1_bias = weights_json["/conv1d_1/bias:0"_json_pointer];
@@ -79,7 +77,7 @@ void ModelLoader::load_json(const char *filename)
     conv1d_1_kernel_nc = matrix3d_to_nc(weights_json["/conv1d_1/kernel:0"_json_pointer]);
     conv1d_1_stride_loader = weights_json["/conv1d_1_stride"_json_pointer];
 
-    conv1d_1_kernel_size = conv1d_1_kernel_nc.size();  //num channels, not kernel_size
+    conv1d_1_kernel_size = conv1d_1_kernel_nc.size();
     conv1d_1_num_channels = conv1d_1_bias_nc.size();
 
     std::vector<float> lstm_bias = weights_json["/lstm/bias:0"_json_pointer];

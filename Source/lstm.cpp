@@ -42,6 +42,7 @@ void lstm::setParams(int hidden_size, int conv1d_kernel_size, int conv1d_1_kerne
 //   is loaded, and are reset when a new model is loaded. Certain
 //   arrays are initialized here based on the model params.
 //
+//  TODO: Handle a better way than having a function with all these arguments
 //====================================================================
 {
     input_size = input_size_loader;
@@ -97,12 +98,13 @@ void lstm::setParams(int hidden_size, int conv1d_kernel_size, int conv1d_1_kerne
 
 
 
-void lstm::pad_init(nc::NdArray<float> xt) //TODO optimize these calculations, one for each conv1d layer, only do once
+void lstm::pad_init(nc::NdArray<float> xt)
 //====================================================================
-// Description: Used in the in conv1d layers. This function applies
+// Description: Used for the conv1d layers. This function intializes
 //   'same' padding to the input data to the conv1d layer. The padding
 //   is all zeros. The amount of padding is based on the kernel_size
-//   and stride of the conv1d layer.
+//   and stride of the conv1d layer. This is called when a new model 
+//   is loaded.
 //
 //====================================================================
 {
@@ -115,7 +117,7 @@ void lstm::pad_init(nc::NdArray<float> xt) //TODO optimize these calculations, o
     } else {
         pad_width = std::max(conv1d_Kernel_Size - seq_mod_stride, 0);
     }
-    pad_left = pad_width / 2; // Integer division here, remainder is left out
+    pad_left = pad_width / 2;
     pad_right = pad_width - pad_left;
 
     pad_left_zeros = nc::zeros<float>(pad_left, local_channels);
@@ -123,12 +125,13 @@ void lstm::pad_init(nc::NdArray<float> xt) //TODO optimize these calculations, o
 }
 
 
-void lstm::pad_init2(nc::NdArray<float> xt) //TODO optimize these calculations, one for each conv1d layer, only do once
+void lstm::pad_init2(nc::NdArray<float> xt)
 //====================================================================
-// Description: Used in the in conv1d layers. This function applies
+// Description: Used for the conv1d layers. This function intializes
 //   'same' padding to the input data to the conv1d layer. The padding
 //   is all zeros. The amount of padding is based on the kernel_size
-//   and stride of the conv1d layer.
+//   and stride of the conv1d layer. This is called when a new model 
+//   is loaded.
 //
 //====================================================================
 {
@@ -142,7 +145,7 @@ void lstm::pad_init2(nc::NdArray<float> xt) //TODO optimize these calculations, 
     else {
         pad_width2 = std::max(conv1d_1_Kernel_Size - seq_mod_stride2, 0);
     }
-    pad_left2 = pad_width2 / 2; // Integer division here, remainder is left out
+    pad_left2 = pad_width2 / 2;
     pad_right2 = pad_width2 - pad_left2;
 
     pad_left_zeros2 = nc::zeros<float>(pad_left2, local_channels2);
@@ -150,10 +153,24 @@ void lstm::pad_init2(nc::NdArray<float> xt) //TODO optimize these calculations, 
 }
 
 nc::NdArray<float> lstm::pad(nc::NdArray<float> xt) {
+//====================================================================
+// Description: Actual application of zero padding to data for 
+//   first conv1d layer. 
+//
+// Note: For stride=12, kernel_size=12, and input_size=120, there
+//       is actually no padding required on the first layer, since
+//       120 is evenly divisible by 12. 
+//
+//====================================================================
     return nc::vstack({ pad_left_zeros, xt, pad_right_zeros });
 }
 
 nc::NdArray<float> lstm::pad2(nc::NdArray<float> xt) {
+//====================================================================
+// Description: Actual application of zero padding to data for 
+//   second conv1d layer. 
+//
+//====================================================================
     return nc::vstack({ pad_left_zeros2, xt, pad_right_zeros2 });
 }
 
@@ -222,9 +239,14 @@ void lstm::conv1d_layer2()
 //   to this project. Kernel size and stride are determined based
 //   on the trained model. 
 //
+//  TODO: Getting incorrect behavior for input_size greater than 
+//     about 140. Using 120 as the default. Will need to fix
+//     if larger input sizes are used. Suspect the calculation is
+//     wrong when the first dimension of the ouput shape of the 
+//     second conv1d layer is greater than 1. For example: (--> 2, 4)
+//     
 //====================================================================
 {
-    //pad_init2(conv1d_out);
     padded_xt2 = pad2(conv1d_out);
     unfolded_xt2[0] = padded_xt2;
 
@@ -262,8 +284,6 @@ void lstm::lstm_layer()
 //====================================================================
 {
     gates = nc::dot(conv1d_1_out, W) + bias;
-
-    // Check if using slicing notation is faster here         np: a[2:5, 5:8]	NC :   a(nc::Slice(2, 5), nc::Slice(5, 8))
     for (int i = 0; i < HS; i++) {
         h_t[i] = sigmoid(gates[3 * HS + i]) * tanh(sigmoid(gates[i]) * tanh(gates[2 * HS + i]));
     }
@@ -283,7 +303,7 @@ void lstm::dense_layer()
 }
 
 
-void lstm::check_buffer(int numSamples)  //TODO this is called every block, how to call just at beginning and when buffer size changes?
+void lstm::check_buffer(int numSamples)
 //====================================================================
 // Description: This checks if either the model or the buffer size
 //   has changed, and if so, initializes certain arrays used for
@@ -296,19 +316,21 @@ void lstm::check_buffer(int numSamples)  //TODO this is called every block, how 
         std::vector<float> temp(numSamples + input_size - 1, 0.0);
         old_buffer = temp;
         new_buffer = temp;
-        std::vector<std::vector<float>> temp3(numSamples, std::vector<float>(input_size, 0.0));  //vector<vector> 128, 120
+        std::vector<std::vector<float>> temp3(numSamples, std::vector<float>(input_size, 0.0));
         data = temp3;
         // Reset the input
         input = nc::zeros<float>(nc::Shape(input_size, 1));
+
         //Set initial conv1d layer 1 arrays
         pad_init(input);
-        padded_xt = pad(input); //TODO ability to set stride
+        padded_xt = pad(input);
         unfolded_xt.clear();
         for (int i = 0; i < padded_xt.shape().rows / conv1d_stride; i++)
         {
             unfolded_xt.push_back(padded_xt(nc::Slice(i * conv1d_stride, i * conv1d_stride + conv1d_Kernel_Size), 0));
         }
         conv1d_out = nc::zeros<float>(nc::Shape(unfolded_xt.size(), conv1d_kernel[0].shape().cols));
+
         // Set initial conv1d layer 2 array
         pad_init2(conv1d_out);
         unfolded_xt2.clear();

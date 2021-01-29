@@ -13,7 +13,6 @@
 
 class lstm
 {
-
     public:
         lstm();
 
@@ -54,7 +53,6 @@ class lstm
         std::vector<std::vector<float>> data;
 
         // Network Parameters
-
         int HS = 1;
         int conv1d_Kernel_Size = 0;
         int conv1d_Num_Channels = 0;

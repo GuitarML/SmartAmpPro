@@ -18,9 +18,6 @@ void Eq4Band::process (const float* inData, float* outData,
                                     const int numSamples, 
                                     const int numInputChannels)
 {
-    //for (int channel = 0; channel < numInputChannels; ++channel) {
-        //float* channelData = buffer.getWritePointer(channel);
-        // For each sample in the block of audio, apply filter
     for (int sample = 0; sample < numSamples; ++sample) {
         spl0 = inData[sample];
         s0 = spl0;
@@ -34,7 +31,6 @@ void Eq4Band::process (const float* inData, float* outData,
    
         outData[sample] = spl0;
     }
-    //}
 }
 
 void Eq4Band::setParameters(float bass_slider, float mid_slider, float treble_slider, float presence_slider)

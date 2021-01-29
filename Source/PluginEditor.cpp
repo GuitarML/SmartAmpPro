@@ -436,7 +436,7 @@ void SmartAmpProAudioProcessorEditor::ampOnButtonClicked() {
     if (processor.amp_state == 0) {
         processor.amp_state = 1;
         // Reset the directory in case user is manually adding or removing models from the SmartAmpPro directory
-        processor.resetDirectory(processor.userAppDataDirectory_tones); // TODO maybe just use addDirectory() here
+        processor.resetDirectory(processor.userAppDataDirectory_tones);
     }
     else {
         processor.amp_state = 0;
@@ -478,7 +478,6 @@ void SmartAmpProAudioProcessorEditor::recordButtonClicked() {
         recordButton.setButtonText("Start Capture");
         timerLabel.setText(minutes + ":" + seconds, juce::NotificationType::dontSendNotification);
         timer_stop();
-        //timerLabel.setVisible(0);
         timerLabel.setText("", juce::NotificationType::dontSendNotification);
         minutes = "";
         seconds = "10";
