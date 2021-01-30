@@ -11,7 +11,7 @@ Training has also been integrated into the plugin.
 
 ## Installing the plugin
 
-1. Download plugin (Windows 10, Mac, Ubuntu Linux) [here](https://github.com/GuitarML/SmartAmpPro/releases/tag/v0.1-alpha)
+1. Download pre-release plugin (Windows 10, Mac, Ubuntu Linux) [here](https://github.com/GuitarML/SmartAmpPro/releases/tag/v0.1-alpha)
 2. Copy to your DAW's VST directory
 
 ## Installing python dependencies
