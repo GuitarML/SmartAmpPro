@@ -95,7 +95,9 @@ for the tone training to work.
 4. Analysis plots are saved to the SmartAmpPro/models/<model_name> directory, along with sample .wav files and the Keras .h5 model file.
 5. After training has completed (should take 5 minutes or less), you will now have a newly created model to select in the plugin drop down box.
 	
-Note: Currently clicking "Stop Training" stops the internal plugin processes for training, but the separate training application will keep running. 
+Note: Currently clicking "Stop Training" stops the internal plugin processes for training, but the separate training application will keep running until complete.
+
+Note: The guitar effect will keep running during training, but due to the extra CPU usage it may be better to switch the effect off until training is finished. 
 
 Note: You can modify the train.py script to test different parameters, but it may produce undesired results in the plugin. Recommended to only
       modify the number of epochs, learning rate, or the number of hidden units of the LSTM layer. 
