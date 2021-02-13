@@ -7,6 +7,10 @@ is accomplished using Tensorflow/Keras. The main improvement from the original S
 training takes less than five minutes on CPU (vs. 8 hours on GPU) for comparable sound quality.
 Training has also been integrated into the plugin.
 
+An alternate way to train models for SmartAmpPro is through [Colab](https://colab.research.google.com/notebooks/intro.ipynb#recent=true)
+Upload the "train_colab.ipynb" script and .wav file(s) to Colab, then follow the instructions in the notes. 
+No installs necessary, only a Google account to train models in the cloud.
+
 ![app](https://github.com/GuitarML/SmartAmpPro/blob/main/resources/plugin.jpg)
 
 ## Installing the plugin
@@ -105,10 +109,6 @@ Note: You can modify the train.py script to test different parameters, but it ma
 See the GuitarLSTM repo for more information on how training works, and tips for creating sample recordings:
 https://github.com/GuitarML/GuitarLSTM<br>
 
-**Colab Notebook**:
-Use Google Colab notebook (train_colab.ipynb) for training 
-SmartAmpPro models in the cloud. See notebook comments for instructions.
-
 
 ## Build Instructions
 
@@ -148,11 +148,3 @@ of future work.
 Other possibilities: <br>
     - Online model sharing and integration with plugin <br>
     - Hardware integration as an actual guitar pedal (RaspberryPi, Arduino, Beaglebone)<br>
-
-## Special Thanks
-
-Thanks to @teddykoker, @mishushakov, @usdivad for help and contributions that were used in developing SmartAmpPro!
-
-Extra special thanks to my wife Rachel, and my kids Joseph, Caroline, and Lena, without whose love and support
-this project would not be possible. 
-
