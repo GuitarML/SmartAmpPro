@@ -106,9 +106,7 @@ Note: The guitar effect will keep running during training, but due to the extra 
 Note: You can modify the train.py script to test different parameters, but it may produce undesired results in the plugin. Recommended to only
       modify the number of epochs, learning rate, or the number of hidden units of the LSTM layer. 
 
-See the GuitarLSTM repo for more information on how training works, and tips for creating sample recordings:
-https://github.com/GuitarML/GuitarLSTM<br>
-
+See the [GuitarLSTM](https://github.com/GuitarML/GuitarLSTM) repo for more information on how training works, and tips for creating sample recordings.
 
 ## Build Instructions
 
@@ -116,7 +114,7 @@ https://github.com/GuitarML/GuitarLSTM<br>
 2. Download and install [JUCE](https://juce.com/) This project uses the "Projucer" application from the JUCE website. 
 3. Download and extract [NumCpp](https://github.com/dpilger26/NumCpp) This is a c++ implementation of the Python Numpy library.
 4. Download and extract [Boost](https://www.boost.org/)  (NumCpp requires Boost)
-5. Download and extract: [json](https://github.com/nlohmann/json) Json for c++
+5. Download and extract: [json](https://github.com/nlohmann/json) Json for c++.
 6. Open the SmartAmpPro.jucer file and in the appropriate Exporter Header Search Path field, enter the appropriate include paths.
    For example:
 
