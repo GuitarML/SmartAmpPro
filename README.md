@@ -8,7 +8,7 @@ training takes less than five minutes on CPU (vs. 8 hours on GPU) for comparable
 Training has also been integrated into the plugin.
 
 An alternate way to train models for SmartAmpPro is through [Colab](https://colab.research.google.com/notebooks/intro.ipynb#recent=true). 
-Upload the "train_colab.ipynb" script and .wav file(s) to Colab, then follow the instructions in the notes. 
+Upload the "train_colab.ipynb" or "train_colab_mse.ipynb" script and .wav file(s) to Colab, then follow the instructions in the notes. 
 No installs necessary, only a Google account to train models in the cloud.
 
 ![app](https://github.com/GuitarML/SmartAmpPro/blob/main/resources/plugin.jpg)
