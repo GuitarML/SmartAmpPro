@@ -5,7 +5,7 @@ This plugin uses a LSTM model to recreate the sound of real amps and pedals. You
 samples and train models from the plugin. Tone models are saved in .json format. Model training
 is accomplished using Tensorflow/Keras. The main improvement from the original SmartAmp is that
 training takes less than five minutes on CPU (vs. 8 hours on GPU) for comparable sound quality.
-Training has also been integrated into the plugin.
+Training has also been integrated into the plugin. For best sound, use with additional Reverb/IR.
 
 An alternate way to train models for SmartAmpPro is through [Colab](https://colab.research.google.com/notebooks/intro.ipynb#recent=true). 
 Upload the "train_colab.ipynb" or "train_colab_mse.ipynb" script and .wav file(s) to Colab, then follow the instructions in the notes. 
