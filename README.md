@@ -11,6 +11,8 @@ An alternate way to train models for SmartAmpPro is through [Colab](https://cola
 Upload the "train_colab.ipynb" or "train_colab_mse.ipynb" script and .wav file(s) to Colab, then follow the instructions in the notes. 
 No installs necessary, only a Google account to train models in the cloud.
 
+Hear the audio demo on [Youtube](https://youtu.be/1njl9wqUG0M)!
+
 ![app](https://github.com/GuitarML/SmartAmpPro/blob/main/resources/plugin.jpg)
 
 ## Installing the plugin
