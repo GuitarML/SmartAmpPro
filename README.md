@@ -97,13 +97,14 @@ for the tone training to work.
 3. On Windows, a terminal window should pop up and execute the training script. Mac suppresses the terminal and runs in the background.
    The percent complete status should update in the plugin. If it remains at 0, or seems to get stuck, stop the training by clicking
    the button. 
-   Note: To troubleshoot, navigate to the SmartAmpPro directory, open a cmd prompt and manually run train.py with the appropriate command.
-   ```
-   # For single stereo wav file recorded from SmartAmpPro:
-   "python train.py input.wav model_name"
    
-      # For two mono wav files:
-   "python train.py input.wav model_name --out_file=output.wav"
+   Note: To troubleshoot or run training manually, navigate to the SmartAmpPro directory, open a cmd prompt and run train.py with the appropriate command.
+   ```
+   # For a stereo (two channel) wav file recorded from SmartAmpPro "Start Capture" button:
+   python train.py stereo.wav model_name
+   
+   # For two mono wav files:
+   python train.py input.wav model_name --out_file=output.wav
    ```
 4. Analysis plots are saved to the SmartAmpPro/models/<model_name> directory, along with sample .wav files and the Keras .h5 model file.
 5. After training has completed (should take 5 minutes or less), you will now have a newly created model to select in the plugin drop down box.
