@@ -19,6 +19,7 @@ Hear the audio demo on [Youtube](https://youtu.be/1njl9wqUG0M)!
 
 1. Download pre-release plugin (Windows 10, Mac, Ubuntu Linux) [here](https://github.com/GuitarML/SmartAmpPro/releases/tag/v0.1-alpha)
 2. Copy to your DAW's VST directory
+3. For additional tones created by the community, download the [TonePack](https://github.com/GuitarML/SmartAmpPro/releases/tag/v1.0)
 
 ## Installing python dependencies
 
