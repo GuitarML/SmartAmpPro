@@ -174,84 +174,37 @@ SmartAmpProAudioProcessorEditor::~SmartAmpProAudioProcessorEditor()
 //==============================================================================
 void SmartAmpProAudioProcessorEditor::paint (Graphics& g)
 {
+    Image background_smp_on = ImageCache::getFromMemory(BinaryData::smp_on_jpg, BinaryData::smp_on_jpgSize);
+    Image background_smp_off = ImageCache::getFromMemory(BinaryData::smp_off_jpg, BinaryData::smp_off_jpgSize);
+    Image background_orig_on = ImageCache::getFromMemory(BinaryData::original_on_jpg, BinaryData::original_on_jpgSize);
+    Image background_orig_off = ImageCache::getFromMemory(BinaryData::original_off_jpg, BinaryData::original_off_jpgSize);
     if (processor.skin == 0) {
         if (current_background == 1 && processor.amp_state == 1) {
-            background = ImageCache::getFromMemory(BinaryData::smp_on_png, BinaryData::smp_on_pngSize);
-        }
-        else if (current_background == 1 && processor.amp_state == 1) {
-            background = ImageCache::getFromMemory(BinaryData::smp_on_png, BinaryData::smp_on_pngSize);
+            // Redraw only the clipped part of the background image
+            juce::Rectangle<int> ClipRect = g.getClipBounds();
+            g.drawImage(background_smp_on, ClipRect.getX(), ClipRect.getY(), ClipRect.getWidth(), ClipRect.getHeight(), ClipRect.getX(), ClipRect.getY(), ClipRect.getWidth(), ClipRect.getHeight());
         }
         else {
-            background = ImageCache::getFromMemory(BinaryData::smp_off_png, BinaryData::smp_off_pngSize);
+            // Redraw only the clipped part of the background image
+            juce::Rectangle<int> ClipRect = g.getClipBounds();
+            g.drawImage(background_smp_off, ClipRect.getX(), ClipRect.getY(), ClipRect.getWidth(), ClipRect.getHeight(), ClipRect.getX(), ClipRect.getY(), ClipRect.getWidth(), ClipRect.getHeight());
         }
     } else if (processor.skin == 1) {
         if (current_background == 1 && processor.amp_state == 1) {
-            background = ImageCache::getFromMemory(BinaryData::original_on_png, BinaryData::original_on_pngSize);
-        }
-        else if (current_background == 1 && processor.amp_state == 1) {
-            background = ImageCache::getFromMemory(BinaryData::original_on_png, BinaryData::original_on_pngSize);
+            // Redraw only the clipped part of the background image
+            juce::Rectangle<int> ClipRect = g.getClipBounds();
+            g.drawImage(background_orig_on, ClipRect.getX(), ClipRect.getY(), ClipRect.getWidth(), ClipRect.getHeight(), ClipRect.getX(), ClipRect.getY(), ClipRect.getWidth(), ClipRect.getHeight());
         }
         else {
-            background = ImageCache::getFromMemory(BinaryData::original_off_png, BinaryData::original_off_pngSize);
+            // Redraw only the clipped part of the background image
+            juce::Rectangle<int> ClipRect = g.getClipBounds();
+            g.drawImage(background_orig_off, ClipRect.getX(), ClipRect.getY(), ClipRect.getWidth(), ClipRect.getHeight(), ClipRect.getX(), ClipRect.getY(), ClipRect.getWidth(), ClipRect.getHeight());
         }
     }
-    g.drawImageAt(background, 0, 0);
+    //g.drawImageAt(background, 0, 0);
 
-    g.setColour (Colours::white);
-    g.setFont (15.0f);
-
-    // Set On/Off amp graphic
-    if (processor.skin == 0) {
-        if (processor.amp_state == 0) {
-            ampOnButton.setImages(true, true, true,
-                ImageCache::getFromMemory(BinaryData::Power_switch_off_png, BinaryData::Power_switch_off_pngSize), 1.0, Colours::transparentWhite,
-                Image(), 1.0, Colours::transparentWhite,
-                ImageCache::getFromMemory(BinaryData::Power_switch_off_png, BinaryData::Power_switch_off_pngSize), 1.0, Colours::transparentWhite,
-                0.0);
-            ampLED.setImages(true, true, true,
-                ImageCache::getFromMemory(BinaryData::led_blue_off_png, BinaryData::led_blue_off_pngSize), 1.0, Colours::transparentWhite,
-                Image(), 1.0, Colours::transparentWhite,
-                ImageCache::getFromMemory(BinaryData::led_blue_off_png, BinaryData::led_blue_off_pngSize), 1.0, Colours::transparentWhite,
-                0.0);
-        }
-        else {
-            ampOnButton.setImages(true, true, true,
-                ImageCache::getFromMemory(BinaryData::Power_switch_on_png, BinaryData::Power_switch_on_pngSize), 1.0, Colours::transparentWhite,
-                Image(), 1.0, Colours::transparentWhite,
-                ImageCache::getFromMemory(BinaryData::Power_switch_on_png, BinaryData::Power_switch_on_pngSize), 1.0, Colours::transparentWhite,
-                0.0);
-            ampLED.setImages(true, true, true,
-                ImageCache::getFromMemory(BinaryData::led_blue_on_png, BinaryData::led_blue_on_pngSize), 1.0, Colours::transparentWhite,
-                Image(), 1.0, Colours::transparentWhite,
-                ImageCache::getFromMemory(BinaryData::led_blue_on_png, BinaryData::led_blue_on_pngSize), 1.0, Colours::transparentWhite,
-                0.0);
-        }
-    } else if (processor.skin == 1) {
-        if (processor.amp_state == 0) {
-            ampOnButton.setImages(true, true, true,
-                ImageCache::getFromMemory(BinaryData::power_switch_up_png, BinaryData::power_switch_up_pngSize), 1.0, Colours::transparentWhite,
-                Image(), 1.0, Colours::transparentWhite,
-                ImageCache::getFromMemory(BinaryData::power_switch_down_png, BinaryData::power_switch_down_pngSize), 1.0, Colours::transparentWhite,
-                0.0);
-            ampLED.setImages(true, true, true,
-                ImageCache::getFromMemory(BinaryData::led_blue_off_png, BinaryData::led_blue_off_pngSize), 1.0, Colours::transparentWhite,
-                Image(), 1.0, Colours::transparentWhite,
-                ImageCache::getFromMemory(BinaryData::led_blue_off_png, BinaryData::led_blue_off_pngSize), 1.0, Colours::transparentWhite,
-                0.0);
-        }
-        else {
-            ampOnButton.setImages(true, true, true,
-                ImageCache::getFromMemory(BinaryData::power_switch_down_png, BinaryData::Power_switch_on_pngSize), 1.0, Colours::transparentWhite,
-                Image(), 1.0, Colours::transparentWhite,
-                ImageCache::getFromMemory(BinaryData::power_switch_down_png, BinaryData::power_switch_down_pngSize), 1.0, Colours::transparentWhite,
-                0.0);
-            ampLED.setImages(true, true, true,
-                ImageCache::getFromMemory(BinaryData::led_blue_on_png, BinaryData::led_blue_on_pngSize), 1.0, Colours::transparentWhite,
-                Image(), 1.0, Colours::transparentWhite,
-                ImageCache::getFromMemory(BinaryData::led_blue_on_png, BinaryData::led_blue_on_pngSize), 1.0, Colours::transparentWhite,
-                0.0);
-        }
-    }
+    //g.setColour (Colours::white);
+    //g.setFont (15.0f);
 }
 
 void SmartAmpProAudioProcessorEditor::resized()
@@ -404,6 +357,7 @@ void SmartAmpProAudioProcessorEditor::setSkin() {
 
         ampOnButton.setBounds(25, 277, 15, 25);
         ampLED.setBounds(653, 87, 15, 15);
+        resetImages();
         repaint();
     }
     else if (processor.skin == 0) {
@@ -418,6 +372,7 @@ void SmartAmpProAudioProcessorEditor::setSkin() {
 
         ampOnButton.setBounds(54, 259, 15, 25);
         ampLED.setBounds(636, 240, 15, 15);
+        resetImages();
         repaint();
     }
 }
@@ -441,6 +396,7 @@ void SmartAmpProAudioProcessorEditor::ampOnButtonClicked() {
     else {
         processor.amp_state = 0;
     }
+    resetImages();
     repaint();
 }
 
@@ -757,6 +713,63 @@ void SmartAmpProAudioProcessorEditor::timerCallback()
         if (t < 181 && t > 0) {
             progressValue = t * 100 / 180;
             progressCircle.setValue(progressValue, juce::NotificationType::dontSendNotification);
+        }
+    }
+}
+
+void SmartAmpProAudioProcessorEditor::resetImages()
+{
+    // Set On/Off amp graphic
+    if (processor.skin == 0) {
+        if (processor.amp_state == 0) {
+            ampOnButton.setImages(true, true, true,
+                ImageCache::getFromMemory(BinaryData::Power_switch_off_png, BinaryData::Power_switch_off_pngSize), 1.0, Colours::transparentWhite,
+                Image(), 1.0, Colours::transparentWhite,
+                ImageCache::getFromMemory(BinaryData::Power_switch_off_png, BinaryData::Power_switch_off_pngSize), 1.0, Colours::transparentWhite,
+                0.0);
+            ampLED.setImages(true, true, true,
+                ImageCache::getFromMemory(BinaryData::led_blue_off_png, BinaryData::led_blue_off_pngSize), 1.0, Colours::transparentWhite,
+                Image(), 1.0, Colours::transparentWhite,
+                ImageCache::getFromMemory(BinaryData::led_blue_off_png, BinaryData::led_blue_off_pngSize), 1.0, Colours::transparentWhite,
+                0.0);
+        }
+        else {
+            ampOnButton.setImages(true, true, true,
+                ImageCache::getFromMemory(BinaryData::Power_switch_on_png, BinaryData::Power_switch_on_pngSize), 1.0, Colours::transparentWhite,
+                Image(), 1.0, Colours::transparentWhite,
+                ImageCache::getFromMemory(BinaryData::Power_switch_on_png, BinaryData::Power_switch_on_pngSize), 1.0, Colours::transparentWhite,
+                0.0);
+            ampLED.setImages(true, true, true,
+                ImageCache::getFromMemory(BinaryData::led_blue_on_png, BinaryData::led_blue_on_pngSize), 1.0, Colours::transparentWhite,
+                Image(), 1.0, Colours::transparentWhite,
+                ImageCache::getFromMemory(BinaryData::led_blue_on_png, BinaryData::led_blue_on_pngSize), 1.0, Colours::transparentWhite,
+                0.0);
+        }
+    }
+    else if (processor.skin == 1) {
+        if (processor.amp_state == 0) {
+            ampOnButton.setImages(true, true, true,
+                ImageCache::getFromMemory(BinaryData::power_switch_up_png, BinaryData::power_switch_up_pngSize), 1.0, Colours::transparentWhite,
+                Image(), 1.0, Colours::transparentWhite,
+                ImageCache::getFromMemory(BinaryData::power_switch_down_png, BinaryData::power_switch_down_pngSize), 1.0, Colours::transparentWhite,
+                0.0);
+            ampLED.setImages(true, true, true,
+                ImageCache::getFromMemory(BinaryData::led_blue_off_png, BinaryData::led_blue_off_pngSize), 1.0, Colours::transparentWhite,
+                Image(), 1.0, Colours::transparentWhite,
+                ImageCache::getFromMemory(BinaryData::led_blue_off_png, BinaryData::led_blue_off_pngSize), 1.0, Colours::transparentWhite,
+                0.0);
+        }
+        else {
+            ampOnButton.setImages(true, true, true,
+                ImageCache::getFromMemory(BinaryData::power_switch_down_png, BinaryData::Power_switch_on_pngSize), 1.0, Colours::transparentWhite,
+                Image(), 1.0, Colours::transparentWhite,
+                ImageCache::getFromMemory(BinaryData::power_switch_down_png, BinaryData::power_switch_down_pngSize), 1.0, Colours::transparentWhite,
+                0.0);
+            ampLED.setImages(true, true, true,
+                ImageCache::getFromMemory(BinaryData::led_blue_on_png, BinaryData::led_blue_on_pngSize), 1.0, Colours::transparentWhite,
+                Image(), 1.0, Colours::transparentWhite,
+                ImageCache::getFromMemory(BinaryData::led_blue_on_png, BinaryData::led_blue_on_pngSize), 1.0, Colours::transparentWhite,
+                0.0);
         }
     }
 }
