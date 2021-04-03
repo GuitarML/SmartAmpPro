@@ -20,9 +20,9 @@
       <FILE id="ceij5f" name="led_blue_on.png" compile="0" resource="1" file="resources/led_blue_on.png"/>
       <FILE id="geQBcU" name="led_red_off.png" compile="0" resource="1" file="resources/led_red_off.png"/>
       <FILE id="UpeQo5" name="led_red_on.png" compile="0" resource="1" file="resources/led_red_on.png"/>
-      <FILE id="O83NVt" name="original_off.png" compile="0" resource="1"
-            file="resources/original_off.png"/>
-      <FILE id="CMoOJy" name="original_on.png" compile="0" resource="1" file="resources/original_on.png"/>
+      <FILE id="mMwbjQ" name="original_off.jpg" compile="0" resource="1"
+            file="resources/original_off.jpg"/>
+      <FILE id="ZLQ8tj" name="original_on.jpg" compile="0" resource="1" file="resources/original_on.jpg"/>
       <FILE id="m7wsyw" name="plot.py" compile="0" resource="1" file="resources/plot.py"/>
       <FILE id="GfT9kD" name="power_switch_down.png" compile="0" resource="1"
             file="resources/power_switch_down.png"/>
@@ -34,8 +34,8 @@
             file="resources/power_switch_up.png"/>
       <FILE id="h8E9nX" name="requirements.txt" compile="0" resource="1"
             file="requirements.txt"/>
-      <FILE id="sIplv3" name="smp_off.png" compile="0" resource="1" file="resources/smp_off.png"/>
-      <FILE id="oyBNlZ" name="smp_on.png" compile="0" resource="1" file="resources/smp_on.png"/>
+      <FILE id="CdUvqW" name="smp_off.jpg" compile="0" resource="1" file="resources/smp_off.jpg"/>
+      <FILE id="NN4qqi" name="smp_on.jpg" compile="0" resource="1" file="resources/smp_on.jpg"/>
       <FILE id="szu9lS" name="status_knob.png" compile="0" resource="1" file="resources/status_knob.png"/>
       <FILE id="GmSw4X" name="train.py" compile="0" resource="1" file="resources/train.py"/>
       <FILE id="x8bPNS" name="TubeClean.json" compile="0" resource="1" file="models/TubeClean.json"/>
@@ -95,7 +95,7 @@
     <VS2019 targetFolder="Builds/VisualStudio2019">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" targetName="SmartAmpPro" headerPath="C:\Users\KBloemer\Desktop\Archive\json-develop\json-develop\include&#10;C:\Users\KBloemer\Desktop\Archive\NumCpp-master\include&#10;C:\Users\KBloemer\Desktop\Archive\boost_1_75_0\boost_1_75_0&#10;&#10;&#10;"/>
-        <CONFIGURATION isDebug="0" name="Release" targetName="SmartAmpPro" headerPath="C:\Users\rache\Desktop\dev\json-develop\include&#10;C:\Users\rache\Desktop\dev\boost_1_75_0&#10;C:\Users\rache\Desktop\dev\NumCpp-master\include"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="SmartAmpPro" headerPath="C:\Users\rache\Desktop\dev\json-develop\include&#10;C:\Users\rache\Desktop\dev\boost_1_75_0&#10;C:\Users\rache\Desktop\dev\NumCpp-master\include&#10;C:\Users\KBloemer\Desktop\Archive\NumCpp-master\NumCpp-master\include&#10;C:\Users\KBloemer\Desktop\Archive\json-develop\json-develop\include&#10;C:\Users\KBloemer\Desktop\Archive\boost_1_75_0\boost_1_75_0"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_video"/>

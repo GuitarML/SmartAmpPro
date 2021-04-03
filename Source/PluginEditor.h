@@ -54,8 +54,12 @@ private:
     myLookAndFeel ampSilverKnobLAF;
     myLookAndFeel statusKnob;
 
-    Image background;
+    //Image background;
     int current_background = 1;
+    Image background_smp_on = ImageCache::getFromMemory(BinaryData::smp_on_jpg, BinaryData::smp_on_jpgSize);
+    Image background_smp_off = ImageCache::getFromMemory(BinaryData::smp_off_jpg, BinaryData::smp_off_jpgSize);
+    Image background_orig_on = ImageCache::getFromMemory(BinaryData::original_on_jpg, BinaryData::original_on_jpgSize);
+    Image background_orig_off = ImageCache::getFromMemory(BinaryData::original_off_jpg, BinaryData::original_off_jpgSize);
 
     int training = 0;
     File test_file;
@@ -90,6 +94,8 @@ private:
     String seconds = "10";
     String minutes = "";
     float progressValue = 0.0;
+
+    void resetImages();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SmartAmpProAudioProcessorEditor)
 };
