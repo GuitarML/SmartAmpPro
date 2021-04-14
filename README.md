@@ -13,6 +13,8 @@ No installs necessary, only a Google account to train models in the cloud.
 
 Hear the audio demo on [Youtube](https://youtu.be/1njl9wqUG0M)!
 
+See a Tone Capture of a pedalboard using SmartAmpPro on [YouTube](https://youtu.be/Rhqy_pUZ5WE)
+
 ![app](https://github.com/GuitarML/SmartAmpPro/blob/main/resources/plugin.jpg)
 
 ## Installing the plugin
