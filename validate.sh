@@ -25,13 +25,13 @@ install_pluginval_win()
 # install
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     pluginval=$(install_pluginval_linux)
-    plugin="Plugin/build/TS-M1N3_artefacts/Release/VST3/TS-M1N3.vst3"
+    plugin="Plugin/build/SmartAmpPro_artefacts/Release/VST3/SmartAmpPro.vst3"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     pluginval=$(install_pluginval_mac)
-    plugin="Plugin/build/TS-M1N3_artefacts/VST3/TS-M1N3.vst3"
+    plugin="Plugin/build/SmartAmpPro_artefacts/VST3/SmartAmpPro.vst3"
 else
     pluginval=$(install_pluginval_win)
-    plugin="Plugin/build/TS-M1N3_artefacts/Release/VST3/TS-M1N3.vst3"
+    plugin="Plugin/build/SmartAmpPro_artefacts/Release/VST3/SmartAmpPro.vst3"
 fi
 
 echo "Pluginval installed at ${pluginval}"

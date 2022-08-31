@@ -3,7 +3,7 @@
 
 # Set the app name and version here
 app_name=SmartAmpPro
-version=1.3
+version=1.0
 
 
 # 1. Create the package directory structure and control file

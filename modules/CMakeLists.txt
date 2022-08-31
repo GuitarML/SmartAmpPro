@@ -16,7 +16,9 @@ target_link_libraries(juce_plugin_modules
         juce::juce_audio_utils
         juce::juce_audio_plugin_client
         juce::juce_dsp
-
+        nlohmann_json::nlohmann_json
+        boost
+        numcpp
         
     PUBLIC
         juce::juce_recommended_config_flags
@@ -41,7 +43,6 @@ target_compile_definitions(juce_plugin_modules
 
 target_include_directories(juce_plugin_modules
     PUBLIC
-        eigen/Eigen
         #libsamplerate/include
     INTERFACE
         $<TARGET_PROPERTY:juce_plugin_modules,INCLUDE_DIRECTORIES>

@@ -16,8 +16,14 @@ Eq4Band::Eq4Band()
 void Eq4Band::process (const float* inData, float* outData,
                                     MidiBuffer& midiMessages, 
                                     const int numSamples, 
-                                    const int numInputChannels)
+                                    const int numInputChannels,
+                                    const int sampleRate)
 {
+    // Reset params if new sampleRate detected
+    if (srate != sampleRate) {
+        srate = sampleRate;
+        resetSampleRate();
+    }
     for (int sample = 0; sample < numSamples; ++sample) {
         spl0 = inData[sample];
         s0 = spl0;
@@ -41,6 +47,21 @@ void Eq4Band::setParameters(float bass_slider, float mid_slider, float treble_sl
     hVol = exp(presence_slider / cAmpDB);
     outVol = exp(0.0 / cAmpDB);
 
+    xHI = exp(-2.0 * pi * treble_frequency / srate);
+    a0HI = 1.0 - xHI;
+    b1HI = -xHI;
+
+    xMID = exp(-2.0 * pi * mid_frequency / srate);
+    a0MID = 1.0 - xMID;
+    b1MID = -xMID;
+
+    xLOW = exp(-2.0 * pi * bass_frequency / srate);
+    a0LOW = 1.0 - xLOW;
+    b1LOW = -xLOW;
+}
+
+void Eq4Band::resetSampleRate()
+{
     xHI = exp(-2.0 * pi * treble_frequency / srate);
     a0HI = 1.0 - xHI;
     b1HI = -xHI;

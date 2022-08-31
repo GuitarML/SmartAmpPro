@@ -167,18 +167,15 @@ void SmartAmpProAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
     // Setup Audio Data
     const int numSamples = buffer.getNumSamples();
     const int numInputChannels = getTotalNumInputChannels();
+    const int sampleRate = getSampleRate();
 
-    auto ampDrive = static_cast<float> (gainParam->load());
-    auto bassValue = static_cast<float> (bassParam->load());
-    auto midValue = static_cast<float> (midParam->load());
-    auto trebleValue = static_cast<float> (trebleParam->load());
-    auto presenceValue = static_cast<float> (presenceParam->load());
+    auto ampGain = static_cast<float> (gainParam->load());
     auto ampMaster = static_cast<float> (masterParam->load());
 
     // Amp =============================================================================
     if (amp_state == 1) {
 
-        buffer.applyGain(ampDrive);
+        buffer.applyGain(ampGain);
 
 		// Apply LSTM model
         if (model_loaded == 1) {
@@ -186,7 +183,7 @@ void SmartAmpProAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
         }
 
         //    EQ (Presence, Bass, Mid, Treble)
-        eq4band.process(buffer.getReadPointer(0), buffer.getWritePointer(0), midiMessages, numSamples, numInputChannels);
+        eq4band.process(buffer.getReadPointer(0), buffer.getWritePointer(0), midiMessages, numSamples, numInputChannels, sampleRate);
 
 
         //    Master Volume 
