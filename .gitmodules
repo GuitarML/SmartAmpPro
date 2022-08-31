@@ -1,0 +1,12 @@
+[submodule "modules/json"]
+	path = modules/json
+	url = https://github.com/nlohmann/json.git
+[submodule "modules/JUCE"]
+	path = modules/JUCE
+	url = https://github.com/juce-framework/JUCE.git
+[submodule "modules/NumCpp"]
+	path = modules/NumCpp
+	url = https://github.com/dpilger26/NumCpp.git
+[submodule "modules/boost"]
+	path = modules/boost
+	url = https://github.com/boostorg/boost.git

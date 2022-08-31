@@ -1,5 +1,0 @@
-tensorflow==2.4
-numpy==1.19.2
-scipy
-matplotlib
-h5py==2.10.0

@@ -23,16 +23,37 @@ SmartAmpProAudioProcessor::SmartAmpProAudioProcessor()
 #endif
         .withOutput("Output", AudioChannelSet::stereo(), true)
 #endif
-    )
+    ),
+    treeState(*this, nullptr, "PARAMETER", { std::make_unique<AudioParameterFloat>(GAIN_ID, GAIN_NAME, NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.5f),
+                        std::make_unique<AudioParameterFloat>(BASS_ID, BASS_NAME, NormalisableRange<float>(-8.0f, 8.0f, 0.01f), 0.0f),
+                        std::make_unique<AudioParameterFloat>(MID_ID, MID_NAME, NormalisableRange<float>(-8.0f, 8.0f, 0.01f), 0.0f),
+                        std::make_unique<AudioParameterFloat>(TREBLE_ID, TREBLE_NAME, NormalisableRange<float>(-8.0f, 8.0f, 0.01f), 0.0f),
+                        std::make_unique<AudioParameterFloat>(PRESENCE_ID, PRESENCE_NAME, NormalisableRange<float>(-8.0f, 8.0f, 0.01f), 0.0f),
+                        std::make_unique<AudioParameterFloat>(MASTER_ID, MASTER_NAME, NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.5f) })
+
 
 #endif
 {
     setupDataDirectories();
-    installPythonScripts();
+    installTones();
     resetDirectory(userAppDataDirectory_tones);
     if (jsonFiles.size() > 0) {
         loadConfig(jsonFiles[current_model_index]);
     }
+
+    gainParam = treeState.getRawParameterValue (GAIN_ID);
+    bassParam = treeState.getRawParameterValue (BASS_ID);
+    midParam = treeState.getRawParameterValue (MID_ID);
+    trebleParam = treeState.getRawParameterValue (TREBLE_ID);
+    presenceParam = treeState.getRawParameterValue (PRESENCE_ID);
+    masterParam = treeState.getRawParameterValue (MASTER_ID);
+
+    auto bassValue = static_cast<float> (bassParam->load());
+    auto midValue = static_cast<float> (midParam->load());
+    auto trebleValue = static_cast<float> (trebleParam->load());
+    auto presenceValue = static_cast<float> (presenceParam->load());
+
+    eq4band.setParameters(bassValue, midValue, trebleValue, presenceValue);
 }
 
 SmartAmpProAudioProcessor::~SmartAmpProAudioProcessor()
@@ -147,10 +168,15 @@ void SmartAmpProAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
     const int numSamples = buffer.getNumSamples();
     const int numInputChannels = getTotalNumInputChannels();
 
+    auto ampDrive = static_cast<float> (gainParam->load());
+    auto bassValue = static_cast<float> (bassParam->load());
+    auto midValue = static_cast<float> (midParam->load());
+    auto trebleValue = static_cast<float> (trebleParam->load());
+    auto presenceValue = static_cast<float> (presenceParam->load());
+    auto ampMaster = static_cast<float> (masterParam->load());
+
     // Amp =============================================================================
     if (amp_state == 1) {
-        //    EQ (Presence, Bass, Mid, Treble)
-        eq4band.process(buffer.getReadPointer(0), buffer.getWritePointer(0), midiMessages, numSamples, numInputChannels);
 
         buffer.applyGain(ampDrive);
 
@@ -158,6 +184,10 @@ void SmartAmpProAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBu
         if (model_loaded == 1) {
             LSTM.process(buffer.getReadPointer(0), buffer.getWritePointer(0), numSamples);
         }
+
+        //    EQ (Presence, Bass, Mid, Treble)
+        eq4band.process(buffer.getReadPointer(0), buffer.getWritePointer(0), midiMessages, numSamples, numInputChannels);
+
 
         //    Master Volume 
         buffer.applyGain(ampMaster);
@@ -185,12 +215,30 @@ void SmartAmpProAudioProcessor::getStateInformation (MemoryBlock& destData)
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
+    auto state = treeState.copyState();
+    std::unique_ptr<XmlElement> xml (state.createXml());
+    xml->setAttribute ("amp_state", amp_state);
+
+    copyXmlToBinary (*xml, destData);
 }
 
 void SmartAmpProAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+    std::unique_ptr<juce::XmlElement> xmlState (getXmlFromBinary (data, sizeInBytes));
+
+    if (xmlState.get() != nullptr)
+    {
+        if (xmlState->hasTagName (treeState.state.getType()))
+        {
+            treeState.replaceState (juce::ValueTree::fromXml (*xmlState));
+            amp_state = xmlState->getBoolAttribute ("amp_state");
+
+            if (auto* editor = dynamic_cast<WaveNetVaAudioProcessorEditor*> (getActiveEditor()))
+                editor->resetImages();
+        }
+    }
 }
 
 void SmartAmpProAudioProcessor::loadConfig(File configFile)
@@ -237,10 +285,10 @@ void SmartAmpProAudioProcessor::setupDataDirectories()
     // User app data directory
     File userAppDataTempFile = userAppDataDirectory.getChildFile("tmp.pdl");
 
-    File userAppDataTempFile_captures = userAppDataDirectory_captures.getChildFile("tmp.pdl");
-    File userAppDataTempFile_install = userAppDataDirectory_install.getChildFile("tmp.pdl");
+    //File userAppDataTempFile_captures = userAppDataDirectory_captures.getChildFile("tmp.pdl");
+    //File userAppDataTempFile_install = userAppDataDirectory_install.getChildFile("tmp.pdl");
     File userAppDataTempFile_tones = userAppDataDirectory_tones.getChildFile("tmp.pdl");
-    File userAppDataTempFile_training = userAppDataDirectory_training.getChildFile("tmp.pdl");
+    //File userAppDataTempFile_training = userAppDataDirectory_training.getChildFile("tmp.pdl");
 
     // Create (and delete) temp file if necessary, so that user doesn't have
     // to manually create directories
@@ -251,19 +299,6 @@ void SmartAmpProAudioProcessor::setupDataDirectories()
         userAppDataTempFile.deleteFile();
     }
 
-    if (!userAppDataDirectory_captures.exists()) {
-        userAppDataTempFile_captures.create();
-    }
-    if (userAppDataTempFile_captures.existsAsFile()) {
-        userAppDataTempFile_captures.deleteFile();
-    }
-
-    if (!userAppDataDirectory_install.exists()) {
-        userAppDataTempFile_install.create();
-    }
-    if (userAppDataTempFile_install.existsAsFile()) {
-        userAppDataTempFile_install.deleteFile();
-    }
 
     if (!userAppDataDirectory_tones.exists()) {
         userAppDataTempFile_tones.create();
@@ -272,18 +307,12 @@ void SmartAmpProAudioProcessor::setupDataDirectories()
         userAppDataTempFile_tones.deleteFile();
     }
 
-    if (!userAppDataDirectory_training.exists()) {
-        userAppDataTempFile_training.create();
-    }
-    if (userAppDataTempFile_training.existsAsFile()) {
-        userAppDataTempFile_training.deleteFile();
-    }
-
+ 
     // Add the tones directory and update tone list
     addDirectory(userAppDataDirectory_tones);
 }
 
-void SmartAmpProAudioProcessor::installPythonScripts()
+void SmartAmpProAudioProcessor::installTones()
 //====================================================================
 // Description: Checks that the python scripts and default tones
 //  are installed to the SmartAmpPro directory, and if not, 
@@ -291,9 +320,6 @@ void SmartAmpProAudioProcessor::installPythonScripts()
 //
 //====================================================================
 {
-    // Python model training scripts
-    File train_script = userAppDataDirectory_training.getFullPathName() + "/train.py";
-    File plot_script = userAppDataDirectory_training.getFullPathName() + "/plot.py";
 
     // Default tones
     File ts9_tone = userAppDataDirectory_tones.getFullPathName() + "/CompressedOverdrive.json";
@@ -303,31 +329,10 @@ void SmartAmpProAudioProcessor::installPythonScripts()
     File cbs_tone = userAppDataDirectory_tones.getFullPathName() + "/ClearBlueSky.json";
 
     // Python dependency installation scripts
-    File install_req_windows = userAppDataDirectory_install.getFullPathName() + "/install_requirements.bat";
-    File install_req_mac = userAppDataDirectory_install.getFullPathName() + "/install_requirements.sh";
-    File req = userAppDataDirectory_install.getFullPathName() + "/requirements.txt";
+    //File install_req_windows = userAppDataDirectory_install.getFullPathName() + "/install_requirements.bat";
+    //File install_req_mac = userAppDataDirectory_install.getFullPathName() + "/install_requirements.sh";
+    //File req = userAppDataDirectory_install.getFullPathName() + "/requirements.txt";
 
-
-    if (train_script.existsAsFile() == false) {
-        std::string string_command = train_script.getFullPathName().toStdString();
-        const char* char_train_script = &string_command[0];
-
-        std::ofstream myfile;
-        myfile.open(char_train_script);
-        myfile << BinaryData::train_py;
-
-        myfile.close();
-    }
-    if (plot_script.existsAsFile() == false) {
-        std::string string_command = plot_script.getFullPathName().toStdString();
-        const char* char_plot_script = &string_command[0];
-
-        std::ofstream myfile;
-        myfile.open(char_plot_script);
-        myfile << BinaryData::plot_py;
-
-        myfile.close();
-    }
     if (ts9_tone.existsAsFile() == false) {
         std::string string_command = ts9_tone.getFullPathName().toStdString();
         const char* char_ts9_tone = &string_command[0];
@@ -378,73 +383,14 @@ void SmartAmpProAudioProcessor::installPythonScripts()
 
         myfile.close();
     }
-    if (install_req_windows.existsAsFile() == false) {
-        std::string string_command = install_req_windows.getFullPathName().toStdString();
-        const char* char_windows = &string_command[0];
-
-        std::ofstream myfile;
-        myfile.open(char_windows);
-        myfile << BinaryData::install_requirements_bat;
-
-        myfile.close();
-    }
-    if (install_req_mac.existsAsFile() == false) {
-        std::string string_command = install_req_mac.getFullPathName().toStdString();
-        const char* char_mac = &string_command[0];
-
-        std::ofstream myfile;
-        myfile.open(char_mac);
-        myfile << BinaryData::install_requirements_sh;
-
-        myfile.close();
-    }
-    if (req.existsAsFile() == false) {
-        std::string string_command = req.getFullPathName().toStdString();
-        const char* char_req = &string_command[0];
-
-        std::ofstream myfile;
-        myfile.open(char_req);
-        myfile << BinaryData::requirements_txt;
-
-        myfile.close();
-    }
 }
 
-float SmartAmpProAudioProcessor::convertLogScale(float in_value, float x_min, float x_max, float y_min, float y_max)
-{
-    float b = log(y_max / y_min) / (x_max - x_min);
-    float a = y_max / exp(b * x_max);
-    float converted_value = a * exp(b * in_value);
-    return converted_value;
-}
-
-void SmartAmpProAudioProcessor::set_ampDrive(float db_ampDrive)
-{
-    ampDrive = decibelToLinear(db_ampDrive);
-    ampGainKnobState = db_ampDrive;
-}
-
-void SmartAmpProAudioProcessor::set_ampMaster(float db_ampMaster)
-{
-    ampMasterKnobState = db_ampMaster;
-    if (db_ampMaster == -36.0) {
-        ampMaster = decibelToLinear(-100.0);
-    } else {
-        ampMaster = decibelToLinear(db_ampMaster);
-    }
-}
 
 void SmartAmpProAudioProcessor::set_ampEQ(float bass_slider, float mid_slider, float treble_slider, float presence_slider)
 {
     eq4band.setParameters(bass_slider, mid_slider, treble_slider, presence_slider);
-
-    ampPresenceKnobState = presence_slider;
 }
 
-float SmartAmpProAudioProcessor::decibelToLinear(float dbValue)
-{
-    return powf(10.0, dbValue/20.0);
-}
 
 //==============================================================================
 // This creates new instances of the plugin..

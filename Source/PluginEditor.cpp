@@ -50,34 +50,6 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     loadButton.setColour(juce::Label::textColourId, juce::Colours::black);
     loadButton.addListener(this);
 
-    addAndMakeVisible(exportButton);
-    exportButton.setButtonText("Export Tone");
-    exportButton.setColour(juce::Label::textColourId, juce::Colours::black);
-    exportButton.addListener(this);
-
-    addAndMakeVisible(recordButton);
-    recordButton.setButtonText("Start Capture");
-    recordButton.setColour(juce::Label::textColourId, juce::Colours::black);
-    recordButton.addListener(this);
-
-    addAndMakeVisible(trainButton);
-    trainButton.setButtonText("Train Tone");
-    trainButton.setColour(juce::Label::textColourId, juce::Colours::black);
-    trainButton.addListener(this);
-    
-    addAndMakeVisible(timerLabel);
-    timerLabel.setText(minutes + ":" + seconds, juce::NotificationType::dontSendNotification);
-    timerLabel.setJustificationType(juce::Justification::horizontallyCentred);
-    timerLabel.setColour(juce::Label::textColourId, juce::Colours::black);
-    timerLabel.setFont(juce::Font(20.0f, juce::Font::bold));
-    timerLabel.setVisible(0);
-
-    addAndMakeVisible(helpLabel);
-    helpLabel.setText("", juce::NotificationType::dontSendNotification);
-    helpLabel.setJustificationType(juce::Justification::topLeft);
-    helpLabel.setColour(juce::Label::textColourId, juce::Colours::black);
-    helpLabel.setFont(juce::Font(18.0f, juce::Font::bold));
-    helpLabel.setVisible(1);
 
     addAndMakeVisible(ampLED);
     ampLED.setImages(true, true, true,
@@ -87,28 +59,18 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
         0.0);
     ampLED.addListener(this);
 
-    addAndMakeVisible(progressCircle);
-    progressCircle.setEnabled(false);
-    progressCircle.setLookAndFeel(&statusKnob);
-    progressCircle.addListener(this);
-    progressCircle.setRange(0.0, 100.0);
-    progressCircle.setValue(progressValue);
-    progressCircle.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    progressCircle.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, false, 75, 20);
-    progressCircle.setColour(juce::Label::textColourId, juce::Colours::deepskyblue);
-    progressCircle.setRotaryParameters(3.14, 9.42, true);
-    progressCircle.setNumDecimalPlacesToDisplay(1);
-
+    presenceSliderAttach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, PRESENCE_ID, ampPresenceKnob);
     addAndMakeVisible(ampPresenceKnob);
     ampPresenceKnob.setLookAndFeel(&ampSilverKnobLAF);
     ampPresenceKnob.addListener(this);
-    ampPresenceKnob.setRange(-10.0, 10.0);
+    //ampPresenceKnob.setRange(-10.0, 10.0);
     ampPresenceKnob.setValue(processor.ampPresenceKnobState);
     ampPresenceKnob.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
     ampPresenceKnob.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, false, 75, 20);
     ampPresenceKnob.setNumDecimalPlacesToDisplay(1);
     ampPresenceKnob.setDoubleClickReturnValue(true, 0.0);
 
+    bassSliderAttach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, BASS_ID, ampBassKnob); 
     addAndMakeVisible(ampBassKnob);
     ampBassKnob.setLookAndFeel(&ampSilverKnobLAF);
     ampBassKnob.addListener(this);
@@ -119,6 +81,7 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     ampBassKnob.setNumDecimalPlacesToDisplay(1);
     ampBassKnob.setDoubleClickReturnValue(true, 0.0);
 
+    midSliderAttach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, MID_ID, ampMidKnob);   
     addAndMakeVisible(ampMidKnob);
     ampMidKnob.setLookAndFeel(&ampSilverKnobLAF);
     ampMidKnob.addListener(this);
@@ -129,6 +92,7 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     ampMidKnob.setNumDecimalPlacesToDisplay(1);
     ampMidKnob.setDoubleClickReturnValue(true, 0.0);
 
+    trebleSliderAttach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, TREBLE_ID, ampTrebleKnob);
     addAndMakeVisible(ampTrebleKnob);
     ampTrebleKnob.setLookAndFeel(&ampSilverKnobLAF);
     ampTrebleKnob.addListener(this);
@@ -139,6 +103,7 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     ampTrebleKnob.setNumDecimalPlacesToDisplay(1);
     ampTrebleKnob.setDoubleClickReturnValue(true, 0.0);
 
+    gainSliderAttach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, GAIN_ID, ampGainKnob);
     addAndMakeVisible(ampGainKnob);
     ampGainKnob.setLookAndFeel(&ampSilverKnobLAF);
     ampGainKnob.addListener(this);
@@ -149,6 +114,7 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     ampGainKnob.setNumDecimalPlacesToDisplay(1);
     ampGainKnob.setDoubleClickReturnValue(true, 0.0);
 
+    masterSliderAttach = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.treeState, MASTER_ID, ampMasterKnob);
     addAndMakeVisible(ampMasterKnob);
     ampMasterKnob.setLookAndFeel(&ampSilverKnobLAF);
     ampMasterKnob.addListener(this);
@@ -159,16 +125,32 @@ SmartAmpProAudioProcessorEditor::SmartAmpProAudioProcessorEditor (SmartAmpProAud
     ampMasterKnob.setNumDecimalPlacesToDisplay(1);
     ampMasterKnob.setDoubleClickReturnValue(true, -12.0);
 
+    addAndMakeVisible(versionLabel);
+    versionLabel.setText("v1.0", juce::NotificationType::dontSendNotification);
+    versionLabel.setJustificationType(juce::Justification::left);
+    versionLabel.setColour(juce::Label::textColourId, juce::Colours::black);
+    auto font = versionLabel.getFont();
+    float height = font.getHeight();
+    font.setHeight(height); // 0.75
+    versionLabel.setFont(font);
+
     // Size of plugin GUI
     setSize(694, 376);
 
     // Set current plugin skin
     setSkin();
+    resetImages();
 
 }
 
 SmartAmpProAudioProcessorEditor::~SmartAmpProAudioProcessorEditor()
 {
+    ampBassKnob.setLookAndFeel(nullptr);
+    ampMidKnob.setLookAndFeel(nullptr);
+    ampTrebleKnob.setLookAndFeel(nullptr);
+    ampGainKnob.setLookAndFeel(nullptr);
+    ampPresenceKnob.setLookAndFeel(nullptr);
+    ampMasterKnob.setLookAndFeel(nullptr);
 }
 
 //==============================================================================
@@ -201,10 +183,7 @@ void SmartAmpProAudioProcessorEditor::paint (Graphics& g)
             g.drawImage(background_orig_off, ClipRect.getX(), ClipRect.getY(), ClipRect.getWidth(), ClipRect.getHeight(), ClipRect.getX(), ClipRect.getY(), ClipRect.getWidth(), ClipRect.getHeight());
         }
     }
-    //g.drawImageAt(background, 0, 0);
 
-    //g.setColour (Colours::white);
-    //g.setFont (15.0f);
 }
 
 void SmartAmpProAudioProcessorEditor::resized()
@@ -212,13 +191,9 @@ void SmartAmpProAudioProcessorEditor::resized()
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
     modelSelect.setBounds(15, 10, 210, 25);
-    recordButton.setBounds(575, 10, 100, 25);
-    trainButton.setBounds(575, 42, 100, 25);
-    timerLabel.setBounds(489, 29, 70, 25);
-    helpLabel.setBounds(236, 10, 255, 65);
-    loadButton.setBounds(15, 42, 100, 25);
-    exportButton.setBounds(125, 42, 100, 25);
-    progressCircle.setBounds(480, 8, 90, 70);
+
+    loadButton.setBounds(15, 42, 300, 25);
+
 
     // Amp Widgets
     ampPresenceKnob.setBounds(445, 242, 55, 75);
@@ -230,6 +205,7 @@ void SmartAmpProAudioProcessorEditor::resized()
 
     ampOnButton.setBounds(54, 259, 15, 25);
     ampLED.setBounds(636, 240, 15, 15);
+    versionLabel.setBounds(675, 362, 60, 10);
 }
 
 void SmartAmpProAudioProcessorEditor::modelSelectChanged()
@@ -243,17 +219,23 @@ void SmartAmpProAudioProcessorEditor::modelSelectChanged()
 
 void SmartAmpProAudioProcessorEditor::loadButtonClicked()
 {
-    FileChooser chooser("Select one or more .json tone files to import",
-        {},
-        "*.json");
-    if (chooser.browseForMultipleFilesToOpen())
+    myChooser = std::make_unique<FileChooser> ("Select a folder to load models from",
+                                               processor.folder,
+                                               "*.json");
+ 
+    auto folderChooserFlags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles;
+ 
+    myChooser->launchAsync (folderChooserFlags, [this] (const FileChooser& chooser)                
     {
-        int import_fail = 1;
+        if (!chooser.getResult().exists()) {
+                return;
+        }
+        
         Array<File> files = chooser.getResults();
         for (auto file : files) {
             File fullpath = processor.userAppDataDirectory_tones.getFullPathName() + "/" + file.getFileName();
             bool b = fullpath.existsAsFile();
-            if (b == false) {
+            if (fullpath.existsAsFile() == false) {
 
                 processor.loadConfig(file);
                 fname = file.getFileName();
@@ -267,64 +249,14 @@ void SmartAmpProAudioProcessorEditor::loadButtonClicked()
                     modelSelect.addItem(file.getFileNameWithoutExtension(), processor.jsonFiles.size() + 1);
                     modelSelect.setSelectedItemIndex(processor.jsonFiles.size(), juce::NotificationType::dontSendNotification);
                     processor.jsonFiles.push_back(file);
-                    if (files.size() == 1) {
-                        helpLabel.setText("Tone file imported:\n" + file.getFileNameWithoutExtension(), juce::NotificationType::dontSendNotification);
-                    }
-                } else {
-                    helpLabel.setText("Tone file could not\nbe imported.", juce::NotificationType::dontSendNotification);
-                    import_fail = 0;
-                }
-            } else {
-                helpLabel.setText("Tone with same name\nexists: " + file.getFileNameWithoutExtension(), juce::NotificationType::dontSendNotification);
-            }
-            if (import_fail == 0 && files.size() > 1) {
-                helpLabel.setText("At least one file could\nnot be imported.", juce::NotificationType::dontSendNotification);
-            } else if (import_fail == 1 && files.size() > 1) {
-                helpLabel.setText("Tones successfully imported.", juce::NotificationType::dontSendNotification);
-            }
-        }
+
+            processor.folder = file.getParentDirectory();
+        } 
+        
     }
 }
 
-void SmartAmpProAudioProcessorEditor::exportButtonClicked()
-{
-    int export_fail = 1;
-    FileChooser chooser("Select one or more .json tone files to export",
-        processor.userAppDataDirectory_tones,
-        "*.json");
-    FileChooser chooser2("Select directory to export tone files to",
-        File::getSpecialLocation(File::userDesktopDirectory),
-        "*.json");
-    if (chooser.browseForMultipleFilesToOpen())
-    {
-        if (chooser2.browseForDirectory()) {
-            Array<File> files = chooser.getResults();
-            File directory = chooser2.getResult();
-            for (auto file : files) {
-                File fullpath = directory.getFullPathName() + "/" + file.getFileName();
-                bool b = fullpath.existsAsFile();
-                if (b == false) {
-                    // Copy selected file from model directory to chosen directory
-                    bool a = file.copyFileTo(fullpath);
-                    if (a == false) {
-                        helpLabel.setText("Tone file could not be exported.", juce::NotificationType::dontSendNotification);
-                        export_fail = 0;
-                    } else if (files.size() == 1) {
-                        helpLabel.setText("Tone file exported:\n" + file.getFileNameWithoutExtension(), juce::NotificationType::dontSendNotification);
-                    }
-                } else {
-                    helpLabel.setText("File with same name exists.\n Could not export.", juce::NotificationType::dontSendNotification);
-                }
-            }
-            if (export_fail == 0 && files.size() > 1) {
-                helpLabel.setText("At least one file could\nnot be exported.", juce::NotificationType::dontSendNotification);
-            }
-            else if (export_fail == 1 && files.size() > 1) {
-                helpLabel.setText("Tones successfully exported.", juce::NotificationType::dontSendNotification);
-            }
-        }
-    }
-}
+
 
 void SmartAmpProAudioProcessorEditor::buttonClicked(juce::Button* button)
 {
@@ -400,149 +332,6 @@ void SmartAmpProAudioProcessorEditor::ampOnButtonClicked() {
     repaint();
 }
 
-void SmartAmpProAudioProcessorEditor::recordButtonClicked() {
-    if (training == 1) {
-        helpLabel.setText("Can't record while training.", juce::NotificationType::dontSendNotification);
-        return;
-    }
-    //File userAppDataDirectory2 = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile(JucePlugin_Manufacturer).getChildFile(JucePlugin_Name);
-    if (processor.recording == 0) {
-        FileChooser chooser("Enter a descriptive tone name (NO SPACES IN NAME)",
-            processor.userAppDataDirectory_captures,
-            "*.wav");
-        if (chooser.browseForFileToSave(false))  // TODO Overwriting existing file seems to lock up the plugin - fix
-        {
-            File file = chooser.getResult(); // TODO: Fix to handle spaces in filename
-            record_file = file.getFileName();
-
-            processor.recording = 1;
-            recordButton.setColour(TextButton::buttonColourId, Colours::red);
-            recordButton.setButtonText("Stop Capture");
-            timerLabel.setText(minutes + ":0" + seconds, juce::NotificationType::dontSendNotification);
-            timerLabel.setVisible(1);
-            timer_start();
-            helpLabel.setText("Ensure input is on Channel 1 and target is on Channel 2", juce::NotificationType::dontSendNotification);
-            progressValue = 100.0;
-            progressCircle.setValue(progressValue, juce::NotificationType::dontSendNotification);
-        }
-
-    }
-    else {
-        processor.audio_recorder.stopRecording();
-        processor.recording = 0;
-        recordButton.setColour(TextButton::buttonColourId, Colours::black);
-        recordButton.setButtonText("Start Capture");
-        timerLabel.setText(minutes + ":" + seconds, juce::NotificationType::dontSendNotification);
-        timer_stop();
-        timerLabel.setText("", juce::NotificationType::dontSendNotification);
-        minutes = "";
-        seconds = "10";
-        helpLabel.setText("Capture ended.", juce::NotificationType::dontSendNotification);
-        progressValue = 0.0;
-        progressCircle.setValue(progressValue, juce::NotificationType::dontSendNotification);
-    }
-}
-
-void SmartAmpProAudioProcessorEditor::trainButtonClicked() 
-{
-    if (processor.recording == 1) {
-        helpLabel.setText("Can't train while recording.", juce::NotificationType::dontSendNotification);
-        return;
-    } else if (training == 1) {
-        training = 0;
-        timer_stop();
-        helpLabel.setText("Training halted.", juce::NotificationType::dontSendNotification);
-        trainButton.setColour(TextButton::buttonColourId, Colours::black);
-        trainButton.setButtonText("Train Tone");
-        progressValue = 0.0;
-        progressCircle.setValue(progressValue, juce::NotificationType::dontSendNotification);
-        timerLabel.setText("", juce::NotificationType::dontSendNotification);
-        return;
-    }
-
-    FileChooser chooser("Select recorded .wav sample for tone training",
-        processor.userAppDataDirectory_captures,
-        "*.wav");
-    if (chooser.browseForMultipleFilesToOpen())
-    {
-        Array<File> files = chooser.getResults();
-   
-        File fullpath = processor.userAppDataDirectory_training.getFullPathName();
-        File train_script = processor.userAppDataDirectory_training.getFullPathName() + "/train.py";
-
-        bool b = train_script.existsAsFile();
-        if (b == true) {
-            File file = files[0]; // TODO: Fix to handle spaces in filename
-            File file2;
-            
-            std::string string_command = "";
-
-            // Generate run script based on platform
-            #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-            //Windows (32-bit and 64-bit)
-            if (files.size() > 1) {
-                file2 = files[1];
-                // TODO: Currently the two selected files will be in alphabetical order, so the first will be input, second is output. Better way to handle?
-                model_folder = processor.userAppDataDirectory.getFullPathName().toStdString() + "/models/" + file2.getFileNameWithoutExtension().toStdString();
-                test_file = processor.userAppDataDirectory_tones.getFullPathName().toStdString() + "/" + file2.getFileNameWithoutExtension().toStdString() + ".json";
-                string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "echo python train.py " + file.getFullPathName().toStdString() + " " + file2.getFileNameWithoutExtension().toStdString() + " --out_file=" + file2.getFullPathName().toStdString() + " > run.bat && start /min run.bat && exit";
-            }
-            else {
-                model_folder = processor.userAppDataDirectory.getFullPathName().toStdString() + "/models/" + file.getFileNameWithoutExtension().toStdString();
-                test_file = processor.userAppDataDirectory_tones.getFullPathName().toStdString() + "/" + file.getFileNameWithoutExtension().toStdString() + ".json";
-                string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "echo python train.py " + file.getFullPathName().toStdString() + " " + file.getFileNameWithoutExtension().toStdString() + " > run.bat && start /min run.bat && exit";
-            }
-
-            #elif __APPLE__
-            if (files.size() > 1) {
-                file2 = files[1];
-                // TODO: Currently the two selected files will be in alphabetical order, so the first will be input, second is output. Better way to handle?
-                model_folder = processor.userAppDataDirectory.getFullPathName().toStdString() + "/models/" + file2.getFileNameWithoutExtension().toStdString();
-                test_file = processor.userAppDataDirectory_tones.getFullPathName().toStdString() + "/" + file2.getFileNameWithoutExtension().toStdString() + ".json";
-                string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "echo python train.py " + file.getFullPathName().toStdString() + " " + file2.getFileNameWithoutExtension().toStdString() + " --out_file=" + file2.getFullPathName().toStdString() + " > run.sh && chmod 775 *  && ./run.sh&";
-            }
-            else {
-                model_folder = processor.userAppDataDirectory.getFullPathName().toStdString() + "/models/" + file.getFileNameWithoutExtension().toStdString();
-                test_file = processor.userAppDataDirectory_tones.getFullPathName().toStdString() + "/" + file.getFileNameWithoutExtension().toStdString() + ".json";
-                string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "echo python train.py " + file.getFullPathName().toStdString() + " " + file.getFileNameWithoutExtension().toStdString() + " > run.sh && chmod 775 * && ./run.sh&";
-            }
-            #elif __linux__
-            if (files.size() > 1) {
-                file2 = files[1];
-                // TODO: Currently the two selected files will be in alphabetical order, so the first will be input, second is output. Better way to handle?
-                model_folder = processor.userAppDataDirectory.getFullPathName().toStdString() + "/models/" + file2.getFileNameWithoutExtension().toStdString();
-                test_file = processor.userAppDataDirectory_tones.getFullPathName().toStdString() + "/" + file2.getFileNameWithoutExtension().toStdString() + ".json";
-                string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "echo python train.py " + file.getFullPathName().toStdString() + " " + file2.getFileNameWithoutExtension().toStdString() + " --out_file=" + file2.getFullPathName().toStdString() + " > run.sh && chmod 775 *  && ./run.sh&";
-            }
-            else {
-                model_folder = processor.userAppDataDirectory.getFullPathName().toStdString() + "/models/" + file.getFileNameWithoutExtension().toStdString();
-                test_file = processor.userAppDataDirectory_tones.getFullPathName().toStdString() + "/" + file.getFileNameWithoutExtension().toStdString() + ".json";
-                string_command = "cd " + fullpath.getFullPathName().toStdString() + " && " + "echo python train.py " + file.getFullPathName().toStdString() + " " + file.getFileNameWithoutExtension().toStdString() + " > run.sh && chmod 775 * && ./run.sh&";
-            }
-            #else
-            #   error "Unknown compiler"
-            #endif
-
-
-            if (test_file.existsAsFile()) {
-                helpLabel.setText("\"" + test_file.getFileNameWithoutExtension().toStdString() + "\" tone already exists.", juce::NotificationType::dontSendNotification);
-            } else if (model_folder.exists()) {
-                helpLabel.setText("\""+ test_file.getFileNameWithoutExtension().toStdString() + "\" model folder already exists. Remove folder or choose a new name.", juce::NotificationType::dontSendNotification);
-            } else {
-                // Attempt to run train.py
-                setTrainingStatus(0);
-                const char* char_command = &string_command[0];
-                system(char_command); // call to training program
-                training = 1;
-                timer_start();
-                trainButton.setColour(TextButton::buttonColourId, Colours::red);
-                trainButton.setButtonText("Stop Training");
-            }
-        } else {
-            helpLabel.setText("Error: Could not locate training script.", juce::NotificationType::dontSendNotification);
-        }
-    }
-}
 
 void SmartAmpProAudioProcessorEditor::sliderValueChanged(Slider* slider)
 {
@@ -563,159 +352,6 @@ void SmartAmpProAudioProcessorEditor::sliderValueChanged(Slider* slider)
     }
 }
 
-
-void SmartAmpProAudioProcessorEditor::timer_start()
-{
-    startTimer(1000);
-}
-
-void SmartAmpProAudioProcessorEditor::timer_stop()
-{
-    stopTimer();
-    t = 190;
-}
-
-void SmartAmpProAudioProcessorEditor::setTrainingStatus(int status) {
-    std::ifstream infile(processor.userAppDataDirectory_training.getFullPathName().toStdString() + "/status.txt");
-    int a = 0;
-    int b = 0;
-    int accuracy = 0.0;
-    while (infile >> a >> b)
-    {
-        accuracy = b;
-    }
-    std::ofstream outfile;
-    outfile.open(processor.userAppDataDirectory_training.getFullPathName().toStdString() + "/status.txt", std::ofstream::trunc);
-    outfile << std::to_string(status) + " " + std::to_string(accuracy);
-    outfile.close();
-    progressValue = 0.0;
-    progressCircle.setValue(progressValue, juce::NotificationType::dontSendNotification);
-    timerLabel.setText("", juce::NotificationType::dontSendNotification);
-}
-
-void SmartAmpProAudioProcessorEditor::timerCallback()
-{
-    // Check if timer is for Training
-    if (training == 1) {
-        timerLabel.setVisible(1);
-        timerLabel.setText("0%", juce::NotificationType::dontSendNotification);
-        std::ifstream infile(processor.userAppDataDirectory_training.getFullPathName().toStdString() + "/status.txt");
-        int a;
-        int b;
-        while (infile >> a >> b)
-        {
-            helpLabel.setText(std::to_string(a) + " status", juce::NotificationType::dontSendNotification);
-            if (a < 100) {
-                helpLabel.setText("Training Tone: " + test_file.getFileNameWithoutExtension().toStdString(), juce::NotificationType::dontSendNotification);
-                // A simple way to keep the progress bar moving
-                int currentValue = progressCircle.getValue();
-                if (currentValue < a - 15 ) {
-                    currentValue = a;
-                } else if (currentValue < a + 15 && currentValue < 100) {
-                    currentValue += 1;
-                }
-                progressCircle.setValue(currentValue, juce::NotificationType::dontSendNotification);
-                timerLabel.setText(std::to_string(currentValue) + "%", juce::NotificationType::dontSendNotification);
-                return;
-            }
-            else {
-                progressCircle.setValue(100, juce::NotificationType::dontSendNotification);
-                timerLabel.setText(std::to_string(100) + "%", juce::NotificationType::dontSendNotification);
-                timer_stop();
-                training = 0;
-                trainButton.setColour(TextButton::buttonColourId, Colours::black);
-                trainButton.setButtonText("Train Tone");
-                // Run this after model has been generated
-                processor.resetDirectory(processor.userAppDataDirectory_tones);
-                modelSelect.clear();
-                int c = 1;
-                for (const auto& jsonFile : processor.jsonFiles) {
-                    modelSelect.addItem(jsonFile.getFileName(), c);
-                    c += 1;
-                }
-                modelSelect.setSelectedItemIndex(0, juce::NotificationType::dontSendNotification);
-
-                // Check that a .json tone was generated, and if not, notify user through helpLabel
-                if (test_file.existsAsFile() == false) {
-                    helpLabel.setText("Failed to create new tone.", juce::NotificationType::dontSendNotification);
-                }
-                else {
-                    helpLabel.setText("New Tone Created: " + test_file.getFileNameWithoutExtension().toStdString() + "\nAccuracy: " + std::to_string(b) + "%", juce::NotificationType::dontSendNotification);
-                }
-            }
-        }
-        if (training == 0) {
-            setTrainingStatus(0);
-        }
-    // else run timer for Recording
-    } else {
-        t -= 1;
-        seconds = std::to_string(t % 60);
-        minutes = std::to_string(t / 60);
-        if (t > 180) {
-            minutes = "";
-            seconds = std::to_string(std::abs(t - 180));
-        }
-        else if (t == 180) {
-            processor.audio_recorder.setRecordName(record_file);
-            processor.audio_recorder.startRecording();
-            helpLabel.setText("Begin 3 minutes of \nguitar playing!", juce::NotificationType::dontSendNotification);
-        }
-
-        if (t % 60 < 10) {
-            seconds = "0" + seconds;
-        }
-
-        timerLabel.setText(minutes + ":" + seconds, juce::NotificationType::dontSendNotification);
-        if (t < 1) {
-            timer_stop();
-            processor.audio_recorder.stopRecording();
-            processor.recording = 0;
-            recordButton.setColour(TextButton::buttonColourId, Colours::black);
-            recordButton.setButtonText("Start Capture");
-            timer_stop();
-            timerLabel.setText(":10", juce::NotificationType::dontSendNotification);
-            t = 190;
-            helpLabel.setText("Tone Capture Complete.\nClick \"Train Tone\"", juce::NotificationType::dontSendNotification);
-            minutes = "";
-            seconds = "10";
-            progressValue = 0.0;
-            progressCircle.setValue(progressValue, juce::NotificationType::dontSendNotification);
-            timerLabel.setText("", juce::NotificationType::dontSendNotification);
-        }
-        else if (t == 170) {
-            helpLabel.setText("Play some chords", juce::NotificationType::dontSendNotification);
-        }
-        else if (t == 150) {
-            helpLabel.setText("Play some notes", juce::NotificationType::dontSendNotification);
-        }
-        else if (t == 130) {
-            helpLabel.setText("Play your favorite song", juce::NotificationType::dontSendNotification);
-        }
-        else if (t == 100) {
-            helpLabel.setText("Play quiet", juce::NotificationType::dontSendNotification);
-        }
-        else if (t == 80) {
-            helpLabel.setText("Play loud!", juce::NotificationType::dontSendNotification);
-        }
-        else if (t == 60) {
-            helpLabel.setText("Make some mistakes", juce::NotificationType::dontSendNotification);
-        }
-        else if (t == 50) {
-            helpLabel.setText("Play some high notes", juce::NotificationType::dontSendNotification);
-        }
-        else if (t == 30) {
-            helpLabel.setText("Play some low notes", juce::NotificationType::dontSendNotification);
-        }
-        else if (t == 10) {
-            helpLabel.setText("Almost done..\nLet it ring out!", juce::NotificationType::dontSendNotification);
-        }
-        if (t < 181 && t > 0) {
-            progressValue = t * 100 / 180;
-            progressCircle.setValue(progressValue, juce::NotificationType::dontSendNotification);
-        }
-    }
-}
 
 void SmartAmpProAudioProcessorEditor::resetImages()
 {
